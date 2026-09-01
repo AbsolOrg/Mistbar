@@ -1,28 +1,47 @@
 import app from "ags/gtk4/app"
 import style from "./styles/style.scss"
-import Bar from "./bar/Bar"
+import Bar, { setBarAutohide, getBarAutohide, getBarWindow } from "./bar/Bar"
 import { loadConfig, saveConfig, MistbarStyle, MistbarLook, MistbarTheme } from "./config"
 
 const config = loadConfig()
 
+function getWindow(): any {
+  return getBarWindow() || app.get_window("mistbar")
+}
+
 function applyStyleClass(win: any, newStyle: MistbarStyle) {
-  win.remove_css_class("style-glassy")
-  win.remove_css_class("style-transparent")
-  win.remove_css_class("style-solid")
-  win.add_css_class(`style-${newStyle}`)
+  if (!win) return
+  try {
+    win.remove_css_class("style-glassy")
+    win.remove_css_class("style-transparent")
+    win.remove_css_class("style-solid")
+    win.add_css_class(`style-${newStyle}`)
+  } catch (err) {
+    console.error("Error applying style class:", err)
+  }
 }
 
 function applyLookClass(win: any, newLook: MistbarLook) {
-  win.remove_css_class("look-pill")
-  win.remove_css_class("look-attached")
-  win.add_css_class(`look-${newLook}`)
+  if (!win) return
+  try {
+    win.remove_css_class("look-pill")
+    win.remove_css_class("look-attached")
+    win.add_css_class(`look-${newLook}`)
+  } catch (err) {
+    console.error("Error applying look class:", err)
+  }
 }
 
 function applyThemeClass(win: any, newTheme: MistbarTheme) {
-  if (newTheme === "light") {
-    win.add_css_class("light-theme")
-  } else {
-    win.remove_css_class("light-theme")
+  if (!win) return
+  try {
+    if (newTheme === "light") {
+      win.add_css_class("light-theme")
+    } else {
+      win.remove_css_class("light-theme")
+    }
+  } catch (err) {
+    console.error("Error applying theme class:", err)
   }
 }
 
@@ -31,16 +50,16 @@ app.start({
   css: style,
   requestHandler(args: string[], res: (response: string) => void) {
     const cmd = args.join(" ").trim()
+    const win = getWindow()
 
     if (cmd === "toggle") {
-      try {
-        app.toggle_window("mistbar")
+      if (win) {
+        win.visible = !win.visible
         res("toggled")
-      } catch {
+      } else {
         res("error: window not found")
       }
     } else if (cmd === "hide") {
-      const win = app.get_window("mistbar")
       if (win) {
         win.visible = false
         res("hidden")
@@ -48,16 +67,29 @@ app.start({
         res("error: window not found")
       }
     } else if (cmd === "show") {
-      const win = app.get_window("mistbar")
       if (win) {
         win.visible = true
+        setBarAutohide(false)
         res("shown")
       } else {
         res("error: window not found")
       }
+    } else if (cmd.startsWith("autohide:") || cmd === "autohide") {
+      const mode = cmd.replace("autohide:", "").trim()
+      let enabled = true
+      if (mode === "off" || mode === "false" || mode === "disable") {
+        enabled = false
+      } else if (mode === "toggle" || mode === "autohide") {
+        enabled = !getBarAutohide()
+      }
+      if (win) {
+        win.visible = true
+      }
+      setBarAutohide(enabled)
+      saveConfig({ autoHide: enabled })
+      res(`autohide set to ${enabled ? "on" : "off"}`)
     } else if (cmd.startsWith("theme:")) {
       const theme = cmd.replace("theme:", "").trim() as MistbarTheme
-      const win = app.get_window("mistbar")
       if (win) {
         applyThemeClass(win, theme)
         saveConfig({ theme })
@@ -67,7 +99,6 @@ app.start({
       }
     } else if (cmd.startsWith("style:")) {
       const styleName = cmd.replace("style:", "").trim() as MistbarStyle
-      const win = app.get_window("mistbar")
       if (win) {
         applyStyleClass(win, styleName)
         saveConfig({ style: styleName })
@@ -77,7 +108,6 @@ app.start({
       }
     } else if (cmd.startsWith("look:")) {
       const lookName = cmd.replace("look:", "").trim() as MistbarLook
-      const win = app.get_window("mistbar")
       if (win) {
         applyLookClass(win, lookName)
         saveConfig({ look: lookName })
@@ -86,8 +116,8 @@ app.start({
         res("error: window not found")
       }
     } else if (cmd === "status") {
-      const win = app.get_window("mistbar")
-      res(win && win.visible ? "running (visible)" : "running (hidden)")
+      const isVisible = win && (typeof win.get_visible === "function" ? win.get_visible() : win.visible)
+      res(isVisible ? "running (visible)" : "running (hidden)")
     } else {
       res(`unknown command: ${cmd}`)
     }
@@ -95,12 +125,16 @@ app.start({
   main() {
     const monitors = app.get_monitors()
     if (monitors.length > 0) {
-      const win = Bar(monitors[0], config)
-      if (win) {
-        applyThemeClass(win, config.theme || "dark")
-        applyStyleClass(win, config.style || "glassy")
-        applyLookClass(win, config.look || "pill")
+      for (const m of monitors) {
+        Bar(m, config)
       }
+    }
+
+    const win = getWindow()
+    if (win) {
+      applyThemeClass(win, config.theme || "dark")
+      applyStyleClass(win, config.style || "glassy")
+      applyLookClass(win, config.look || "pill")
     }
   },
 })

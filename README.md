@@ -74,6 +74,9 @@ mistbar start             # Start the bar
 mistbar stop              # Stop the bar
 mistbar restart           # Restart the bar
 mistbar toggle            # Toggle bar visibility (hide/show)
+mistbar auto-hide on      # Enable intelligent auto-hide (or mistbar --auto-hide)
+mistbar auto-hide off     # Disable auto-hide (or mistbar --always-visible)
+mistbar auto-hide toggle  # Toggle auto-hide state
 mistbar style glassy      # Switch to Frosted Liquid Glass (default)
 mistbar style transparent # Switch to 100% Transparent See-Through
 mistbar style solid       # Switch to Solid Opaque Color (deep black/white)

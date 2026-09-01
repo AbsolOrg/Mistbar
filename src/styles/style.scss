@@ -79,10 +79,25 @@ window.Bar {
     }
   }
 
+  // Top container & hover trigger zone
+  .bar-outer-container {
+    background: transparent;
+    padding: 0;
+    margin: 0;
+  }
+
+  .hover-trigger-zone {
+    min-height: 4px;
+    max-height: 4px;
+    background: transparent;
+    padding: 0;
+    margin: 0;
+  }
+
   // Base inner bar container
   centerbox,
   .bar-inner {
-    transition: all 150ms ease;
+    transition: background-color 150ms ease;
   }
 
   // ── Look Presets: Pill (Default) vs Attached ──

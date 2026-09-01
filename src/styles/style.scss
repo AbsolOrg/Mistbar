@@ -50,6 +50,35 @@ window.Bar {
   font-size: 12px;
   font-weight: 500;
 
+  // Clear any default GTK button bounding boxes and borders
+  button,
+  menubutton,
+  menubutton > button {
+    background: transparent;
+    background-color: transparent;
+    background-image: none;
+    border: none;
+    border-color: transparent;
+    box-shadow: none;
+    outline: none;
+    padding: 0;
+    margin: 0;
+    min-height: 0;
+    min-width: 0;
+    color: inherit;
+
+    &:hover {
+      background-color: transparent;
+      box-shadow: none;
+    }
+
+    &:active,
+    &:checked {
+      background-color: transparent;
+      box-shadow: none;
+    }
+  }
+
   // Floating rounded pill container detached from screen lines
   centerbox,
   .bar-inner {
@@ -84,17 +113,21 @@ window.Bar {
         0 2px 6px rgba(0, 0, 0, 0.06);
     }
 
-    .logo-button:hover { background-color: $glass-bg-hover-light; }
+    .logo-button:hover,
+    .logo-button > button:hover { background-color: $glass-bg-hover-light; }
     .logo-button .logo-icon { color: $text-primary-light; }
     .active-window { color: $text-primary-light; }
 
-    .menu-item-btn:hover { background-color: $glass-bg-hover-light; }
+    .menu-item-btn:hover,
+    .menu-item-btn > button:hover { background-color: $glass-bg-hover-light; }
     .menu-item-btn label { color: $text-primary-light; }
 
     .workspace-dots { color: $text-secondary-light; }
     .clock { color: $text-primary-light; }
+    .clock:hover { background-color: $glass-bg-hover-light; }
 
-    .status-icon:hover { background-color: $glass-bg-hover-light; }
+    .status-icon:hover,
+    .status-icon > button:hover { background-color: $glass-bg-hover-light; }
     .status-icon-label { color: $text-primary-light; }
     .battery-percent { color: $text-secondary-light; }
     .power-icon { color: $text-secondary-light; }
@@ -109,18 +142,28 @@ window.Bar {
 
 .logo-button {
   background: transparent;
+  background-color: transparent;
   border: none;
-  border-radius: 6px;
+  box-shadow: none;
+  border-radius: 5px;
   padding: 1px 5px;
   min-width: 20px;
   min-height: 20px;
-  transition: background-color 120ms ease;
+  transition: background-color 100ms ease;
 
-  &:hover {
+  > button {
+    background: transparent;
+    border: none;
+    box-shadow: none;
+  }
+
+  &:hover,
+  > button:hover {
     background-color: $glass-bg-hover;
   }
 
-  &:active {
+  &:active,
+  > button:active {
     background-color: $glass-bg-active;
   }
 
@@ -145,17 +188,32 @@ window.Bar {
 
   .menu-item-btn {
     background: transparent;
+    background-color: transparent;
     border: none;
-    border-radius: 5px;
+    box-shadow: none;
+    border-radius: 4px;
     padding: 1px 6px;
     min-height: 20px;
-    transition: background-color 120ms ease;
+    transition: background-color 100ms ease;
 
-    &:hover {
+    > button {
+      background: transparent;
+      border: none;
+      box-shadow: none;
+      padding: 1px 6px;
+      min-height: 20px;
+      border-radius: 4px;
+    }
+
+    &:hover,
+    > button:hover {
       background-color: $glass-bg-hover;
     }
 
-    &:active {
+    &:active,
+    &:checked,
+    > button:active,
+    > button:checked {
       background-color: $glass-bg-active;
     }
 
@@ -179,7 +237,7 @@ window.Bar {
     border: none;
     border-radius: 6px;
     padding: 4px 8px;
-    transition: background-color 120ms ease;
+    transition: background-color 100ms ease;
 
     &:hover {
       background-color: $accent-blue;
@@ -230,38 +288,55 @@ window.Bar {
 }
 
 .privacy-pill {
-  background-color: #ff9500;
-  border-radius: 10px;
-  padding: 1px 6px;
-  min-height: 18px;
+  background: transparent;
+  border: none;
+  padding: 1px 4px;
+  min-height: 20px;
 
   .privacy-icon {
     font-family: $font-icon;
-    font-size: 11px;
-    color: #ffffff;
+    font-size: 13px;
+    color: #ff9500;
   }
 }
 
 .status-icon {
   background: transparent;
+  background-color: transparent;
   border: none;
-  border-radius: 6px;
-  padding: 1px 5px;
+  box-shadow: none;
+  border-radius: 4px;
+  padding: 1px 4px;
   min-width: 20px;
   min-height: 20px;
-  transition: background-color 120ms ease;
+  transition: background-color 100ms ease;
 
-  &:hover {
+  > button {
+    background: transparent;
+    background-color: transparent;
+    border: none;
+    box-shadow: none;
+    padding: 1px 4px;
+    min-width: 20px;
+    min-height: 20px;
+    border-radius: 4px;
+  }
+
+  &:hover,
+  > button:hover {
     background-color: $glass-bg-hover;
   }
 
-  &:active {
+  &:active,
+  &:checked,
+  > button:active,
+  > button:checked {
     background-color: $glass-bg-active;
   }
 
   .status-icon-label {
     font-family: $font-icon;
-    font-size: 13px;
+    font-size: 12.5px;
     color: $text-primary;
   }
 }
@@ -271,9 +346,9 @@ window.Bar {
   font-size: 12px;
   color: $text-primary;
   padding: 1px 6px;
-  border-radius: 6px;
+  border-radius: 4px;
   letter-spacing: -0.1px;
-  transition: background-color 120ms ease;
+  transition: background-color 100ms ease;
 
   &:hover {
     background-color: $glass-bg-hover;

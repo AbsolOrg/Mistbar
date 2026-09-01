@@ -17,9 +17,9 @@ BOLD='\033[1m'
 NC='\033[0m'
 
 echo -e "${CYAN}${BOLD}"
-echo "  ╔══════════════════════════════════════╗"
-echo "  ║         🍏 Mistbar Uninstaller       ║"
-echo "  ╚══════════════════════════════════════╝"
+echo "  ========================================"
+echo "            Mistbar Uninstaller           "
+echo "  ========================================"
 echo -e "${NC}"
 
 # 1. Stop Mistbar if running

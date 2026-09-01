@@ -1,21 +1,21 @@
-# 🍏 Mistbar
+# Mistbar
 
 **macOS Tahoe Liquid Glass Top Bar for Linux (Wayland)**
 
 A faithful macOS Tahoe-inspired floating menu bar built with [AGS 3](https://github.com/Aylur/ags) (Astal + GTK4 + TypeScript) for the [Niri](https://github.com/YaLTeR/niri) compositor on Wayland.
 
-## ✨ Features
+## Features
 
-- **Liquid Glass Design** — Frosted glass effect with semi-transparent dark background, subtle inner glow, and drop shadows
-- **Floating Bar** — Hovering with gaps from screen edges, rounded pill-like corners
-- **macOS Layout** — Three-section layout: App menu (left), Clock + Workspaces (center), System icons (right)
-- **System Status Icons** — Wi-Fi, Bluetooth, Volume, Battery, Brightness with Nerd Font icons
-- **Workspace Dots** — macOS Mission Control-style dot indicators for Niri workspaces
-- **Power Menu** — Sleep, Restart, Shut Down, Log Out dropdown
-- **CLI Interface** — `mistbar start/stop/restart/status` with colored output
-- **Scroll Controls** — Scroll on volume/brightness icons to adjust levels
+- **Liquid Glass Design** -- Frosted glass effect with semi-transparent dark background, subtle inner glow, and drop shadows
+- **Floating Bar** -- Hovering with gaps from screen edges, rounded pill-like corners
+- **macOS Layout** -- Three-section layout: App menu (left), Clock + Workspaces (center), System icons (right)
+- **System Status Icons** -- Wi-Fi, Bluetooth, Volume, Battery, Brightness with Nerd Font icons
+- **Workspace Dots** -- macOS Mission Control-style dot indicators for Niri workspaces
+- **Power Menu** -- Sleep, Restart, Shut Down, Log Out dropdown
+- **CLI Interface** -- `mistbar start/stop/restart/status` with colored output
+- **Scroll Controls** -- Scroll on volume/brightness icons to adjust levels
 
-## 📦 Dependencies
+## Dependencies
 
 | Package | Purpose |
 |---|---|
@@ -31,7 +31,7 @@ A faithful macOS Tahoe-inspired floating menu bar built with [AGS 3](https://git
 | BlueZ | Bluetooth |
 | brightnessctl | Brightness control |
 
-## 🚀 Installation & Updates
+## Installation & Updates
 
 ```bash
 # Clone
@@ -47,13 +47,13 @@ mistbar install-deps
 
 > **Note:** Running `./install.sh` when Mistbar is already installed automatically switches to **Update mode**, refreshing links, permissions, and restarting any active bar instances.
 
-## 🗑️ Uninstallation
+## Uninstallation
 
 ```bash
 ./uninstall.sh
 ```
 
-## 🎮 Usage
+## Usage
 
 ```bash
 mistbar start          # Start the bar
@@ -66,7 +66,7 @@ mistbar --help         # Show help
 mistbar --version      # Show version
 ```
 
-## 🎨 Customization
+## Customization
 
 Edit `src/styles/style.scss` to adjust:
 - Glass background opacity/color
@@ -75,12 +75,13 @@ Edit `src/styles/style.scss` to adjust:
 - Font sizes
 - Color scheme
 
-## 📁 Project Structure
+## Project Structure
 
 ```
 Mistbar/
 ├── mistbar              # CLI launcher
 ├── install.sh           # Installer
+├── uninstall.sh         # Uninstaller
 ├── README.md
 └── src/
     ├── app.ts           # Entry point
@@ -103,7 +104,7 @@ Mistbar/
         └── style.scss
 ```
 
-## 📋 Roadmap
+## Roadmap
 
 - [x] Phase 1: Core bar (layout, glass effect, clock, workspaces, system icons)
 - [ ] Phase 2: Dropdown popovers (volume slider, Wi-Fi list, etc.)
@@ -111,7 +112,7 @@ Mistbar/
 - [ ] Phase 4: System tray (StatusNotifier)
 - [ ] Phase 5: Polish, auto-hide, themes
 
-## 📄 License
+## License
 
 MIT
 

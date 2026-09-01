@@ -1,0 +1,15 @@
+# AGS 3 / Astal generated types and modules
+@girs/
+**/@girs/
+node_modules/
+**/node_modules/
+
+# Compiled outputs
+*.js
+*.js.map
+dist/
+build/
+
+# Logs & temp
+*.log
+.DS_Store

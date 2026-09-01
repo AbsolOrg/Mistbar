@@ -214,10 +214,23 @@ window.Bar {
   }
 }
 
-// ── Right Section (Status Menus, Spotlight, Control Center, Clock) ──
+// ── Right Section (Privacy, Status Menus, Spotlight, Control Center, Clock) ──
 .bar-right,
 .right-section {
   padding: 0;
+}
+
+.privacy-pill {
+  background-color: #ff9500;
+  border-radius: 10px;
+  padding: 1px 6px;
+  min-height: 18px;
+
+  .privacy-icon {
+    font-family: $font-icon;
+    font-size: 11px;
+    color: #ffffff;
+  }
 }
 
 .status-icon {

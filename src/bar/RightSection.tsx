@@ -5,6 +5,7 @@ import Bluetooth from "../widgets/Bluetooth"
 import Battery from "../widgets/Battery"
 import Brightness from "../widgets/Brightness"
 import ControlCenter from "../widgets/ControlCenter"
+import Clock from "../widgets/Clock"
 import PowerMenu from "../widgets/PowerMenu"
 
 export default function RightSection() {
@@ -17,6 +18,7 @@ export default function RightSection() {
       <Bluetooth />
       <Battery />
       <ControlCenter />
+      <Clock />
       <PowerMenu />
     </box>
   )

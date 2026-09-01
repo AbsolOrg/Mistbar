@@ -1,8 +1,14 @@
 import GLib from "gi://GLib?version=2.0"
 import Gio from "gi://Gio?version=2.0"
 
+export type MistbarTheme = "dark" | "light"
+export type MistbarStyle = "glassy" | "transparent" | "solid"
+export type MistbarLook = "pill" | "attached"
+
 export interface MistbarConfig {
-  theme: "dark" | "light"
+  theme: MistbarTheme
+  style: MistbarStyle
+  look: MistbarLook
   autoHide: boolean
   barHeight: number
   barMargin: number
@@ -21,6 +27,8 @@ export interface MistbarConfig {
 
 export const defaultConfig: MistbarConfig = {
   theme: "dark",
+  style: "glassy",
+  look: "pill",
   autoHide: false,
   barHeight: 28,
   barMargin: 6,
@@ -55,6 +63,27 @@ export function loadConfig(): MistbarConfig {
     console.error(`Error loading config from ${configFilePath}:`, err)
   }
   return { ...defaultConfig }
+}
+
+export function saveConfig(newConfig: Partial<MistbarConfig>): void {
+  try {
+    if (!GLib.file_test(configDirPath, GLib.FileTest.IS_DIR)) {
+      GLib.mkdir_with_parents(configDirPath, 0o755)
+    }
+    const current = loadConfig()
+    const merged = { ...current, ...newConfig }
+    const file = Gio.File.new_for_path(configFilePath)
+    const jsonStr = JSON.stringify(merged, null, 2)
+    file.replace_contents(
+      jsonStr,
+      null,
+      false,
+      Gio.FileCreateFlags.REPLACE_DESTINATION,
+      null
+    )
+  } catch (err) {
+    console.error(`Error saving config to ${configFilePath}:`, err)
+  }
 }
 
 export function saveDefaultConfig(): void {

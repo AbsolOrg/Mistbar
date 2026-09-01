@@ -74,8 +74,13 @@ mistbar start             # Start the bar
 mistbar stop              # Stop the bar
 mistbar restart           # Restart the bar
 mistbar toggle            # Toggle bar visibility (hide/show)
-mistbar theme light       # Switch to Light liquid glass theme
-mistbar theme dark        # Switch to Dark liquid glass theme
+mistbar style glassy      # Switch to Frosted Liquid Glass (default)
+mistbar style transparent # Switch to 100% Transparent See-Through
+mistbar style solid       # Switch to Solid Opaque Color (deep black/white)
+mistbar look pill         # Switch to Floating Rounded Pill capsule (default)
+mistbar look attached     # Switch to Edge-to-Edge Full-Width Top Bar
+mistbar theme light       # Switch to Light theme
+mistbar theme dark        # Switch to Dark theme
 mistbar status            # Check if running and visibility state
 mistbar config            # View or edit ~/.config/mistbar/config.json
 mistbar inspect           # Open GTK Inspector for live CSS inspection
@@ -91,6 +96,8 @@ Mistbar can be customized by editing `~/.config/mistbar/config.json` (or via `mi
 ```json
 {
   "theme": "dark",
+  "style": "glassy",
+  "look": "pill",
   "autoHide": false,
   "barHeight": 28,
   "barMargin": 6,
@@ -108,7 +115,9 @@ Mistbar can be customized by editing `~/.config/mistbar/config.json` (or via `mi
 }
 ```
 
-- **Theme Switching**: Switch between Dark and Light frosted glass modes at any time with `mistbar theme dark` and `mistbar theme light`.
+- **Dynamic Look & Shape**: Switch between floating capsule and attached top bar on-the-fly (`mistbar look pill` and `mistbar look attached`).
+- **Dynamic Background Styles**: Switch between frosted glass, transparent, and solid modes (`mistbar style glassy`, `mistbar style transparent`, `mistbar style solid`).
+- **Theme Switching**: Switch between Dark and Light modes (`mistbar theme dark` and `mistbar theme light`).
 - **Styling**: Fine-tune colors, blur, margins, and borders directly in `src/styles/style.scss`.
 
 ## Project Structure

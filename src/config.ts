@@ -22,9 +22,9 @@ export interface MistbarConfig {
 export const defaultConfig: MistbarConfig = {
   theme: "dark",
   autoHide: false,
-  barHeight: 24,
-  barMargin: 0,
-  borderRadius: 0,
+  barHeight: 28,
+  barMargin: 6,
+  borderRadius: 16,
   showAppMenu: true,
   showWorkspaces: true,
   showTray: true,

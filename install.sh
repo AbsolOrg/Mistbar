@@ -41,18 +41,18 @@ fi
 echo ""
 
 # 1. Ensure scripts are executable
-echo -e "${BLUE}[1/4] Setting file permissions...${NC}"
+echo -e "${BLUE}[1/5] Setting file permissions...${NC}"
 chmod +x "$SCRIPT_DIR/mistbar" "$SCRIPT_DIR/install.sh" "$SCRIPT_DIR/uninstall.sh" "$SCRIPT_DIR/view.sh"
 echo -e "${GREEN}  ✓ Scripts are executable${NC}"
 
 # 2. Setup / Refresh symlink in ~/.local/bin
-echo -e "${BLUE}[2/4] Linking binary to ~/.local/bin/mistbar...${NC}"
+echo -e "${BLUE}[2/5] Linking binary to ~/.local/bin/mistbar...${NC}"
 mkdir -p "$HOME/.local/bin"
 ln -sf "$SCRIPT_DIR/mistbar" "$BIN_TARGET"
 echo -e "${GREEN}  ✓ Symlink configured: $BIN_TARGET -> $SCRIPT_DIR/mistbar${NC}"
 
 # 3. Ensure TypeScript type declarations are present
-echo -e "${BLUE}[3/4] Checking TypeScript types...${NC}"
+echo -e "${BLUE}[3/5] Checking TypeScript types...${NC}"
 if [ ! -d "$SCRIPT_DIR/src/@girs" ]; then
     echo -e "  Generating TypeScript types with AGS..."
     ags types -d "$SCRIPT_DIR/src" 2>/dev/null || true
@@ -61,8 +61,46 @@ else
     echo -e "${GREEN}  ✓ Types are up to date${NC}"
 fi
 
-# 4. PATH check
-echo -e "${BLUE}[4/4] Verifying PATH...${NC}"
+# 4. Check & Configure Niri Compositor Layer Blur Rule
+echo -e "${BLUE}[4/5] Checking Niri compositor blur integration...${NC}"
+NIRI_CONFIG="$HOME/.config/niri/config.kdl"
+if [ -f "$NIRI_CONFIG" ]; then
+    if ! grep -q 'namespace="mistbar"' "$NIRI_CONFIG"; then
+        python3 -c "
+kdl_path = '$NIRI_CONFIG'
+with open(kdl_path, 'r') as f:
+    content = f.read()
+
+rule = '''
+layer-rule {
+    match namespace=\"mistbar\"
+    background-effect {
+        blur true
+    }
+}
+'''
+if 'match namespace=\"mistbar\"' not in content:
+    idx = content.find('input {')
+    if idx != -1:
+        new_content = content[:idx] + rule + '\n' + content[idx:]
+    else:
+        new_content = content + '\n' + rule
+    with open(kdl_path, 'w') as f:
+        f.write(new_content)
+" 2>/dev/null || true
+        echo -e "${GREEN}  ✓ Added mistbar background-effect blur rule to Niri config${NC}"
+        if command -v niri &>/dev/null; then
+            niri msg action load-config-file 2>/dev/null || true
+        fi
+    else
+        echo -e "${GREEN}  ✓ Niri blur layer-rule already configured${NC}"
+    fi
+else
+    echo -e "${DIM}  Niri config not detected, skipping layer-rule setup${NC}"
+fi
+
+# 5. PATH check
+echo -e "${BLUE}[5/5] Verifying PATH...${NC}"
 if echo "$PATH" | grep -q "$HOME/.local/bin"; then
     echo -e "${GREEN}  ✓ ~/.local/bin is in your PATH${NC}"
 else

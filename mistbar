@@ -119,7 +119,12 @@ cmd_start() {
     done
 
     # Start AGS in background
-    nohup ags run -d "$SRC_DIR" >/dev/null 2>&1 &
+    if command -v setsid &>/dev/null; then
+        setsid -f ags run -d "$SRC_DIR" >/dev/null 2>&1
+    else
+        nohup ags run -d "$SRC_DIR" >/dev/null 2>&1 &
+        disown 2>/dev/null || true
+    fi
 
     sleep 1
     if ags list 2>/dev/null | grep -q "$INSTANCE_NAME"; then
@@ -199,9 +204,9 @@ cmd_config() {
 {
   "theme": "dark",
   "autoHide": false,
-  "barHeight": 36,
-  "barMargin": 8,
-  "borderRadius": 16,
+  "barHeight": 28,
+  "barMargin": 6,
+  "borderRadius": 14,
   "showAppMenu": true,
   "showWorkspaces": true,
   "showTray": true,
@@ -209,7 +214,8 @@ cmd_config() {
   "showBrightness": true,
   "showVolume": true,
   "showNetwork": true,
-  "showBluetooth": true
+  "showBluetooth": true,
+  "showControlCenter": true
 }
 EOF
     fi

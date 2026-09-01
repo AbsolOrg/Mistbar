@@ -12,6 +12,7 @@ export default function Bar(gdkmonitor: Gdk.Monitor, config: MistbarConfig = def
     <window
       visible
       name="mistbar"
+      namespace="mistbar"
       class="Bar"
       gdkmonitor={gdkmonitor}
       exclusivity={config.autoHide ? Astal.Exclusivity.IGNORE : Astal.Exclusivity.EXCLUSIVE}

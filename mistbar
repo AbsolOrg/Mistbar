@@ -37,31 +37,35 @@ print_help() {
     echo "    mistbar <command> [options]"
     echo ""
     echo -e "${BOLD}COMMANDS:${NC}"
-    echo -e "    ${GREEN}start${NC}            Start the bar"
-    echo -e "    ${GREEN}stop${NC}             Stop the bar"
-    echo -e "    ${GREEN}restart${NC}          Restart the bar"
-    echo -e "    ${GREEN}toggle${NC}           Toggle bar visibility on/off"
-    echo -e "    ${GREEN}show${NC}             Show the bar"
-    echo -e "    ${GREEN}hide${NC}             Hide the bar"
-    echo -e "    ${GREEN}theme <dark|light>${NC} Switch theme dynamically"
-    echo -e "    ${GREEN}status${NC}           Check if the bar is running"
-    echo -e "    ${GREEN}config${NC}           View or edit configuration"
-    echo -e "    ${GREEN}inspect${NC}          Open GTK Inspector for live debugging"
-    echo -e "    ${GREEN}install-deps${NC}     Install required system dependencies"
+    echo -e "    ${GREEN}start${NC}                       Start the bar"
+    echo -e "    ${GREEN}stop${NC}                        Stop the bar"
+    echo -e "    ${GREEN}restart${NC}                     Restart the bar"
+    echo -e "    ${GREEN}toggle${NC}                      Toggle bar visibility on/off"
+    echo -e "    ${GREEN}show${NC}                        Show the bar"
+    echo -e "    ${GREEN}hide${NC}                        Hide the bar"
+    echo -e "    ${GREEN}theme <dark|light>${NC}          Switch theme dynamically"
+    echo -e "    ${GREEN}style <glassy|transparent|solid>${NC} Switch background style dynamically"
+    echo -e "    ${GREEN}look <pill|attached>${NC}        Switch shape/geometry dynamically"
+    echo -e "    ${GREEN}status${NC}                      Check if the bar is running"
+    echo -e "    ${GREEN}config${NC}                      View or edit configuration"
+    echo -e "    ${GREEN}inspect${NC}                     Open GTK Inspector for live debugging"
+    echo -e "    ${GREEN}install-deps${NC}                Install required system dependencies"
     echo ""
     echo -e "${BOLD}OPTIONS:${NC}"
-    echo -e "    ${BLUE}--auto-hide${NC}      Start with auto-hide behavior"
-    echo -e "    ${BLUE}--always-visible${NC}   Start with always-visible behavior (default)"
-    echo -e "    ${BLUE}-h, --help${NC}       Show this help message"
-    echo -e "    ${BLUE}-v, --version${NC}    Show version"
+    echo -e "    ${BLUE}--auto-hide${NC}                 Start with auto-hide behavior"
+    echo -e "    ${BLUE}--always-visible${NC}              Start with always-visible behavior (default)"
+    echo -e "    ${BLUE}-h, --help${NC}                  Show this help message"
+    echo -e "    ${BLUE}-v, --version${NC}               Show version"
     echo ""
     echo -e "${BOLD}EXAMPLES:${NC}"
     echo "    mistbar start"
-    echo "    mistbar toggle"
-    echo "    mistbar theme light"
-    echo "    mistbar theme dark"
-    echo "    mistbar restart"
-    echo "    mistbar stop"
+    echo "    mistbar style glassy       # Frosted liquid glass (default)"
+    echo "    mistbar style transparent  # 100% clear see-through background"
+    echo "    mistbar style solid        # Solid opaque color (pitch black/white)"
+    echo "    mistbar look pill          # Floating rounded pill (default)"
+    echo "    mistbar look attached      # Edge-to-edge full-width top bar"
+    echo "    mistbar theme light        # Light frosted glass"
+    echo "    mistbar theme dark         # Dark frosted glass"
     echo ""
     echo -e "${DIM}Project: https://github.com/AbsolOrg/Mistbar${NC}"
 }
@@ -73,80 +77,78 @@ check_deps() {
     command -v niri &>/dev/null || missing+=("niri")
     command -v fuzzel &>/dev/null || missing+=("fuzzel")
     command -v wpctl &>/dev/null || missing+=("wireplumber (wpctl)")
+    command -v brightnessctl &>/dev/null || missing+=("brightnessctl")
     command -v nmcli &>/dev/null || missing+=("networkmanager (nmcli)")
     command -v bluetoothctl &>/dev/null || missing+=("bluez-utils (bluetoothctl)")
-    command -v brightnessctl &>/dev/null || missing+=("brightnessctl")
 
     if [ ${#missing[@]} -gt 0 ]; then
-        echo -e "${RED}Missing dependencies:${NC}"
+        echo -e "${RED}Warning: Missing optional/required dependencies:${NC}"
         for dep in "${missing[@]}"; do
-            echo -e "  ✗ $dep"
+            echo -e "  - ${DIM}$dep${NC}"
         done
+        echo -e "${BLUE}Run '${BOLD}mistbar install-deps${NC}${BLUE}' or install them with pacman.${NC}"
         echo ""
-        echo -e "Run ${CYAN}mistbar install-deps${NC} to install them."
-        return 1
     fi
-    return 0
 }
 
 cmd_start() {
-    echo -e "${GREEN}Starting Mistbar...${NC}"
+    check_deps
 
-    # Check if already running
     if ags list 2>/dev/null | grep -q "$INSTANCE_NAME"; then
-        echo -e "${BLUE}Mistbar is already running. Use 'mistbar restart' to restart.${NC}"
+        echo -e "${BLUE}Mistbar is already running.${NC}"
         return 0
     fi
 
-    # Check dependencies
-    if ! check_deps; then
-        return 1
-    fi
+    echo -e "${GREEN}Starting Mistbar...${NC}"
 
-    # Handle auto-hide flag if passed
+    # Build entrypoint flags
+    local extra_flags=()
     for arg in "$@"; do
-        if [ "$arg" = "--auto-hide" ]; then
-            mkdir -p "$CONFIG_DIR"
-            if [ -f "$CONFIG_FILE" ]; then
-                sed -i 's/"autoHide": false/"autoHide": true/' "$CONFIG_FILE" 2>/dev/null || true
-            fi
-        elif [ "$arg" = "--always-visible" ]; then
-            mkdir -p "$CONFIG_DIR"
-            if [ -f "$CONFIG_FILE" ]; then
-                sed -i 's/"autoHide": true/"autoHide": false/' "$CONFIG_FILE" 2>/dev/null || true
-            fi
-        fi
+        case "$arg" in
+            --auto-hide)
+                extra_flags+=("-a")
+                ;;
+            --always-visible)
+                ;;
+        esac
     done
 
-    # Start AGS in background
-    if command -v setsid &>/dev/null; then
-        setsid -f ags run -d "$SRC_DIR" >/dev/null 2>&1
+    # Launch daemon in background detached from current terminal
+    if [ ${#extra_flags[@]} -gt 0 ]; then
+        setsid -f ags run -d "$SRC_DIR" "${extra_flags[@]}" >/dev/null 2>&1
     else
-        nohup ags run -d "$SRC_DIR" >/dev/null 2>&1 &
-        disown 2>/dev/null || true
+        setsid -f ags run -d "$SRC_DIR" >/dev/null 2>&1
     fi
 
-    sleep 1
-    if ags list 2>/dev/null | grep -q "$INSTANCE_NAME"; then
-        echo -e "${GREEN}✓ Mistbar started successfully!${NC}"
-    else
-        echo -e "${RED}✗ Failed to start Mistbar. Check logs.${NC}"
-        return 1
-    fi
+    # Wait up to 3 seconds for instance to register
+    local count=0
+    while [ $count -lt 15 ]; do
+        if ags list 2>/dev/null | grep -q "$INSTANCE_NAME"; then
+            echo -e "${GREEN}✓ Mistbar started successfully!${NC}"
+            return 0
+        fi
+        sleep 0.2
+        count=$((count + 1))
+    done
+
+    echo -e "${RED}Failed to verify Mistbar startup.${NC}"
+    return 1
 }
 
 cmd_stop() {
     echo -e "${BLUE}Stopping Mistbar...${NC}"
-
-    if ags quit -i "$INSTANCE_NAME" 2>/dev/null; then
-        echo -e "${GREEN}✓ Mistbar stopped.${NC}"
-    else
-        echo -e "${DIM}Mistbar is not running.${NC}"
+    if ags list 2>/dev/null | grep -q "$INSTANCE_NAME"; then
+        ags quit -i "$INSTANCE_NAME" 2>/dev/null || true
+        sleep 0.3
     fi
+
+    # Force kill any remaining ags run process for this directory
+    pkill -f "ags run -d $SRC_DIR" 2>/dev/null || true
+    echo -e "${GREEN}✓ Mistbar stopped.${NC}"
 }
 
 cmd_restart() {
-    cmd_stop 2>/dev/null || true
+    cmd_stop
     sleep 0.5
     cmd_start "$@"
 }
@@ -196,6 +198,50 @@ cmd_theme() {
     fi
 }
 
+cmd_style() {
+    local target="${1:-}"
+    if [ "$target" != "glassy" ] && [ "$target" != "transparent" ] && [ "$target" != "solid" ]; then
+        echo -e "${RED}Usage: mistbar style <glassy|transparent|solid>${NC}"
+        return 1
+    fi
+
+    # Update config file
+    mkdir -p "$CONFIG_DIR"
+    if [ -f "$CONFIG_FILE" ]; then
+        sed -i "s/\"style\": \"[^\"]*\"/\"style\": \"$target\"/" "$CONFIG_FILE" 2>/dev/null || true
+    fi
+
+    # If running, send dynamic IPC request
+    if ags list 2>/dev/null | grep -q "$INSTANCE_NAME"; then
+        ags request -i "$INSTANCE_NAME" "style:$target" 2>/dev/null || true
+        echo -e "${GREEN}✓ Switched style to: $target${NC}"
+    else
+        echo -e "${GREEN}✓ Default style saved as: $target${NC}"
+    fi
+}
+
+cmd_look() {
+    local target="${1:-}"
+    if [ "$target" != "pill" ] && [ "$target" != "attached" ]; then
+        echo -e "${RED}Usage: mistbar look <pill|attached>${NC}"
+        return 1
+    fi
+
+    # Update config file
+    mkdir -p "$CONFIG_DIR"
+    if [ -f "$CONFIG_FILE" ]; then
+        sed -i "s/\"look\": \"[^\"]*\"/\"look\": \"$target\"/" "$CONFIG_FILE" 2>/dev/null || true
+    fi
+
+    # If running, send dynamic IPC request
+    if ags list 2>/dev/null | grep -q "$INSTANCE_NAME"; then
+        ags request -i "$INSTANCE_NAME" "look:$target" 2>/dev/null || true
+        echo -e "${GREEN}✓ Switched look to: $target${NC}"
+    else
+        echo -e "${GREEN}✓ Default look saved as: $target${NC}"
+    fi
+}
+
 cmd_config() {
     if [ ! -f "$CONFIG_FILE" ]; then
         echo -e "${BLUE}Generating default config at $CONFIG_FILE...${NC}"
@@ -203,6 +249,8 @@ cmd_config() {
         cat << 'EOF' > "$CONFIG_FILE"
 {
   "theme": "dark",
+  "style": "glassy",
+  "look": "pill",
   "autoHide": false,
   "barHeight": 28,
   "barMargin": 6,
@@ -292,6 +340,14 @@ case "${1:-}" in
     theme)
         shift
         cmd_theme "$@"
+        ;;
+    style)
+        shift
+        cmd_style "$@"
+        ;;
+    look)
+        shift
+        cmd_look "$@"
         ;;
     config)
         cmd_config

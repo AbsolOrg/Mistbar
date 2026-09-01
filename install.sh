@@ -42,7 +42,7 @@ echo ""
 
 # 1. Ensure scripts are executable
 echo -e "${BLUE}[1/4] Setting file permissions...${NC}"
-chmod +x "$SCRIPT_DIR/mistbar" "$SCRIPT_DIR/install.sh" "$SCRIPT_DIR/uninstall.sh"
+chmod +x "$SCRIPT_DIR/mistbar" "$SCRIPT_DIR/install.sh" "$SCRIPT_DIR/uninstall.sh" "$SCRIPT_DIR/view.sh"
 echo -e "${GREEN}  ✓ Scripts are executable${NC}"
 
 # 2. Setup / Refresh symlink in ~/.local/bin

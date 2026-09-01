@@ -31,6 +31,20 @@ A faithful macOS Tahoe-inspired floating menu bar built with [AGS 3](https://git
 | BlueZ | Bluetooth |
 | brightnessctl | Brightness control |
 
+## Live Preview (Try Without Installing)
+
+You can try Mistbar live without downloading or installing anything permanently:
+
+```bash
+# One-liner remote preview:
+curl -sSL https://raw.githubusercontent.com/AbsolOrg/Mistbar/main/view.sh | bash
+
+# Or from local clone:
+./view.sh
+```
+
+Press `Ctrl+C` at any time to close the preview and clean up.
+
 ## Installation & Updates
 
 ```bash
@@ -82,6 +96,7 @@ Mistbar/
 ├── mistbar              # CLI launcher
 ├── install.sh           # Installer
 ├── uninstall.sh         # Uninstaller
+├── view.sh              # Live preview script
 ├── README.md
 └── src/
     ├── app.ts           # Entry point
@@ -107,7 +122,7 @@ Mistbar/
 ## Roadmap
 
 - [x] Phase 1: Core bar (layout, glass effect, clock, workspaces, system icons)
-- [ ] Phase 2: Dropdown popovers (volume slider, Wi-Fi list, etc.)
+- [x] Phase 2: Dropdown popovers (volume slider, Wi-Fi list, Bluetooth manager, brightness slider, battery/power profile, power menu)
 - [ ] Phase 3: Global app menu (DBus-based File/Edit/View)
 - [ ] Phase 4: System tray (StatusNotifier)
 - [ ] Phase 5: Polish, auto-hide, themes

@@ -70,38 +70,59 @@ mistbar install-deps
 ## Usage
 
 ```bash
-mistbar start          # Start the bar
-mistbar stop           # Stop the bar
-mistbar restart        # Restart the bar
-mistbar status         # Check if running
-mistbar inspect        # Open GTK Inspector
-mistbar install-deps   # Install dependencies
-mistbar --help         # Show help
-mistbar --version      # Show version
+mistbar start             # Start the bar
+mistbar stop              # Stop the bar
+mistbar restart           # Restart the bar
+mistbar toggle            # Toggle bar visibility (hide/show)
+mistbar theme light       # Switch to Light liquid glass theme
+mistbar theme dark        # Switch to Dark liquid glass theme
+mistbar status            # Check if running and visibility state
+mistbar config            # View or edit ~/.config/mistbar/config.json
+mistbar inspect           # Open GTK Inspector for live CSS inspection
+mistbar install-deps      # Install dependencies
+mistbar --help            # Show all commands and options
+mistbar --version         # Show version
 ```
 
-## Customization
+## Configuration & Themes
 
-Edit `src/styles/style.scss` to adjust:
-- Glass background opacity/color
-- Bar height and margins
-- Corner radius
-- Font sizes
-- Color scheme
+Mistbar can be customized by editing `~/.config/mistbar/config.json` (or via `mistbar config`):
+
+```json
+{
+  "theme": "dark",
+  "autoHide": false,
+  "barHeight": 36,
+  "barMargin": 8,
+  "borderRadius": 16,
+  "showAppMenu": true,
+  "showWorkspaces": true,
+  "showTray": true,
+  "showBattery": true,
+  "showBrightness": true,
+  "showVolume": true,
+  "showNetwork": true,
+  "showBluetooth": true
+}
+```
+
+- **Theme Switching**: Switch between Dark and Light frosted glass modes at any time with `mistbar theme dark` and `mistbar theme light`.
+- **Styling**: Fine-tune colors, blur, margins, and borders directly in `src/styles/style.scss`.
 
 ## Project Structure
 
 ```
 Mistbar/
-├── mistbar              # CLI launcher
-├── install.sh           # Installer
-├── uninstall.sh         # Uninstaller
+├── mistbar              # CLI launcher & manager
+├── install.sh           # Smart installer & updater
+├── uninstall.sh         # Clean uninstaller
 ├── view.sh              # Live preview script
 ├── README.md
 └── src/
-    ├── app.ts           # Entry point
+    ├── app.ts           # AGS 3 entry point & IPC request handler
+    ├── config.ts        # Configuration manager & JSON parser
     ├── bar/
-    │   ├── Bar.tsx      # Main bar
+    │   ├── Bar.tsx      # Main layer-shell floating bar
     │   ├── LeftSection.tsx
     │   ├── CenterSection.tsx
     │   └── RightSection.tsx
@@ -127,7 +148,7 @@ Mistbar/
 - [x] Phase 2: Dropdown popovers (volume slider, Wi-Fi list, Bluetooth manager, brightness slider, battery/power profile, power menu)
 - [x] Phase 3: Global app menu (macOS-style contextual File/Edit/View/Window/Help menus)
 - [x] Phase 4: System tray (DBus StatusNotifierItem integration)
-- [ ] Phase 5: Polish, auto-hide, themes
+- [x] Phase 5: Polish, auto-hide, dark/light themes, config file, and enhanced CLI manager
 
 ## License
 

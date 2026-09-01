@@ -93,8 +93,8 @@ Mistbar can be customized by editing `~/.config/mistbar/config.json` (or via `mi
   "theme": "dark",
   "autoHide": false,
   "barHeight": 24,
-  "barMargin": 3,
-  "borderRadius": 10,
+  "barMargin": 0,
+  "borderRadius": 0,
   "showAppMenu": true,
   "showWorkspaces": true,
   "showTray": true,
@@ -103,11 +103,47 @@ Mistbar can be customized by editing `~/.config/mistbar/config.json` (or via `mi
   "showVolume": true,
   "showNetwork": true,
   "showBluetooth": true,
-  "showControlCenter": true
+  "showControlCenter": true,
+  "showSpotlight": true
 }
 ```
 
 - **Theme Switching**: Switch between Dark and Light frosted glass modes at any time with `mistbar theme dark` and `mistbar theme light`.
 - **Styling**: Fine-tune colors, blur, margins, and borders directly in `src/styles/style.scss`.
+
+## Project Structure
+
+```
+Mistbar/
+├── mistbar              # CLI launcher & manager
+├── install.sh           # Smart installer & updater
+├── uninstall.sh         # Clean uninstaller
+├── view.sh              # Live preview script
+├── README.md
+└── src/
+    ├── app.ts           # AGS 3 entry point & IPC request handler
+    ├── config.ts        # Configuration manager & JSON parser
+    ├── bar/
+    │   ├── Bar.tsx      # Main layer-shell floating bar
+    │   ├── LeftSection.tsx
+    │   ├── CenterSection.tsx
+    │   └── RightSection.tsx
+    ├── widgets/
+    │   ├── ActiveWindow.tsx
+    │   ├── AppMenu.tsx
+    │   ├── Battery.tsx
+    │   ├── Bluetooth.tsx
+    │   ├── Brightness.tsx
+    │   ├── Clock.tsx
+    │   ├── ControlCenter.tsx
+    │   ├── Network.tsx
+    │   ├── PowerMenu.tsx
+    │   ├── Spotlight.tsx
+    │   ├── SystemTray.tsx
+    │   ├── Volume.tsx
+    │   └── Workspaces.tsx
+    └── styles/
+        └── style.scss
+```
 
 > *Not affiliated with Apple Inc. macOS is a trademark of Apple Inc.*

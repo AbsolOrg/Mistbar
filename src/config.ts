@@ -16,14 +16,15 @@ export interface MistbarConfig {
   showNetwork: boolean
   showBluetooth: boolean
   showControlCenter: boolean
+  showSpotlight: boolean
 }
 
 export const defaultConfig: MistbarConfig = {
   theme: "dark",
   autoHide: false,
   barHeight: 24,
-  barMargin: 3,
-  borderRadius: 10,
+  barMargin: 0,
+  borderRadius: 0,
   showAppMenu: true,
   showWorkspaces: true,
   showTray: true,
@@ -33,6 +34,7 @@ export const defaultConfig: MistbarConfig = {
   showNetwork: true,
   showBluetooth: true,
   showControlCenter: true,
+  showSpotlight: true,
 }
 
 const configDirPath = `${GLib.get_user_config_dir()}/mistbar`

@@ -5,18 +5,14 @@ import AppMenu from "../widgets/AppMenu"
 
 export default function LeftSection() {
   return (
-    <box class="left-section" spacing={4}>
+    <box class="left-section" spacing={6}>
       <button
         class="logo-button"
-        onClicked={() => execAsync("fuzzel").catch(console.error)}
-        tooltipText="App Launcher"
+        onClicked={() => execAsync(["bash", "-c", "fuzzel 2>/dev/null || rofi -show drun 2>/dev/null || true"]).catch(console.error)}
+        tooltipText="Apple Menu"
       >
         <label class="logo-icon" label="󰀵" />
       </button>
-
-      <box class="separator-dot">
-        <label label="·" />
-      </box>
 
       <ActiveWindow />
 

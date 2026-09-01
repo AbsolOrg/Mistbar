@@ -89,7 +89,7 @@ window.Bar {
     margin: $bar-margin;
     min-height: $bar-height;
     max-height: $bar-height;
-    padding: 0 10px;
+    padding: 0 12px;
     box-shadow:
       inset 0 1px 0 0 $glass-inner-glow,
       inset 0 -1px 0 0 rgba(255, 255, 255, 0.05),
@@ -137,7 +137,7 @@ window.Bar {
 // ── Left Section (Apple Menu & App Menus) ──
 .bar-left,
 .left-section {
-  padding: 0 2px;
+  padding: 0 4px;
 }
 
 .logo-button {
@@ -146,8 +146,8 @@ window.Bar {
   border: none;
   box-shadow: none;
   border-radius: 5px;
-  padding: 2px 6px;
-  min-width: 22px;
+  padding: 2px 8px;
+  min-width: 24px;
   min-height: 22px;
   transition: background-color 100ms ease;
 
@@ -178,7 +178,7 @@ window.Bar {
   font-weight: 700;
   font-size: 12px;
   color: $text-primary;
-  padding: 1px 6px;
+  padding: 2px 8px;
   letter-spacing: -0.1px;
 }
 
@@ -191,8 +191,8 @@ window.Bar {
     background-color: transparent;
     border: none;
     box-shadow: none;
-    border-radius: 4px;
-    padding: 1px 6px;
+    border-radius: 5px;
+    padding: 2px 8px;
     min-height: 20px;
     transition: background-color 100ms ease;
 
@@ -200,9 +200,9 @@ window.Bar {
       background: transparent;
       border: none;
       box-shadow: none;
-      padding: 1px 6px;
+      padding: 2px 8px;
       min-height: 20px;
-      border-radius: 4px;
+      border-radius: 5px;
     }
 
     &:hover,
@@ -267,24 +267,24 @@ window.Bar {
 // ── Center Section ──
 .bar-center,
 .center-section {
-  padding: 0 4px;
+  padding: 0 6px;
 }
 
 .workspaces {
-  padding: 0 2px;
+  padding: 0 4px;
 
   .workspace-dots {
     font-family: $font-icon;
     font-size: 7px;
     color: $text-secondary;
-    letter-spacing: 2px;
+    letter-spacing: 3px;
   }
 }
 
 // ── Right Section (Privacy, Status Menus, Spotlight, Control Center, Clock) ──
 .bar-right,
 .right-section {
-  padding: 0 2px;
+  padding: 0 4px;
 }
 
 .status-group {
@@ -294,7 +294,8 @@ window.Bar {
 .privacy-pill {
   background: transparent;
   border: none;
-  padding: 1px 4px;
+  padding: 2px 6px;
+  margin: 0 2px;
   min-height: 20px;
 
   .privacy-icon {
@@ -310,10 +311,10 @@ window.Bar {
   border: none;
   box-shadow: none;
   border-radius: 5px;
-  padding: 2px 7px;
-  min-width: 22px;
+  padding: 2px 9px;
+  min-width: 26px;
   min-height: 22px;
-  margin: 0 1px;
+  margin: 0 2px;
   transition: background-color 100ms ease;
 
   > button {
@@ -321,8 +322,8 @@ window.Bar {
     background-color: transparent;
     border: none;
     box-shadow: none;
-    padding: 2px 7px;
-    min-width: 22px;
+    padding: 2px 9px;
+    min-width: 26px;
     min-height: 22px;
     border-radius: 5px;
   }
@@ -351,8 +352,8 @@ window.Bar {
   font-weight: 500;
   font-size: 12px;
   color: $text-primary;
-  padding: 2px 8px;
-  margin: 0 2px;
+  padding: 2px 10px;
+  margin: 0 4px;
   border-radius: 5px;
   letter-spacing: -0.1px;
   transition: background-color 100ms ease;
@@ -367,8 +368,8 @@ window.Bar {
   padding: 0;
 
   .tray-item-btn {
-    padding: 2px 4px;
-    min-width: 20px;
+    padding: 2px 5px;
+    min-width: 22px;
     min-height: 20px;
 
     image {

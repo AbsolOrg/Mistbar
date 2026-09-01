@@ -1,40 +1,18 @@
 import app from "ags/gtk4/app"
 import { Astal, Gtk, Gdk } from "ags/gtk4"
+import GLib from "gi://GLib?version=2.0"
 import LeftSection from "./LeftSection"
 import CenterSection from "./CenterSection"
 import RightSection from "./RightSection"
 import { MistbarConfig, defaultConfig } from "../config"
-import { createPoll } from "ags/time"
-
-const hasActiveWindow = createPoll(
-  false,
-  500,
-  ["bash", "-c", `python3 -c "
-import subprocess, json
-try:
-  ws = json.loads(subprocess.check_output(['niri', 'msg', '-j', 'workspaces'], stderr=subprocess.DEVNULL))
-  act = next((w['id'] for w in ws if w.get('is_active')), None)
-  if act is not None:
-    wins = json.loads(subprocess.check_output(['niri', 'msg', '-j', 'windows'], stderr=subprocess.DEVNULL))
-    has_w = any(w.get('workspace_id') == act for w in wins)
-    print('true' if has_w else 'false')
-    exit(0)
-except: pass
-try:
-  act = json.loads(subprocess.check_output(['hyprctl', 'activewindow', '-j'], stderr=subprocess.DEVNULL))
-  print('true' if (act.get('title') or act.get('class')) else 'false')
-  exit(0)
-except: pass
-print('false')
-"`],
-  (out: string) => out.trim() === "true"
-)
+import { execAsync } from "ags/process"
 
 let winRef: any = null
 let revealerRef: Gtk.Revealer | null = null
 let isHovered = false
 let hasWindow = false
 let autoHide = false
+let watcherStarted = false
 
 export function getBarWindow() {
   return winRef
@@ -72,6 +50,46 @@ function updateVisibility() {
       winRef.exclusivity = Astal.Exclusivity.IGNORE
     }
   }
+}
+
+function startWindowWatcher() {
+  if (watcherStarted) return
+  watcherStarted = true
+
+  GLib.timeout_add(GLib.PRIORITY_DEFAULT, 400, () => {
+    execAsync([
+      "python3",
+      "-c",
+      `
+import subprocess, json
+try:
+  ws = json.loads(subprocess.check_output(['niri', 'msg', '-j', 'workspaces'], stderr=subprocess.DEVNULL))
+  act = next((w['id'] for w in ws if w.get('is_active')), None)
+  if act is not None:
+    wins = json.loads(subprocess.check_output(['niri', 'msg', '-j', 'windows'], stderr=subprocess.DEVNULL))
+    has_w = any(w.get('workspace_id') == act for w in wins)
+    print('true' if has_w else 'false')
+    exit(0)
+except: pass
+try:
+  act = json.loads(subprocess.check_output(['hyprctl', 'activewindow', '-j'], stderr=subprocess.DEVNULL))
+  print('true' if (act.get('title') or act.get('class')) else 'false')
+  exit(0)
+except: pass
+print('false')
+`
+    ])
+      .then((out: string) => {
+        const has = out.trim() === "true"
+        if (has !== hasWindow) {
+          hasWindow = has
+          updateVisibility()
+        }
+      })
+      .catch(() => {})
+
+    return GLib.SOURCE_CONTINUE
+  })
 }
 
 export default function Bar(gdkmonitor: Gdk.Monitor, config: MistbarConfig = defaultConfig) {
@@ -145,11 +163,7 @@ export default function Bar(gdkmonitor: Gdk.Monitor, config: MistbarConfig = def
   winRef = win
   win.visible = true
 
-  hasActiveWindow.subscribe((val) => {
-    hasWindow = val
-    updateVisibility()
-  })
-
+  startWindowWatcher()
   updateVisibility()
 
   return win

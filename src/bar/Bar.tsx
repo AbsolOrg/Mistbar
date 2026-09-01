@@ -30,60 +30,57 @@ print('false')
   (out: string) => out.trim() === "true"
 )
 
-let setAutohideFn: ((enabled: boolean) => void) | null = null
-let getAutohideFn: (() => boolean) | null = null
+let winRef: any = null
+let isHovered = false
+let hasWindow = false
+let autoHide = false
+
+export function getBarWindow() {
+  return winRef
+}
 
 export function setBarAutohide(enabled: boolean) {
-  if (setAutohideFn) {
-    setAutohideFn(enabled)
+  autoHide = enabled
+  if (winRef) {
+    winRef.visible = true
+    winRef.exclusivity = enabled ? Astal.Exclusivity.IGNORE : Astal.Exclusivity.EXCLUSIVE
   }
+  updateVisibility()
 }
 
 export function getBarAutohide(): boolean {
-  return getAutohideFn ? getAutohideFn() : false
+  return autoHide
+}
+
+function updateVisibility() {
+  if (!winRef) return
+  if (!autoHide) {
+    winRef.remove_css_class("bar-hidden")
+    winRef.exclusivity = Astal.Exclusivity.EXCLUSIVE
+  } else {
+    // Intelligent Auto-Hide:
+    // Visible when desktop is clean/empty or hovered
+    // Hidden when windows occupy active workspace and mouse is away
+    const shouldShow = !hasWindow || isHovered
+    if (shouldShow) {
+      winRef.remove_css_class("bar-hidden")
+    } else {
+      winRef.add_css_class("bar-hidden")
+    }
+    winRef.exclusivity = Astal.Exclusivity.IGNORE
+  }
 }
 
 export default function Bar(gdkmonitor: Gdk.Monitor, config: MistbarConfig = defaultConfig) {
   const { TOP, LEFT, RIGHT } = Astal.WindowAnchor
-
-  let winRef: any = null
-  let revealerWidget: Gtk.Revealer | null = null
-  let isHovered = false
-  let hasWindow = false
-  let autoHide = Boolean(config.autoHide)
-
-  function updateVisibility() {
-    if (!revealerWidget) return
-    if (!autoHide) {
-      revealerWidget.set_reveal_child(true)
-    } else {
-      // Intelligent Auto-Hide (Intellihide):
-      // Visible when desktop is clean/empty, or when mouse is hovered at the top
-      // Hidden when windows occupy the active workspace and mouse is away
-      if (!hasWindow || isHovered) {
-        revealerWidget.set_reveal_child(true)
-      } else {
-        revealerWidget.set_reveal_child(false)
-      }
-    }
-  }
-
-  setAutohideFn = (enabled: boolean) => {
-    autoHide = enabled
-    if (winRef) {
-      winRef.exclusivity = enabled ? Astal.Exclusivity.IGNORE : Astal.Exclusivity.EXCLUSIVE
-    }
-    updateVisibility()
-  }
-
-  getAutohideFn = () => autoHide
+  autoHide = Boolean(config.autoHide)
 
   hasActiveWindow.subscribe((val) => {
     hasWindow = val
     updateVisibility()
   })
 
-  return (
+  const win = (
     <window
       visible
       name="mistbar"
@@ -93,51 +90,35 @@ export default function Bar(gdkmonitor: Gdk.Monitor, config: MistbarConfig = def
       exclusivity={config.autoHide ? Astal.Exclusivity.IGNORE : Astal.Exclusivity.EXCLUSIVE}
       anchor={TOP | LEFT | RIGHT}
       application={app}
-      setup={(win: any) => {
-        winRef = win
-        updateVisibility()
-      }}
     >
-      <box
-        orientation={Gtk.Orientation.VERTICAL}
-        setup={(self) => {
-          const motion = new Gtk.EventControllerMotion()
-          motion.connect("enter", () => {
-            isHovered = true
-            updateVisibility()
-          })
-          motion.connect("leave", () => {
-            isHovered = false
-            updateVisibility()
-          })
-          self.add_controller(motion)
-        }}
-      >
-        {/* 2px top hover trigger strip */}
-        <box class="hover-trigger-zone" />
-
-        <revealer
-          transitionType={Gtk.RevealerTransitionType.SLIDE_DOWN}
-          transitionDuration={200}
-          revealChild={true}
-          setup={(self) => {
-            revealerWidget = self
-            updateVisibility()
-          }}
-        >
-          <centerbox class="bar-inner">
-            <box $type="start" class="bar-left">
-              <LeftSection />
-            </box>
-            <box $type="center" class="bar-center">
-              <CenterSection />
-            </box>
-            <box $type="end" class="bar-right">
-              <RightSection />
-            </box>
-          </centerbox>
-        </revealer>
-      </box>
+      <centerbox class="bar-inner">
+        <box $type="start" class="bar-left">
+          <LeftSection />
+        </box>
+        <box $type="center" class="bar-center">
+          <CenterSection />
+        </box>
+        <box $type="end" class="bar-right">
+          <RightSection />
+        </box>
+      </centerbox>
     </window>
   )
+
+  winRef = win
+
+  const motion = new Gtk.EventControllerMotion()
+  motion.connect("enter", () => {
+    isHovered = true
+    updateVisibility()
+  })
+  motion.connect("leave", () => {
+    isHovered = false
+    updateVisibility()
+  })
+  win.add_controller(motion)
+
+  updateVisibility()
+
+  return win
 }

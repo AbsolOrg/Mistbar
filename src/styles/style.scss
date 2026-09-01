@@ -91,7 +91,18 @@ window.Bar {
   // Base inner bar container
   centerbox,
   .bar-inner {
-    transition: all 150ms ease;
+    transition: transform 220ms cubic-bezier(0.16, 1, 0.3, 1), opacity 180ms ease, background-color 150ms ease;
+    transform: translateY(0);
+    opacity: 1;
+  }
+
+  // Hidden state for intelligent auto-hide
+  &.bar-hidden {
+    centerbox,
+    .bar-inner {
+      transform: translateY(-40px);
+      opacity: 0;
+    }
   }
 
   // ── Look Presets: Pill (Default) vs Attached ──

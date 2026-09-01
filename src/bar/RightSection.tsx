@@ -12,17 +12,29 @@ import PowerMenu from "../widgets/PowerMenu"
 
 export default function RightSection() {
   return (
-    <box class="right-section" spacing={3}>
+    <box class="right-section" spacing={12}>
       <PrivacyIndicator />
-      <SystemTray />
-      <Brightness />
-      <Volume />
-      <Network />
-      <Bluetooth />
-      <Battery />
+
+      {/* System Status Indicators Group */}
+      <box class="status-group" spacing={10}>
+        <SystemTray />
+        <Brightness />
+        <Volume />
+        <Network />
+        <Bluetooth />
+        <Battery />
+      </box>
+
+      {/* Spotlight Search */}
       <Spotlight />
+
+      {/* Control Center */}
       <ControlCenter />
+
+      {/* Date & Time (Notification Center) */}
       <Clock />
+
+      {/* Power Menu */}
       <PowerMenu />
     </box>
   )

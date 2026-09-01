@@ -2,7 +2,7 @@
 // Mistbar — macOS Tahoe Liquid Glass Theme
 // ============================================================================
 
-// ── Color Palette ──
+// ── Color Palette (Dark Theme Default) ──
 $glass-bg: rgba(24, 24, 28, 0.78);
 $glass-card: rgba(255, 255, 255, 0.08);
 $glass-card-hover: rgba(255, 255, 255, 0.14);
@@ -12,12 +12,26 @@ $glass-border: rgba(255, 255, 255, 0.14);
 $glass-inner-glow: rgba(255, 255, 255, 0.08);
 $glass-shadow: rgba(0, 0, 0, 0.50);
 
+// ── Color Palette (Light Theme) ──
+$glass-bg-light: rgba(246, 246, 248, 0.85);
+$glass-card-light: rgba(0, 0, 0, 0.05);
+$glass-card-hover-light: rgba(0, 0, 0, 0.09);
+$glass-bg-hover-light: rgba(0, 0, 0, 0.07);
+$glass-bg-active-light: rgba(0, 0, 0, 0.12);
+$glass-border-light: rgba(0, 0, 0, 0.12);
+$glass-inner-glow-light: rgba(255, 255, 255, 0.60);
+$glass-shadow-light: rgba(0, 0, 0, 0.15);
+
 $accent-blue: #007aff;
 $accent-blue-hover: #0062cc;
 
 $text-primary: #f5f5f7;
 $text-secondary: rgba(245, 245, 247, 0.72);
 $text-dim: rgba(245, 245, 247, 0.45);
+
+$text-primary-light: #1d1d1f;
+$text-secondary-light: rgba(29, 29, 31, 0.72);
+$text-dim-light: rgba(29, 29, 31, 0.45);
 
 $bar-height: 36px;
 $bar-radius: 16px;
@@ -48,6 +62,37 @@ window.Bar {
       inset 0 1px 0 0 $glass-inner-glow,
       0 8px 30px $glass-shadow,
       0 2px 6px rgba(0, 0, 0, 0.25);
+  }
+
+  // ── Light Theme Variant ──
+  &.light-theme {
+    color: $text-primary-light;
+
+    > centerbox,
+    .bar-inner {
+      background-color: $glass-bg-light;
+      border: 1px solid $glass-border-light;
+      box-shadow:
+        inset 0 1px 0 0 $glass-inner-glow-light,
+        0 8px 24px $glass-shadow-light,
+        0 2px 6px rgba(0, 0, 0, 0.08);
+    }
+
+    .logo-button:hover { background-color: $glass-bg-hover-light; }
+    .logo-button .logo-icon { color: $text-primary-light; }
+    .separator-dot { color: $text-dim-light; }
+    .active-window { color: $text-primary-light; }
+
+    .menu-item-btn:hover { background-color: $glass-bg-hover-light; }
+    .menu-item-btn label { color: $text-primary-light; }
+
+    .workspace-dots { color: $text-secondary-light; }
+    .clock { color: $text-primary-light; }
+
+    .status-icon:hover { background-color: $glass-bg-hover-light; }
+    .status-icon-label { color: $text-primary-light; }
+    .battery-percent { color: $text-secondary-light; }
+    .power-icon { color: $text-secondary-light; }
   }
 }
 

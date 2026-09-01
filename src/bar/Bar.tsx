@@ -3,8 +3,9 @@ import { Astal, Gtk, Gdk } from "ags/gtk4"
 import LeftSection from "./LeftSection"
 import CenterSection from "./CenterSection"
 import RightSection from "./RightSection"
+import { MistbarConfig, defaultConfig } from "../config"
 
-export default function Bar(gdkmonitor: Gdk.Monitor) {
+export default function Bar(gdkmonitor: Gdk.Monitor, config: MistbarConfig = defaultConfig) {
   const { TOP, LEFT, RIGHT } = Astal.WindowAnchor
 
   return (
@@ -13,7 +14,7 @@ export default function Bar(gdkmonitor: Gdk.Monitor) {
       name="mistbar"
       class="Bar"
       gdkmonitor={gdkmonitor}
-      exclusivity={Astal.Exclusivity.EXCLUSIVE}
+      exclusivity={config.autoHide ? Astal.Exclusivity.IGNORE : Astal.Exclusivity.EXCLUSIVE}
       anchor={TOP | LEFT | RIGHT}
       application={app}
     >

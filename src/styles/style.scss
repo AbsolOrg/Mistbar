@@ -95,6 +95,71 @@ window.Bar {
   letter-spacing: -0.1px;
 }
 
+// ── App Menu Bar ──
+.app-menu-bar {
+  padding: 0 2px;
+
+  .menu-item-btn {
+    background: transparent;
+    border: none;
+    border-radius: 8px;
+    padding: 2px 6px;
+    transition: background-color 150ms ease;
+
+    &:hover {
+      background-color: $glass-bg-hover;
+    }
+
+    &:active {
+      background-color: $glass-bg-active;
+    }
+
+    label {
+      font-size: 13px;
+      font-weight: 500;
+      color: $text-primary;
+    }
+  }
+}
+
+.appmenu-popover {
+  .appmenu-content {
+    padding: 4px;
+    min-width: 190px;
+  }
+
+  .menu-option-btn {
+    background: transparent;
+    border: none;
+    border-radius: 6px;
+    padding: 5px 8px;
+    transition: background-color 150ms ease;
+
+    &:hover {
+      background-color: $accent-blue;
+      
+      label {
+        color: #ffffff;
+      }
+      .menu-shortcut {
+        color: rgba(255, 255, 255, 0.8);
+      }
+    }
+
+    .menu-option-label {
+      font-size: 13px;
+      font-weight: 500;
+      color: $text-primary;
+    }
+
+    .menu-shortcut {
+      font-size: 11px;
+      color: $text-dim;
+      font-family: $font-main;
+    }
+  }
+}
+
 // ── Center Section ──
 .bar-center,
 .center-section {
@@ -150,6 +215,21 @@ window.Bar {
   }
 }
 
+// ── System Tray ──
+.system-tray {
+  padding: 0 2px;
+
+  .tray-item-btn {
+    padding: 3px 4px;
+    min-width: 22px;
+    min-height: 22px;
+
+    image {
+      margin: 0;
+    }
+  }
+}
+
 .battery-widget {
   .battery-percent {
     font-size: 12px;
@@ -185,7 +265,7 @@ popover {
   separator {
     background-color: $glass-border;
     min-height: 1px;
-    margin: 2px 0;
+    margin: 3px 0;
   }
 }
 

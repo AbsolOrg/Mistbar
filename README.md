@@ -107,12 +107,14 @@ Mistbar/
     │   └── RightSection.tsx
     ├── widgets/
     │   ├── ActiveWindow.tsx
+    │   ├── AppMenu.tsx
     │   ├── Battery.tsx
     │   ├── Bluetooth.tsx
     │   ├── Brightness.tsx
     │   ├── Clock.tsx
     │   ├── Network.tsx
     │   ├── PowerMenu.tsx
+    │   ├── SystemTray.tsx
     │   ├── Volume.tsx
     │   └── Workspaces.tsx
     └── styles/
@@ -123,8 +125,8 @@ Mistbar/
 
 - [x] Phase 1: Core bar (layout, glass effect, clock, workspaces, system icons)
 - [x] Phase 2: Dropdown popovers (volume slider, Wi-Fi list, Bluetooth manager, brightness slider, battery/power profile, power menu)
-- [ ] Phase 3: Global app menu (DBus-based File/Edit/View)
-- [ ] Phase 4: System tray (StatusNotifier)
+- [x] Phase 3: Global app menu (macOS-style contextual File/Edit/View/Window/Help menus)
+- [x] Phase 4: System tray (DBus StatusNotifierItem integration)
 - [ ] Phase 5: Polish, auto-hide, themes
 
 ## License

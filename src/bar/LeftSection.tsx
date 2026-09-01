@@ -1,6 +1,7 @@
 import { Gtk } from "ags/gtk4"
 import { execAsync } from "ags/process"
 import ActiveWindow from "../widgets/ActiveWindow"
+import AppMenu from "../widgets/AppMenu"
 
 export default function LeftSection() {
   return (
@@ -18,6 +19,8 @@ export default function LeftSection() {
       </box>
 
       <ActiveWindow />
+
+      <AppMenu />
     </box>
   )
 }

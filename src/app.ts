@@ -1,6 +1,6 @@
 import app from "ags/gtk4/app"
 import style from "./styles/style.scss"
-import Bar from "./bar/Bar"
+import Bar, { setBarAutohide, getBarAutohide } from "./bar/Bar"
 import { loadConfig, saveConfig, MistbarStyle, MistbarLook, MistbarTheme } from "./config"
 
 const config = loadConfig()
@@ -55,6 +55,17 @@ app.start({
       } else {
         res("error: window not found")
       }
+    } else if (cmd.startsWith("autohide:") || cmd === "autohide") {
+      const mode = cmd.replace("autohide:", "").trim()
+      let enabled = true
+      if (mode === "off" || mode === "false" || mode === "disable") {
+        enabled = false
+      } else if (mode === "toggle" || mode === "autohide") {
+        enabled = !getBarAutohide()
+      }
+      setBarAutohide(enabled)
+      saveConfig({ autoHide: enabled })
+      res(`autohide set to ${enabled ? "on" : "off"}`)
     } else if (cmd.startsWith("theme:")) {
       const theme = cmd.replace("theme:", "").trim() as MistbarTheme
       const win = app.get_window("mistbar")

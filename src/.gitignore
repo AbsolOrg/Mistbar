@@ -1,0 +1,4 @@
+@girs/
+node_modules/
+*.js
+*.js.map

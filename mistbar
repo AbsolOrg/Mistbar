@@ -1,0 +1,192 @@
+#!/usr/bin/env bash
+# ============================================================================
+# Mistbar — macOS Tahoe Liquid Glass Top Bar for Linux (Wayland)
+# CLI launcher and manager
+# ============================================================================
+
+set -euo pipefail
+
+SCRIPT_SOURCE="$(readlink -f "${BASH_SOURCE[0]}")"
+SCRIPT_DIR="$(cd "$(dirname "$SCRIPT_SOURCE")" && pwd)"
+SRC_DIR="$SCRIPT_DIR/src"
+INSTANCE_NAME="mistbar"
+
+# Colors for output
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+BLUE='\033[0;34m'
+CYAN='\033[0;36m'
+DIM='\033[2m'
+BOLD='\033[1m'
+NC='\033[0m' # No Color
+
+print_banner() {
+    echo -e "${CYAN}${BOLD}"
+    echo "  ╔══════════════════════════════════════╗"
+    echo "  ║          🍏 Mistbar v0.1.0           ║"
+    echo "  ║   macOS Tahoe Liquid Glass Bar       ║"
+    echo "  ╚══════════════════════════════════════╝"
+    echo -e "${NC}"
+}
+
+print_help() {
+    print_banner
+    echo -e "${BOLD}USAGE:${NC}"
+    echo "    mistbar <command> [options]"
+    echo ""
+    echo -e "${BOLD}COMMANDS:${NC}"
+    echo -e "    ${GREEN}start${NC}          Start the bar"
+    echo -e "    ${GREEN}stop${NC}           Stop the bar"
+    echo -e "    ${GREEN}restart${NC}        Restart the bar"
+    echo -e "    ${GREEN}status${NC}         Check if the bar is running"
+    echo -e "    ${GREEN}inspect${NC}        Open GTK Inspector for debugging"
+    echo -e "    ${GREEN}install-deps${NC}   Install required dependencies"
+    echo ""
+    echo -e "${BOLD}OPTIONS:${NC}"
+    echo -e "    ${BLUE}--auto-hide${NC}    Start with auto-hide behavior"
+    echo -e "    ${BLUE}--always-visible${NC} Start with always-visible behavior (default)"
+    echo -e "    ${BLUE}-h, --help${NC}     Show this help message"
+    echo -e "    ${BLUE}-v, --version${NC}  Show version"
+    echo ""
+    echo -e "${BOLD}EXAMPLES:${NC}"
+    echo "    mistbar start"
+    echo "    mistbar start --auto-hide"
+    echo "    mistbar restart"
+    echo "    mistbar stop"
+    echo ""
+    echo -e "${DIM}Project: https://github.com/AbsolOrg/Mistbar${NC}"
+}
+
+check_deps() {
+    local missing=()
+
+    command -v ags &>/dev/null || missing+=("ags (AGS 3)")
+    command -v niri &>/dev/null || missing+=("niri")
+    command -v fuzzel &>/dev/null || missing+=("fuzzel")
+    command -v wpctl &>/dev/null || missing+=("wireplumber (wpctl)")
+    command -v nmcli &>/dev/null || missing+=("networkmanager (nmcli)")
+    command -v bluetoothctl &>/dev/null || missing+=("bluez-utils (bluetoothctl)")
+    command -v brightnessctl &>/dev/null || missing+=("brightnessctl")
+
+    if [ ${#missing[@]} -gt 0 ]; then
+        echo -e "${RED}Missing dependencies:${NC}"
+        for dep in "${missing[@]}"; do
+            echo -e "  ✗ $dep"
+        done
+        echo ""
+        echo -e "Run ${CYAN}mistbar install-deps${NC} to install them."
+        return 1
+    fi
+    return 0
+}
+
+cmd_start() {
+    echo -e "${GREEN}Starting Mistbar...${NC}"
+
+    # Check if already running
+    if ags list 2>/dev/null | grep -q "$INSTANCE_NAME"; then
+        echo -e "${BLUE}Mistbar is already running. Use 'mistbar restart' to restart.${NC}"
+        return 0
+    fi
+
+    # Check dependencies
+    if ! check_deps; then
+        return 1
+    fi
+
+    # Start AGS in background
+    nohup ags run -d "$SRC_DIR" >/dev/null 2>&1 &
+
+    sleep 1
+    if ags list 2>/dev/null | grep -q "$INSTANCE_NAME"; then
+        echo -e "${GREEN}✓ Mistbar started successfully!${NC}"
+    else
+        echo -e "${RED}✗ Failed to start Mistbar. Check logs.${NC}"
+        return 1
+    fi
+}
+
+cmd_stop() {
+    echo -e "${BLUE}Stopping Mistbar...${NC}"
+
+    if ags quit -i "$INSTANCE_NAME" 2>/dev/null; then
+        echo -e "${GREEN}✓ Mistbar stopped.${NC}"
+    else
+        echo -e "${DIM}Mistbar is not running.${NC}"
+    fi
+}
+
+cmd_restart() {
+    cmd_stop 2>/dev/null || true
+    sleep 0.5
+    cmd_start
+}
+
+cmd_status() {
+    if ags list 2>/dev/null | grep -q "$INSTANCE_NAME"; then
+        echo -e "${GREEN}● Mistbar is running${NC}"
+    else
+        echo -e "${RED}○ Mistbar is not running${NC}"
+    fi
+}
+
+cmd_inspect() {
+    echo -e "${BLUE}Opening GTK Inspector...${NC}"
+    ags inspect -i "$INSTANCE_NAME" 2>/dev/null || echo -e "${RED}Mistbar is not running.${NC}"
+}
+
+cmd_install_deps() {
+    echo -e "${CYAN}Installing dependencies...${NC}"
+    echo ""
+
+    if command -v pacman &>/dev/null; then
+        echo -e "${BLUE}Detected Arch-based system (pacman)${NC}"
+        echo "Installing: inter-font brightnessctl networkmanager bluez-utils wireplumber"
+        sudo pacman -S --needed --noconfirm \
+            inter-font \
+            brightnessctl \
+            networkmanager \
+            bluez-utils \
+            wireplumber \
+            gtk4-layer-shell \
+            2>/dev/null || true
+        echo -e "${GREEN}✓ Dependencies installed!${NC}"
+    else
+        echo -e "${RED}Unsupported package manager. Please install dependencies manually.${NC}"
+        echo "Required: inter-font, brightnessctl, networkmanager, bluez-utils, wireplumber, gtk4-layer-shell"
+    fi
+}
+
+# ── Main ──
+case "${1:-}" in
+    start)
+        shift
+        cmd_start "$@"
+        ;;
+    stop)
+        cmd_stop
+        ;;
+    restart)
+        cmd_restart
+        ;;
+    status)
+        cmd_status
+        ;;
+    inspect)
+        cmd_inspect
+        ;;
+    install-deps)
+        cmd_install_deps
+        ;;
+    -v|--version)
+        echo "Mistbar v0.1.0"
+        ;;
+    -h|--help|"")
+        print_help
+        ;;
+    *)
+        echo -e "${RED}Unknown command: $1${NC}"
+        echo "Run 'mistbar --help' for usage."
+        exit 1
+        ;;
+esac

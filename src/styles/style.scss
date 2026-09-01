@@ -137,7 +137,7 @@ window.Bar {
 // ── Left Section (Apple Menu & App Menus) ──
 .bar-left,
 .left-section {
-  padding: 0;
+  padding: 0 2px;
 }
 
 .logo-button {
@@ -146,9 +146,9 @@ window.Bar {
   border: none;
   box-shadow: none;
   border-radius: 5px;
-  padding: 1px 5px;
-  min-width: 20px;
-  min-height: 20px;
+  padding: 2px 6px;
+  min-width: 22px;
+  min-height: 22px;
   transition: background-color 100ms ease;
 
   > button {
@@ -284,6 +284,10 @@ window.Bar {
 // ── Right Section (Privacy, Status Menus, Spotlight, Control Center, Clock) ──
 .bar-right,
 .right-section {
+  padding: 0 2px;
+}
+
+.status-group {
   padding: 0;
 }
 
@@ -305,10 +309,11 @@ window.Bar {
   background-color: transparent;
   border: none;
   box-shadow: none;
-  border-radius: 4px;
-  padding: 1px 4px;
-  min-width: 20px;
-  min-height: 20px;
+  border-radius: 5px;
+  padding: 2px 7px;
+  min-width: 22px;
+  min-height: 22px;
+  margin: 0 1px;
   transition: background-color 100ms ease;
 
   > button {
@@ -316,10 +321,10 @@ window.Bar {
     background-color: transparent;
     border: none;
     box-shadow: none;
-    padding: 1px 4px;
-    min-width: 20px;
-    min-height: 20px;
-    border-radius: 4px;
+    padding: 2px 7px;
+    min-width: 22px;
+    min-height: 22px;
+    border-radius: 5px;
   }
 
   &:hover,
@@ -336,8 +341,9 @@ window.Bar {
 
   .status-icon-label {
     font-family: $font-icon;
-    font-size: 12.5px;
+    font-size: 13px;
     color: $text-primary;
+    line-height: 1;
   }
 }
 
@@ -345,8 +351,9 @@ window.Bar {
   font-weight: 500;
   font-size: 12px;
   color: $text-primary;
-  padding: 1px 6px;
-  border-radius: 4px;
+  padding: 2px 8px;
+  margin: 0 2px;
+  border-radius: 5px;
   letter-spacing: -0.1px;
   transition: background-color 100ms ease;
 
@@ -360,9 +367,9 @@ window.Bar {
   padding: 0;
 
   .tray-item-btn {
-    padding: 0 2px;
-    min-width: 18px;
-    min-height: 18px;
+    padding: 2px 4px;
+    min-width: 20px;
+    min-height: 20px;
 
     image {
       margin: 0;

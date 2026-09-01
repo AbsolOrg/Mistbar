@@ -3,7 +3,7 @@ import { createPoll } from "ags/time"
 import { execAsync } from "ags/process"
 
 const batteryIcon = createPoll(
-  "󰁹",
+  "",
   5000,
   ["bash", "-c", "cat /sys/class/power_supply/BAT*/capacity 2>/dev/null | head -1; echo '|'; cat /sys/class/power_supply/BAT*/status 2>/dev/null | head -1"],
   (out: string) => {
@@ -13,12 +13,11 @@ const batteryIcon = createPoll(
     const charging = status === "Charging"
 
     if (charging) return "󰂄"
-    if (percent >= 90) return "󰁹"
-    if (percent >= 70) return "󰂀"
-    if (percent >= 50) return "󰁾"
-    if (percent >= 30) return "󰁼"
-    if (percent >= 15) return "󰁻"
-    return "󰂃"
+    if (percent >= 85) return ""
+    if (percent >= 60) return ""
+    if (percent >= 35) return ""
+    if (percent >= 15) return ""
+    return ""
   }
 )
 
@@ -53,7 +52,7 @@ export default function Battery() {
       tooltipText={batteryPercent((p) => `Battery: ${p}`)}
     >
       <label
-        class="status-icon-label"
+        class="status-icon-label battery-icon-label"
         label={batteryIcon}
       />
 

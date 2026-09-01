@@ -19,7 +19,7 @@ export default function Bar(gdkmonitor: Gdk.Monitor, config: MistbarConfig = def
       anchor={TOP | LEFT | RIGHT}
       application={app}
     >
-      <centerbox cssName="bar-inner">
+      <centerbox class="bar-inner">
         <box $type="start" class="bar-left">
           <LeftSection />
         </box>

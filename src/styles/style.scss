@@ -1,43 +1,43 @@
 // ============================================================================
-// Mistbar — macOS Sequoia / Tahoe Liquid Glass Theme (Ultra-Slim 24px)
+// Mistbar — macOS Tahoe / Sequoia Floating Glass Pill Bar
 // ============================================================================
 
 // ── Color Palette (Dark Liquid Glass) ──
-$glass-bg-dark: rgba(22, 22, 26, 0.58);
-$glass-gradient-dark: linear-gradient(180deg, rgba(255, 255, 255, 0.12) 0%, rgba(18, 18, 22, 0.58) 100%);
+$glass-bg-dark: rgba(22, 22, 28, 0.60);
+$glass-gradient-dark: linear-gradient(180deg, rgba(255, 255, 255, 0.14) 0%, rgba(18, 18, 22, 0.60) 100%);
 $glass-card: rgba(255, 255, 255, 0.08);
 $glass-card-hover: rgba(255, 255, 255, 0.14);
 $glass-bg-hover: rgba(255, 255, 255, 0.12);
 $glass-bg-active: rgba(255, 255, 255, 0.20);
-$glass-border: rgba(255, 255, 255, 0.15);
+$glass-border: rgba(255, 255, 255, 0.16);
 $glass-inner-glow: rgba(255, 255, 255, 0.28);
-$glass-shadow: rgba(0, 0, 0, 0.30);
+$glass-shadow: rgba(0, 0, 0, 0.45);
 
 // ── Color Palette (Light Liquid Glass) ──
-$glass-bg-light: rgba(245, 245, 248, 0.65);
-$glass-gradient-light: linear-gradient(180deg, rgba(255, 255, 255, 0.80) 0%, rgba(235, 235, 240, 0.60) 100%);
+$glass-bg-light: rgba(245, 245, 248, 0.70);
+$glass-gradient-light: linear-gradient(180deg, rgba(255, 255, 255, 0.85) 0%, rgba(235, 235, 240, 0.65) 100%);
 $glass-card-light: rgba(0, 0, 0, 0.05);
 $glass-card-hover-light: rgba(0, 0, 0, 0.09);
 $glass-bg-hover-light: rgba(0, 0, 0, 0.07);
 $glass-bg-active-light: rgba(0, 0, 0, 0.12);
-$glass-border-light: rgba(255, 255, 255, 0.50);
+$glass-border-light: rgba(255, 255, 255, 0.55);
 $glass-inner-glow-light: rgba(255, 255, 255, 0.90);
-$glass-shadow-light: rgba(0, 0, 0, 0.12);
+$glass-shadow-light: rgba(0, 0, 0, 0.14);
 
 $accent-blue: #007aff;
 $accent-blue-hover: #006ee6;
 
-$text-primary: #f5f5f7;
-$text-secondary: rgba(245, 245, 247, 0.75);
-$text-dim: rgba(245, 245, 247, 0.45);
+$text-primary: #ffffff;
+$text-secondary: rgba(255, 255, 255, 0.80);
+$text-dim: rgba(255, 255, 255, 0.50);
 
 $text-primary-light: #1d1d1f;
-$text-secondary-light: rgba(29, 29, 31, 0.75);
-$text-dim-light: rgba(29, 29, 31, 0.45);
+$text-secondary-light: rgba(29, 29, 31, 0.80);
+$text-dim-light: rgba(29, 29, 31, 0.50);
 
-$bar-height: 24px;
-$bar-radius: 10px;
-$bar-margin: 3px 6px 0 6px;
+$bar-height: 28px;
+$bar-radius: 16px;
+$bar-margin: 6px 12px 0 12px;
 
 $font-main: "SF Pro Text", "SF Pro Display", "Inter", "Adwaita Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
 $font-icon: "Symbols Nerd Font Mono", "MesloLGS Nerd Font", "MesloLGSDZ Nerd Font Mono", monospace;
@@ -47,11 +47,11 @@ window.Bar {
   background: transparent;
   color: $text-primary;
   font-family: $font-main;
-  font-size: 11.5px;
+  font-size: 12px;
   font-weight: 500;
 
-  // Inner floating pill container
-  > centerbox,
+  // Floating rounded pill container detached from screen lines
+  centerbox,
   .bar-inner {
     background-color: $glass-bg-dark;
     background-image: $glass-gradient-dark;
@@ -59,12 +59,13 @@ window.Bar {
     border-radius: $bar-radius;
     margin: $bar-margin;
     min-height: $bar-height;
-    padding: 0 6px;
+    max-height: $bar-height;
+    padding: 0 10px;
     box-shadow:
       inset 0 1px 0 0 $glass-inner-glow,
       inset 0 -1px 0 0 rgba(255, 255, 255, 0.05),
-      0 3px 12px $glass-shadow,
-      0 1px 2px rgba(0, 0, 0, 0.15);
+      0 8px 24px $glass-shadow,
+      0 2px 6px rgba(0, 0, 0, 0.25);
     transition: all 150ms ease;
   }
 
@@ -72,20 +73,19 @@ window.Bar {
   &.light-theme {
     color: $text-primary-light;
 
-    > centerbox,
+    centerbox,
     .bar-inner {
       background-color: $glass-bg-light;
       background-image: $glass-gradient-light;
       border: 1px solid $glass-border-light;
       box-shadow:
         inset 0 1px 0 0 $glass-inner-glow-light,
-        0 3px 12px $glass-shadow-light,
-        0 1px 2px rgba(0, 0, 0, 0.06);
+        0 8px 24px $glass-shadow-light,
+        0 2px 6px rgba(0, 0, 0, 0.06);
     }
 
     .logo-button:hover { background-color: $glass-bg-hover-light; }
     .logo-button .logo-icon { color: $text-primary-light; }
-    .separator-dot { color: $text-dim-light; }
     .active-window { color: $text-primary-light; }
 
     .menu-item-btn:hover { background-color: $glass-bg-hover-light; }
@@ -101,7 +101,7 @@ window.Bar {
   }
 }
 
-// ── Left Section ──
+// ── Left Section (Apple Menu & App Menus) ──
 .bar-left,
 .left-section {
   padding: 0;
@@ -110,10 +110,10 @@ window.Bar {
 .logo-button {
   background: transparent;
   border: none;
-  border-radius: 5px;
-  padding: 0 3px;
-  min-width: 18px;
-  min-height: 18px;
+  border-radius: 6px;
+  padding: 1px 5px;
+  min-width: 20px;
+  min-height: 20px;
   transition: background-color 120ms ease;
 
   &:hover {
@@ -126,35 +126,29 @@ window.Bar {
 
   .logo-icon {
     font-family: $font-icon;
-    font-size: 13px;
+    font-size: 14px;
     color: $text-primary;
   }
 }
 
-.separator-dot {
-  color: $text-dim;
-  font-size: 10px;
-  margin: 0 1px;
-}
-
 .active-window {
   font-weight: 700;
-  font-size: 11.5px;
+  font-size: 12px;
   color: $text-primary;
-  padding: 0 3px;
-  letter-spacing: -0.15px;
+  padding: 1px 6px;
+  letter-spacing: -0.1px;
 }
 
-// ── App Menu Bar ──
+// ── App Menu Bar (File, Edit, View, Window, Help) ──
 .app-menu-bar {
   padding: 0;
 
   .menu-item-btn {
     background: transparent;
     border: none;
-    border-radius: 4px;
-    padding: 0 4px;
-    min-height: 18px;
+    border-radius: 5px;
+    padding: 1px 6px;
+    min-height: 20px;
     transition: background-color 120ms ease;
 
     &:hover {
@@ -166,7 +160,7 @@ window.Bar {
     }
 
     label {
-      font-size: 11.5px;
+      font-size: 12px;
       font-weight: 500;
       color: $text-primary;
       letter-spacing: -0.1px;
@@ -176,7 +170,7 @@ window.Bar {
 
 .appmenu-popover {
   .appmenu-content {
-    padding: 3px;
+    padding: 4px;
     min-width: 180px;
   }
 
@@ -229,19 +223,32 @@ window.Bar {
   }
 }
 
-// ── Right Section ──
+// ── Right Section (Privacy, Status Menus, Spotlight, Control Center, Clock) ──
 .bar-right,
 .right-section {
   padding: 0;
 }
 
+.privacy-pill {
+  background-color: #ff9500;
+  border-radius: 10px;
+  padding: 1px 6px;
+  min-height: 18px;
+
+  .privacy-icon {
+    font-family: $font-icon;
+    font-size: 11px;
+    color: #ffffff;
+  }
+}
+
 .status-icon {
   background: transparent;
   border: none;
-  border-radius: 4px;
-  padding: 0 3px;
-  min-width: 18px;
-  min-height: 18px;
+  border-radius: 6px;
+  padding: 1px 5px;
+  min-width: 20px;
+  min-height: 20px;
   transition: background-color 120ms ease;
 
   &:hover {
@@ -254,17 +261,23 @@ window.Bar {
 
   .status-icon-label {
     font-family: $font-icon;
-    font-size: 12px;
+    font-size: 13px;
     color: $text-primary;
   }
 }
 
 .clock {
-  font-weight: 600;
-  font-size: 11.5px;
+  font-weight: 500;
+  font-size: 12px;
   color: $text-primary;
-  padding: 0 4px;
-  letter-spacing: -0.15px;
+  padding: 1px 6px;
+  border-radius: 6px;
+  letter-spacing: -0.1px;
+  transition: background-color 120ms ease;
+
+  &:hover {
+    background-color: $glass-bg-hover;
+  }
 }
 
 // ── System Tray ──
@@ -284,19 +297,19 @@ window.Bar {
 
 .battery-widget {
   .battery-percent {
-    font-size: 10.5px;
+    font-size: 11px;
     font-weight: 600;
     color: $text-secondary;
-    margin-left: 1px;
+    margin-left: 2px;
   }
 }
 
 // ── macOS Popovers & Glass Cards ──
 popover {
-  background-color: rgba(24, 24, 30, 0.88);
-  background-image: linear-gradient(180deg, rgba(255, 255, 255, 0.12) 0%, rgba(20, 20, 26, 0.90) 100%);
+  background-color: rgba(24, 24, 30, 0.90);
+  background-image: linear-gradient(180deg, rgba(255, 255, 255, 0.12) 0%, rgba(20, 20, 26, 0.92) 100%);
   border: 1px solid rgba(255, 255, 255, 0.16);
-  border-radius: 12px;
+  border-radius: 14px;
   box-shadow:
     inset 0 1px 0 0 rgba(255, 255, 255, 0.25),
     0 12px 36px rgba(0, 0, 0, 0.60),
@@ -306,7 +319,7 @@ popover {
 
   > contents {
     background: transparent;
-    border-radius: 12px;
+    border-radius: 14px;
     padding: 0;
   }
 
@@ -349,10 +362,10 @@ popover {
   letter-spacing: 0.5px;
 }
 
-// ── macOS Tahoe Sliders ──
+// ── macOS Sliders ──
 .control-slider-box {
   background-color: $glass-card;
-  border-radius: 9px;
+  border-radius: 10px;
   padding: 5px 8px;
 
   .slider-icon {
@@ -368,14 +381,14 @@ popover {
 
     trough {
       background-color: rgba(255, 255, 255, 0.14);
-      border-radius: 7px;
+      border-radius: 6px;
       min-height: 6px;
       min-width: 6px;
     }
 
     highlight {
       background-color: $text-primary;
-      border-radius: 7px;
+      border-radius: 6px;
       min-height: 6px;
     }
 
@@ -404,7 +417,7 @@ popover {
   .cc-tile {
     background-color: $glass-card;
     border: 1px solid rgba(255, 255, 255, 0.08);
-    border-radius: 9px;
+    border-radius: 10px;
     padding: 6px 8px;
     transition: all 120ms ease;
 
@@ -449,7 +462,7 @@ popover {
 
   .cc-slider-card {
     background-color: rgba(255, 255, 255, 0.04);
-    border-radius: 9px;
+    border-radius: 10px;
     padding: 5px 7px;
 
     .cc-slider-title {
@@ -467,7 +480,7 @@ popover {
 
   .cc-media-card {
     background-color: $glass-card;
-    border-radius: 9px;
+    border-radius: 10px;
     padding: 6px 8px;
 
     .cc-media-icon {
@@ -516,7 +529,7 @@ popover {
 // ── Popover Cards & Lists ──
 .popover-card {
   background-color: $glass-card;
-  border-radius: 8px;
+  border-radius: 9px;
   padding: 5px 7px;
 
   .card-icon {
@@ -539,7 +552,7 @@ popover {
 
 .popover-card-list {
   background-color: $glass-card;
-  border-radius: 8px;
+  border-radius: 9px;
   padding: 5px 7px;
 
   .network-list-text,

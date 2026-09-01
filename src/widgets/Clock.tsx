@@ -1,11 +1,11 @@
 import { createPoll } from "ags/time"
 
 export default function Clock() {
-  // macOS Tahoe format: "Tue 1 Sep 8:41 PM"
+  // Exact macOS format as in Apple docs: "Tue Apr 1  9:41 AM"
   const time = createPoll(
     "",
     1000,
-    ["date", "+%a %-d %b %-I:%M %p"]
+    ["date", "+%a %b %-d  %-I:%M %p"]
   )
 
   return (

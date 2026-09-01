@@ -204,9 +204,9 @@ cmd_config() {
 {
   "theme": "dark",
   "autoHide": false,
-  "barHeight": 24,
-  "barMargin": 3,
-  "borderRadius": 10,
+  "barHeight": 28,
+  "barMargin": 6,
+  "borderRadius": 16,
   "showAppMenu": true,
   "showWorkspaces": true,
   "showTray": true,
@@ -215,7 +215,8 @@ cmd_config() {
   "showVolume": true,
   "showNetwork": true,
   "showBluetooth": true,
-  "showControlCenter": true
+  "showControlCenter": true,
+  "showSpotlight": true
 }
 EOF
     fi

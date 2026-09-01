@@ -107,7 +107,7 @@ Mistbar/
 ## Roadmap
 
 - [x] Phase 1: Core bar (layout, glass effect, clock, workspaces, system icons)
-- [ ] Phase 2: Dropdown popovers (volume slider, Wi-Fi list, etc.)
+- [x] Phase 2: Dropdown popovers (volume slider, Wi-Fi list, Bluetooth manager, brightness slider, battery/power profile, power menu)
 - [ ] Phase 3: Global app menu (DBus-based File/Edit/View)
 - [ ] Phase 4: System tray (StatusNotifier)
 - [ ] Phase 5: Polish, auto-hide, themes

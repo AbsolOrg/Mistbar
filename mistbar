@@ -22,10 +22,10 @@ NC='\033[0m' # No Color
 
 print_banner() {
     echo -e "${CYAN}${BOLD}"
-    echo "  ╔══════════════════════════════════════╗"
-    echo "  ║          🍏 Mistbar v0.1.0           ║"
-    echo "  ║   macOS Tahoe Liquid Glass Bar       ║"
-    echo "  ╚══════════════════════════════════════╝"
+    echo "  ========================================"
+    echo "              Mistbar v0.1.0              "
+    echo "       macOS Tahoe Liquid Glass Bar       "
+    echo "  ========================================"
     echo -e "${NC}"
 }
 

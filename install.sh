@@ -24,13 +24,13 @@ if [ -L "$BIN_TARGET" ] || [ -f "$BIN_TARGET" ]; then
 fi
 
 echo -e "${CYAN}${BOLD}"
-echo "  ╔══════════════════════════════════════╗"
+echo "  ========================================"
 if [ "$IS_UPDATE" = true ]; then
-    echo "  ║          🍏 Mistbar Updater          ║"
+    echo "              Mistbar Updater             "
 else
-    echo "  ║         🍏 Mistbar Installer         ║"
+    echo "             Mistbar Installer            "
 fi
-echo "  ╚══════════════════════════════════════╝"
+echo "  ========================================"
 echo -e "${NC}"
 
 if [ "$IS_UPDATE" = true ]; then

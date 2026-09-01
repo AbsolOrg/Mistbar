@@ -92,9 +92,9 @@ Mistbar can be customized by editing `~/.config/mistbar/config.json` (or via `mi
 {
   "theme": "dark",
   "autoHide": false,
-  "barHeight": 28,
-  "barMargin": 6,
-  "borderRadius": 14,
+  "barHeight": 24,
+  "barMargin": 3,
+  "borderRadius": 10,
   "showAppMenu": true,
   "showWorkspaces": true,
   "showTray": true,

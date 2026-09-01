@@ -1,11 +1,9 @@
 import Workspaces from "../widgets/Workspaces"
-import Clock from "../widgets/Clock"
 
 export default function CenterSection() {
   return (
-    <box class="center-section" spacing={12}>
+    <box class="center-section">
       <Workspaces />
-      <Clock />
     </box>
   )
 }

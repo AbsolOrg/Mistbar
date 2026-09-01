@@ -1,5 +1,5 @@
 // ============================================================================
-// Mistbar — macOS Tahoe Liquid Glass Theme
+// Mistbar — macOS Sequoia / Tahoe Liquid Glass Theme (Ultra-Slim 24px)
 // ============================================================================
 
 // ── Color Palette (Dark Liquid Glass) ──
@@ -11,7 +11,7 @@ $glass-bg-hover: rgba(255, 255, 255, 0.12);
 $glass-bg-active: rgba(255, 255, 255, 0.20);
 $glass-border: rgba(255, 255, 255, 0.15);
 $glass-inner-glow: rgba(255, 255, 255, 0.28);
-$glass-shadow: rgba(0, 0, 0, 0.35);
+$glass-shadow: rgba(0, 0, 0, 0.30);
 
 // ── Color Palette (Light Liquid Glass) ──
 $glass-bg-light: rgba(245, 245, 248, 0.65);
@@ -35,9 +35,9 @@ $text-primary-light: #1d1d1f;
 $text-secondary-light: rgba(29, 29, 31, 0.75);
 $text-dim-light: rgba(29, 29, 31, 0.45);
 
-$bar-height: 28px;
-$bar-radius: 14px;
-$bar-margin: 6px 8px 0 8px;
+$bar-height: 24px;
+$bar-radius: 10px;
+$bar-margin: 3px 6px 0 6px;
 
 $font-main: "SF Pro Text", "SF Pro Display", "Inter", "Adwaita Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
 $font-icon: "Symbols Nerd Font Mono", "MesloLGS Nerd Font", "MesloLGSDZ Nerd Font Mono", monospace;
@@ -47,7 +47,7 @@ window.Bar {
   background: transparent;
   color: $text-primary;
   font-family: $font-main;
-  font-size: 12.5px;
+  font-size: 11.5px;
   font-weight: 500;
 
   // Inner floating pill container
@@ -59,12 +59,12 @@ window.Bar {
     border-radius: $bar-radius;
     margin: $bar-margin;
     min-height: $bar-height;
-    padding: 0 8px;
+    padding: 0 6px;
     box-shadow:
       inset 0 1px 0 0 $glass-inner-glow,
       inset 0 -1px 0 0 rgba(255, 255, 255, 0.05),
-      0 4px 18px $glass-shadow,
-      0 1px 3px rgba(0, 0, 0, 0.20);
+      0 3px 12px $glass-shadow,
+      0 1px 2px rgba(0, 0, 0, 0.15);
     transition: all 150ms ease;
   }
 
@@ -79,8 +79,8 @@ window.Bar {
       border: 1px solid $glass-border-light;
       box-shadow:
         inset 0 1px 0 0 $glass-inner-glow-light,
-        0 4px 16px $glass-shadow-light,
-        0 1px 3px rgba(0, 0, 0, 0.06);
+        0 3px 12px $glass-shadow-light,
+        0 1px 2px rgba(0, 0, 0, 0.06);
     }
 
     .logo-button:hover { background-color: $glass-bg-hover-light; }
@@ -104,16 +104,16 @@ window.Bar {
 // ── Left Section ──
 .bar-left,
 .left-section {
-  padding: 0 1px;
+  padding: 0;
 }
 
 .logo-button {
   background: transparent;
   border: none;
-  border-radius: 6px;
-  padding: 1px 5px;
-  min-width: 22px;
-  min-height: 22px;
+  border-radius: 5px;
+  padding: 0 3px;
+  min-width: 18px;
+  min-height: 18px;
   transition: background-color 120ms ease;
 
   &:hover {
@@ -126,35 +126,35 @@ window.Bar {
 
   .logo-icon {
     font-family: $font-icon;
-    font-size: 14px;
+    font-size: 13px;
     color: $text-primary;
   }
 }
 
 .separator-dot {
   color: $text-dim;
-  font-size: 11px;
-  margin: 0 2px;
+  font-size: 10px;
+  margin: 0 1px;
 }
 
 .active-window {
   font-weight: 700;
-  font-size: 12.5px;
+  font-size: 11.5px;
   color: $text-primary;
-  padding: 0 4px;
+  padding: 0 3px;
   letter-spacing: -0.15px;
 }
 
 // ── App Menu Bar ──
 .app-menu-bar {
-  padding: 0 1px;
+  padding: 0;
 
   .menu-item-btn {
     background: transparent;
     border: none;
-    border-radius: 5px;
-    padding: 1px 5px;
-    min-height: 20px;
+    border-radius: 4px;
+    padding: 0 4px;
+    min-height: 18px;
     transition: background-color 120ms ease;
 
     &:hover {
@@ -166,7 +166,7 @@ window.Bar {
     }
 
     label {
-      font-size: 12px;
+      font-size: 11.5px;
       font-weight: 500;
       color: $text-primary;
       letter-spacing: -0.1px;
@@ -199,13 +199,13 @@ window.Bar {
     }
 
     .menu-option-label {
-      font-size: 12.5px;
+      font-size: 12px;
       font-weight: 500;
       color: $text-primary;
     }
 
     .menu-shortcut {
-      font-size: 11px;
+      font-size: 10.5px;
       color: $text-dim;
       font-family: $font-main;
     }
@@ -215,41 +215,33 @@ window.Bar {
 // ── Center Section ──
 .bar-center,
 .center-section {
-  padding: 0 6px;
+  padding: 0 4px;
 }
 
 .workspaces {
-  padding: 0 3px;
+  padding: 0 2px;
 
   .workspace-dots {
     font-family: $font-icon;
-    font-size: 8px;
+    font-size: 7px;
     color: $text-secondary;
-    letter-spacing: 3px;
+    letter-spacing: 2px;
   }
-}
-
-.clock {
-  font-weight: 600;
-  font-size: 12.5px;
-  color: $text-primary;
-  padding: 0 4px;
-  letter-spacing: -0.15px;
 }
 
 // ── Right Section ──
 .bar-right,
 .right-section {
-  padding: 0 1px;
+  padding: 0;
 }
 
 .status-icon {
   background: transparent;
   border: none;
-  border-radius: 5px;
-  padding: 1px 4px;
-  min-width: 22px;
-  min-height: 22px;
+  border-radius: 4px;
+  padding: 0 3px;
+  min-width: 18px;
+  min-height: 18px;
   transition: background-color 120ms ease;
 
   &:hover {
@@ -262,19 +254,27 @@ window.Bar {
 
   .status-icon-label {
     font-family: $font-icon;
-    font-size: 13.5px;
+    font-size: 12px;
     color: $text-primary;
   }
 }
 
+.clock {
+  font-weight: 600;
+  font-size: 11.5px;
+  color: $text-primary;
+  padding: 0 4px;
+  letter-spacing: -0.15px;
+}
+
 // ── System Tray ──
 .system-tray {
-  padding: 0 1px;
+  padding: 0;
 
   .tray-item-btn {
-    padding: 1px 3px;
-    min-width: 20px;
-    min-height: 20px;
+    padding: 0 2px;
+    min-width: 18px;
+    min-height: 18px;
 
     image {
       margin: 0;
@@ -284,10 +284,10 @@ window.Bar {
 
 .battery-widget {
   .battery-percent {
-    font-size: 11.5px;
+    font-size: 10.5px;
     font-weight: 600;
     color: $text-secondary;
-    margin-left: 2px;
+    margin-left: 1px;
   }
 }
 
@@ -296,7 +296,7 @@ popover {
   background-color: rgba(24, 24, 30, 0.88);
   background-image: linear-gradient(180deg, rgba(255, 255, 255, 0.12) 0%, rgba(20, 20, 26, 0.90) 100%);
   border: 1px solid rgba(255, 255, 255, 0.16);
-  border-radius: 14px;
+  border-radius: 12px;
   box-shadow:
     inset 0 1px 0 0 rgba(255, 255, 255, 0.25),
     0 12px 36px rgba(0, 0, 0, 0.60),
@@ -306,7 +306,7 @@ popover {
 
   > contents {
     background: transparent;
-    border-radius: 14px;
+    border-radius: 12px;
     padding: 0;
   }
 
@@ -329,20 +329,20 @@ popover {
 
 .popover-header {
   .popover-title {
-    font-size: 13px;
+    font-size: 12.5px;
     font-weight: 600;
     color: $text-primary;
   }
 
   .popover-subtitle {
-    font-size: 11.5px;
+    font-size: 11px;
     font-weight: 500;
     color: $text-secondary;
   }
 }
 
 .section-subtitle {
-  font-size: 10.5px;
+  font-size: 10px;
   font-weight: 600;
   color: $text-dim;
   text-transform: uppercase;
@@ -352,38 +352,38 @@ popover {
 // ── macOS Tahoe Sliders ──
 .control-slider-box {
   background-color: $glass-card;
-  border-radius: 10px;
+  border-radius: 9px;
   padding: 5px 8px;
 
   .slider-icon {
     font-family: $font-icon;
-    font-size: 13px;
+    font-size: 12px;
     color: $text-secondary;
   }
 
   scale,
   slider {
-    min-height: 22px;
+    min-height: 20px;
     min-width: 130px;
 
     trough {
       background-color: rgba(255, 255, 255, 0.14);
-      border-radius: 8px;
-      min-height: 7px;
-      min-width: 7px;
+      border-radius: 7px;
+      min-height: 6px;
+      min-width: 6px;
     }
 
     highlight {
       background-color: $text-primary;
-      border-radius: 8px;
-      min-height: 7px;
+      border-radius: 7px;
+      min-height: 6px;
     }
 
     slider {
       background-color: #ffffff;
       border-radius: 50%;
-      min-height: 14px;
-      min-width: 14px;
+      min-height: 13px;
+      min-width: 13px;
       margin: -3.5px 0;
       box-shadow: 0 2px 4px rgba(0, 0, 0, 0.4);
     }
@@ -392,11 +392,11 @@ popover {
 
 // ── Control Center Specific Styles ──
 .control-center-container {
-  padding: 12px;
-  min-width: 290px;
+  padding: 10px;
+  min-width: 280px;
 
   .cc-header-title {
-    font-size: 13.5px;
+    font-size: 13px;
     font-weight: 700;
     color: $text-primary;
   }
@@ -404,8 +404,8 @@ popover {
   .cc-tile {
     background-color: $glass-card;
     border: 1px solid rgba(255, 255, 255, 0.08);
-    border-radius: 10px;
-    padding: 7px 9px;
+    border-radius: 9px;
+    padding: 6px 8px;
     transition: all 120ms ease;
 
     &:hover {
@@ -431,35 +431,35 @@ popover {
 
     .cc-tile-icon {
       font-family: $font-icon;
-      font-size: 16px;
+      font-size: 15px;
       color: $text-secondary;
     }
 
     .cc-tile-title {
-      font-size: 12px;
+      font-size: 11.5px;
       font-weight: 600;
       color: $text-primary;
     }
 
     .cc-tile-subtitle {
-      font-size: 10px;
+      font-size: 9.5px;
       color: $text-dim;
     }
   }
 
   .cc-slider-card {
     background-color: rgba(255, 255, 255, 0.04);
-    border-radius: 10px;
-    padding: 6px 8px;
+    border-radius: 9px;
+    padding: 5px 7px;
 
     .cc-slider-title {
-      font-size: 11.5px;
+      font-size: 11px;
       font-weight: 600;
       color: $text-primary;
     }
 
     .cc-slider-value {
-      font-size: 11px;
+      font-size: 10.5px;
       font-weight: 500;
       color: $text-secondary;
     }
@@ -467,17 +467,17 @@ popover {
 
   .cc-media-card {
     background-color: $glass-card;
-    border-radius: 10px;
-    padding: 7px 9px;
+    border-radius: 9px;
+    padding: 6px 8px;
 
     .cc-media-icon {
       font-family: $font-icon;
-      font-size: 14px;
+      font-size: 13px;
       color: $accent-blue;
     }
 
     .cc-media-title {
-      font-size: 11.5px;
+      font-size: 11px;
       font-weight: 500;
       color: $text-primary;
     }
@@ -486,11 +486,11 @@ popover {
       background-color: rgba(255, 255, 255, 0.10);
       border: none;
       border-radius: 50%;
-      min-width: 24px;
-      min-height: 24px;
+      min-width: 22px;
+      min-height: 22px;
       padding: 0;
       font-family: $font-icon;
-      font-size: 11px;
+      font-size: 10px;
       color: $text-primary;
       transition: background-color 120ms ease;
 
@@ -501,9 +501,9 @@ popover {
       &.play-btn {
         background-color: $accent-blue;
         color: #ffffff;
-        min-width: 26px;
-        min-height: 26px;
-        font-size: 12px;
+        min-width: 24px;
+        min-height: 24px;
+        font-size: 11px;
 
         &:hover {
           background-color: $accent-blue-hover;
@@ -516,35 +516,35 @@ popover {
 // ── Popover Cards & Lists ──
 .popover-card {
   background-color: $glass-card;
-  border-radius: 9px;
-  padding: 6px 8px;
+  border-radius: 8px;
+  padding: 5px 7px;
 
   .card-icon {
     font-family: $font-icon;
-    font-size: 16px;
+    font-size: 15px;
     color: $accent-blue;
   }
 
   .card-title {
-    font-size: 11.5px;
+    font-size: 11px;
     font-weight: 600;
     color: $text-primary;
   }
 
   .card-subtitle {
-    font-size: 10.5px;
+    font-size: 10px;
     color: $text-secondary;
   }
 }
 
 .popover-card-list {
   background-color: $glass-card;
-  border-radius: 9px;
-  padding: 6px 8px;
+  border-radius: 8px;
+  padding: 5px 7px;
 
   .network-list-text,
   .device-list-text {
-    font-size: 11.5px;
+    font-size: 11px;
     color: $text-secondary;
     line-height: 1.4;
   }
@@ -553,9 +553,9 @@ popover {
 .popover-toggle-btn {
   background-color: rgba(255, 255, 255, 0.12);
   border: none;
-  border-radius: 7px;
-  padding: 3px 8px;
-  font-size: 11px;
+  border-radius: 6px;
+  padding: 2px 7px;
+  font-size: 10.5px;
   font-weight: 600;
   color: $text-primary;
   transition: background-color 120ms ease;
@@ -570,9 +570,9 @@ popover {
   .preset-btn {
     background-color: $glass-card;
     border: none;
-    border-radius: 7px;
-    padding: 4px 8px;
-    font-size: 10.5px;
+    border-radius: 6px;
+    padding: 3px 7px;
+    font-size: 10px;
     font-weight: 500;
     color: $text-secondary;
     transition: all 120ms ease;
@@ -593,8 +593,8 @@ popover {
 .action-button {
   background-color: $glass-card;
   border: none;
-  border-radius: 9px;
-  padding: 6px 8px;
+  border-radius: 8px;
+  padding: 5px 7px;
   transition: background-color 120ms ease;
 
   &:hover {
@@ -603,12 +603,12 @@ popover {
 
   .action-icon {
     font-family: $font-icon;
-    font-size: 13px;
+    font-size: 12px;
     color: $text-secondary;
   }
 
   label {
-    font-size: 11.5px;
+    font-size: 11px;
     font-weight: 500;
     color: $text-primary;
   }
@@ -617,15 +617,15 @@ popover {
 // ── Power Menu Popover ──
 .power-popover {
   .power-popover-content {
-    padding: 4px;
-    min-width: 160px;
+    padding: 3px;
+    min-width: 150px;
   }
 
   .power-option {
     background: transparent;
     border: none;
-    border-radius: 7px;
-    padding: 5px 8px;
+    border-radius: 6px;
+    padding: 4px 7px;
     transition: background-color 120ms ease;
 
     &:hover {
@@ -638,13 +638,13 @@ popover {
 
     label {
       color: $text-primary;
-      font-size: 12.5px;
+      font-size: 12px;
       font-weight: 500;
     }
 
     .power-option-icon {
       font-family: $font-icon;
-      font-size: 14px;
+      font-size: 13px;
       color: $text-secondary;
     }
   }

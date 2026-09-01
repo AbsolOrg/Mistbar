@@ -8,7 +8,7 @@ import { createPoll } from "ags/time"
 
 const hasActiveWindow = createPoll(
   false,
-  600,
+  500,
   ["bash", "-c", `python3 -c "
 import subprocess, json
 try:
@@ -31,6 +31,7 @@ print('false')
 )
 
 let winRef: any = null
+let revealerRef: Gtk.Revealer | null = null
 let isHovered = false
 let hasWindow = false
 let autoHide = false
@@ -53,21 +54,23 @@ export function getBarAutohide(): boolean {
 }
 
 function updateVisibility() {
-  if (!winRef) return
+  if (!revealerRef) return
   if (!autoHide) {
-    winRef.remove_css_class("bar-hidden")
-    winRef.exclusivity = Astal.Exclusivity.EXCLUSIVE
-  } else {
-    // Intelligent Auto-Hide:
-    // Visible when desktop is clean/empty or hovered
-    // Hidden when windows occupy active workspace and mouse is away
-    const shouldShow = !hasWindow || isHovered
-    if (shouldShow) {
-      winRef.remove_css_class("bar-hidden")
-    } else {
-      winRef.add_css_class("bar-hidden")
+    revealerRef.set_reveal_child(true)
+    if (winRef) {
+      winRef.visible = true
+      winRef.exclusivity = Astal.Exclusivity.EXCLUSIVE
     }
-    winRef.exclusivity = Astal.Exclusivity.IGNORE
+  } else {
+    // Intelligent Auto-Hide (Intellihide):
+    // If desktop has NO windows on active workspace OR mouse is hovered -> slide down / reveal
+    // If windows are active AND mouse is not hovered -> slide up / hide smoothly
+    const shouldShow = !hasWindow || isHovered
+    revealerRef.set_reveal_child(shouldShow)
+    if (winRef) {
+      winRef.visible = true
+      winRef.exclusivity = Astal.Exclusivity.IGNORE
+    }
   }
 }
 
@@ -75,11 +78,55 @@ export default function Bar(gdkmonitor: Gdk.Monitor, config: MistbarConfig = def
   const { TOP, LEFT, RIGHT } = Astal.WindowAnchor
   autoHide = Boolean(config.autoHide)
 
-  hasActiveWindow.subscribe((val) => {
-    hasWindow = val
-    updateVisibility()
+  // 1. Build the inner floating bar
+  const innerBar = (
+    <centerbox class="bar-inner">
+      <box $type="start" class="bar-left">
+        <LeftSection />
+      </box>
+      <box $type="center" class="bar-center">
+        <CenterSection />
+      </box>
+      <box $type="end" class="bar-right">
+        <RightSection />
+      </box>
+    </centerbox>
+  )
+
+  // 2. Wrap in native GTK4 Revealer for smooth hardware-accelerated slide up / down animation
+  const revealer = new Gtk.Revealer({
+    transition_type: Gtk.RevealerTransitionType.SLIDE_DOWN,
+    transition_duration: 250,
+    reveal_child: !config.autoHide,
+  })
+  revealer.set_child(innerBar)
+  revealerRef = revealer
+
+  // 3. Top hover trigger zone & outer container
+  const triggerZone = new Gtk.Box({
+    css_classes: ["hover-trigger-zone"],
   })
 
+  const outerBox = new Gtk.Box({
+    orientation: Gtk.Orientation.VERTICAL,
+    css_classes: ["bar-outer-container"],
+  })
+  outerBox.append(triggerZone)
+  outerBox.append(revealer)
+
+  // 4. Attach mouse motion controller to outerBox for hover detection
+  const motion = new Gtk.EventControllerMotion()
+  motion.connect("enter", () => {
+    isHovered = true
+    updateVisibility()
+  })
+  motion.connect("leave", () => {
+    isHovered = false
+    updateVisibility()
+  })
+  outerBox.add_controller(motion)
+
+  // 5. Build the layer-shell window
   const win = (
     <window
       visible
@@ -91,32 +138,17 @@ export default function Bar(gdkmonitor: Gdk.Monitor, config: MistbarConfig = def
       anchor={TOP | LEFT | RIGHT}
       application={app}
     >
-      <centerbox class="bar-inner">
-        <box $type="start" class="bar-left">
-          <LeftSection />
-        </box>
-        <box $type="center" class="bar-center">
-          <CenterSection />
-        </box>
-        <box $type="end" class="bar-right">
-          <RightSection />
-        </box>
-      </centerbox>
+      {outerBox}
     </window>
   )
 
   winRef = win
+  win.visible = true
 
-  const motion = new Gtk.EventControllerMotion()
-  motion.connect("enter", () => {
-    isHovered = true
+  hasActiveWindow.subscribe((val) => {
+    hasWindow = val
     updateVisibility()
   })
-  motion.connect("leave", () => {
-    isHovered = false
-    updateVisibility()
-  })
-  win.add_controller(motion)
 
   updateVisibility()
 

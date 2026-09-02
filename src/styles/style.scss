@@ -2,16 +2,16 @@
 // Mistbar — macOS Tahoe / Sequoia Floating Glass Pill Bar
 // ============================================================================
 
-// ── Color Palette (Dark Liquid Glass) ──
-$glass-bg-dark: rgba(22, 22, 28, 0.60);
-$glass-gradient-dark: linear-gradient(180deg, rgba(255, 255, 255, 0.14) 0%, rgba(18, 18, 22, 0.60) 100%);
+// ── Color Palette (Dark Liquid Glass / macOS Frosted Acrylic) ──
+$glass-bg-dark: rgba(14, 18, 26, 0.38);
+$glass-gradient-dark: linear-gradient(180deg, rgba(255, 255, 255, 0.15) 0%, rgba(10, 14, 20, 0.32) 100%);
 $glass-card: rgba(255, 255, 255, 0.08);
 $glass-card-hover: rgba(255, 255, 255, 0.14);
 $glass-bg-hover: rgba(255, 255, 255, 0.12);
 $glass-bg-active: rgba(255, 255, 255, 0.20);
-$glass-border: rgba(255, 255, 255, 0.16);
-$glass-inner-glow: rgba(255, 255, 255, 0.28);
-$glass-shadow: rgba(0, 0, 0, 0.45);
+$glass-border: rgba(255, 255, 255, 0.20);
+$glass-highlight: rgba(255, 255, 255, 0.45);
+$glass-shadow: rgba(0, 0, 0, 0.35);
 
 // ── Color Palette (Light Liquid Glass) ──
 $glass-bg-light: rgba(245, 245, 248, 0.70);
@@ -121,7 +121,7 @@ window.Bar {
     padding: 0 10px;
   }
 
-  // ── Style Presets: Glassy (Default) ──
+  // ── Style Presets: Glassy (macOS Frosted Acrylic) ──
   &.style-glassy centerbox,
   &.style-glassy .bar-inner,
   centerbox,
@@ -129,11 +129,10 @@ window.Bar {
     background-color: $glass-bg-dark;
     background-image: $glass-gradient-dark;
     border: 1px solid $glass-border;
+    border-top: 1px solid $glass-highlight;
     box-shadow:
-      inset 0 1px 0 0 $glass-inner-glow,
-      inset 0 -1px 0 0 rgba(255, 255, 255, 0.05),
       0 8px 24px $glass-shadow,
-      0 2px 6px rgba(0, 0, 0, 0.25);
+      0 2px 6px rgba(0, 0, 0, 0.20);
   }
 
   &.look-attached.style-glassy centerbox,
@@ -141,17 +140,47 @@ window.Bar {
     border-left: none;
     border-right: none;
     border-top: none;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.14);
-    box-shadow: 0 1px 4px $glass-shadow;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.25);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25);
   }
 
-  // ── Style Presets: Transparent (100% Clear) ──
+  // ── Style Presets: Transparent (100% Clear with Frosted Micro-Capsules) ──
   &.style-transparent centerbox,
   &.style-transparent .bar-inner {
     background-color: transparent !important;
     background-image: none !important;
     border: none !important;
     box-shadow: none !important;
+  }
+
+  &.style-transparent {
+    .bar-left,
+    .center-section,
+    .status-group,
+    .status-icon.spotlight-btn,
+    .status-icon.control-center-btn,
+    .clock,
+    .status-icon.power-menu {
+      background-color: rgba(14, 18, 26, 0.42);
+      background-image: linear-gradient(180deg, rgba(255, 255, 255, 0.12) 0%, rgba(10, 14, 20, 0.35) 100%);
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      border-top: 1px solid rgba(255, 255, 255, 0.38);
+      border-radius: 12px;
+      padding: 1px 8px;
+      margin: 1px 2px;
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.28);
+      transition: all 120ms ease;
+
+      &:hover {
+        background-color: rgba(24, 30, 42, 0.58);
+        border-color: rgba(255, 255, 255, 0.28);
+        border-top-color: rgba(255, 255, 255, 0.50);
+      }
+    }
+
+    .clock {
+      padding: 2px 10px;
+    }
   }
 
   // ── Style Presets: Solid (Opaque Color) ──
@@ -171,31 +200,29 @@ window.Bar {
     border-bottom: 1px solid rgba(255, 255, 255, 0.14) !important;
   }
 
-  // ── Light Theme Variant ──
-  &.light-theme {
+  // Ensure Glassy & Transparent always have clean crisp white text & icons
+  &.style-glassy,
+  &.style-transparent {
+    color: #ffffff;
+
+    .logo-icon,
+    .active-window,
+    .menu-item-btn label,
+    .status-icon-label,
+    .battery-percent,
+    .clock,
+    .power-icon {
+      color: #ffffff;
+    }
+
+    .workspace-dots {
+      color: rgba(255, 255, 255, 0.75);
+    }
+  }
+
+  // ── Light Theme Variant (Only for Solid mode or explicit light styling) ──
+  &.light-theme:not(.style-glassy):not(.style-transparent) {
     color: $text-primary-light;
-
-    &.style-glassy centerbox,
-    &.style-glassy .bar-inner,
-    centerbox,
-    .bar-inner {
-      background-color: $glass-bg-light;
-      background-image: $glass-gradient-light;
-      border: 1px solid $glass-border-light;
-      box-shadow:
-        inset 0 1px 0 0 $glass-inner-glow-light,
-        0 8px 24px $glass-shadow-light,
-        0 2px 6px rgba(0, 0, 0, 0.06);
-    }
-
-    &.look-attached.style-glassy centerbox,
-    &.look-attached.style-glassy .bar-inner {
-      border-left: none;
-      border-right: none;
-      border-top: none;
-      border-bottom: 1px solid rgba(0, 0, 0, 0.12);
-      box-shadow: 0 1px 3px $glass-shadow-light;
-    }
 
     &.style-solid centerbox,
     &.style-solid .bar-inner {
@@ -203,6 +230,15 @@ window.Bar {
       background-image: none !important;
       border: 1px solid rgba(0, 0, 0, 0.10) !important;
       box-shadow: 0 6px 20px rgba(0, 0, 0, 0.10) !important;
+    }
+
+    &.look-attached.style-solid centerbox,
+    &.look-attached.style-solid .bar-inner {
+      border-left: none !important;
+      border-right: none !important;
+      border-top: none !important;
+      border-bottom: 1px solid rgba(0, 0, 0, 0.12) !important;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08) !important;
     }
 
     .logo-button:hover,

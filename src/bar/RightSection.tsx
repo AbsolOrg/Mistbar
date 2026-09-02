@@ -12,11 +12,11 @@ import PowerMenu from "../widgets/PowerMenu"
 
 export default function RightSection() {
   return (
-    <box class="right-section" spacing={16}>
+    <box class="right-section" spacing={6}>
       <PrivacyIndicator />
 
       {/* System Status Indicators Group */}
-      <box class="status-group" spacing={12}>
+      <box class="status-group" spacing={4}>
         <SystemTray />
         <Brightness />
         <Volume />

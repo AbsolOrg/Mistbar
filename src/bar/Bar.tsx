@@ -145,6 +145,7 @@ export default function Bar(gdkmonitor: Gdk.Monitor, config: MistbarConfig = def
   outerBox.add_controller(motion)
 
   // 5. Build the layer-shell window
+  const isPill = (config.look || "pill") === "pill"
   const win = (
     <window
       visible
@@ -154,6 +155,10 @@ export default function Bar(gdkmonitor: Gdk.Monitor, config: MistbarConfig = def
       gdkmonitor={gdkmonitor}
       exclusivity={config.autoHide ? Astal.Exclusivity.IGNORE : Astal.Exclusivity.EXCLUSIVE}
       anchor={TOP | LEFT | RIGHT}
+      margin_top={isPill ? (config.barMargin ?? 6) : 0}
+      margin_left={isPill ? 12 : 0}
+      margin_right={isPill ? 12 : 0}
+      margin_bottom={0}
       application={app}
     >
       {outerBox}
@@ -161,6 +166,26 @@ export default function Bar(gdkmonitor: Gdk.Monitor, config: MistbarConfig = def
   )
 
   winRef = win
+  try {
+    win.remove_css_class("background")
+  } catch {}
+
+  try {
+    if (isPill) {
+      win.margin_top = config.barMargin ?? 6
+      win.margin_left = 12
+      win.margin_right = 12
+      win.margin_bottom = 0
+    } else {
+      win.margin_top = 0
+      win.margin_left = 0
+      win.margin_right = 0
+      win.margin_bottom = 0
+    }
+  } catch (err) {
+    console.error("Error setting layer surface margins:", err)
+  }
+
   win.visible = true
 
   startWindowWatcher()

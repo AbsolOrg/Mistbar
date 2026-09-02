@@ -26,7 +26,7 @@ export interface MistbarConfig {
 }
 
 export const defaultConfig: MistbarConfig = {
-  theme: "dark",
+  theme: "light",
   style: "glassy",
   look: "pill",
   autoHide: false,

@@ -41,18 +41,18 @@ fi
 echo ""
 
 # 1. Ensure scripts are executable
-echo -e "${BLUE}[1/5] Setting file permissions...${NC}"
+echo -e "${BLUE}[1/6] Setting file permissions...${NC}"
 chmod +x "$SCRIPT_DIR/mistbar" "$SCRIPT_DIR/install.sh" "$SCRIPT_DIR/uninstall.sh" "$SCRIPT_DIR/view.sh"
 echo -e "${GREEN}  ✓ Scripts are executable${NC}"
 
 # 2. Setup / Refresh symlink in ~/.local/bin
-echo -e "${BLUE}[2/5] Linking binary to ~/.local/bin/mistbar...${NC}"
+echo -e "${BLUE}[2/6] Linking binary to ~/.local/bin/mistbar...${NC}"
 mkdir -p "$HOME/.local/bin"
 ln -sf "$SCRIPT_DIR/mistbar" "$BIN_TARGET"
 echo -e "${GREEN}  ✓ Symlink configured: $BIN_TARGET -> $SCRIPT_DIR/mistbar${NC}"
 
 # 3. Ensure TypeScript type declarations are present
-echo -e "${BLUE}[3/5] Checking TypeScript types...${NC}"
+echo -e "${BLUE}[3/6] Checking TypeScript types...${NC}"
 if [ ! -d "$SCRIPT_DIR/src/@girs" ]; then
     echo -e "  Generating TypeScript types with AGS..."
     ags types -d "$SCRIPT_DIR/src" 2>/dev/null || true
@@ -62,7 +62,7 @@ else
 fi
 
 # 4. Check & Configure Niri Compositor Layer Blur Rule
-echo -e "${BLUE}[4/5] Checking Niri compositor blur integration...${NC}"
+echo -e "${BLUE}[4/6] Checking Niri compositor blur integration...${NC}"
 NIRI_CONFIG="$HOME/.config/niri/config.kdl"
 if [ -f "$NIRI_CONFIG" ]; then
     if ! grep -q 'namespace="mistbar"' "$NIRI_CONFIG"; then
@@ -74,6 +74,7 @@ with open(kdl_path, 'r') as f:
 rule = '''
 layer-rule {
     match namespace=\"mistbar\"
+    geometry-corner-radius 16
     background-effect {
         blur true
     }
@@ -99,8 +100,26 @@ else
     echo -e "${DIM}  Niri config not detected, skipping layer-rule setup${NC}"
 fi
 
-# 5. PATH check
-echo -e "${BLUE}[5/5] Verifying PATH...${NC}"
+# 5. Auto-start on login via Niri spawn-at-startup
+echo -e "${BLUE}[5/6] Configuring auto-start on login...${NC}"
+if [ -f "$NIRI_CONFIG" ]; then
+    if ! grep -q 'spawn-at-startup.*mistbar' "$NIRI_CONFIG"; then
+        # Add spawn-at-startup directive after the layer-rule block
+        echo '' >> "$NIRI_CONFIG"
+        echo 'spawn-at-startup "mistbar" "start"' >> "$NIRI_CONFIG"
+        echo -e "${GREEN}  ✓ Added auto-start rule to Niri config${NC}"
+        if command -v niri &>/dev/null; then
+            niri msg action load-config-file 2>/dev/null || true
+        fi
+    else
+        echo -e "${GREEN}  ✓ Auto-start already configured${NC}"
+    fi
+else
+    echo -e "${DIM}  Niri config not detected, skipping auto-start setup${NC}"
+fi
+
+# 6. PATH check
+echo -e "${BLUE}[6/6] Verifying PATH...${NC}"
 if echo "$PATH" | grep -q "$HOME/.local/bin"; then
     echo -e "${GREEN}  ✓ ~/.local/bin is in your PATH${NC}"
 else

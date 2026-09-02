@@ -74,6 +74,7 @@ with open(kdl_path, 'r') as f:
 rule = '''
 layer-rule {
     match namespace=\"mistbar\"
+    geometry-corner-radius 16
     background-effect {
         blur true
     }

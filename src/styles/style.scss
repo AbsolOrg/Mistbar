@@ -451,54 +451,85 @@ window.Bar {
   }
 }
 
-.status-icon {
+menubutton.status-icon {
   background: transparent;
   background-color: transparent;
   border: none;
   box-shadow: none;
-  border-radius: 6px;
-  padding: 2px 7px;
-  min-width: 24px;
-  min-height: 22px;
+  padding: 0;
   margin: 0;
-  transition: all 120ms ease;
+  min-width: 26px;
+  max-width: 26px;
+  min-height: 22px;
 
   > button {
     background: transparent;
     background-color: transparent;
     border: none;
     box-shadow: none;
-    padding: 2px 7px;
-    min-width: 24px;
-    min-height: 22px;
     border-radius: 6px;
-  }
+    padding: 0;
+    min-width: 26px;
+    max-width: 26px;
+    min-height: 22px;
+    margin: 0;
+    transition: all 120ms ease;
 
-  &:hover,
-  > button:hover {
+    &:hover {
+      background-color: rgba(255, 255, 255, 0.16);
+    }
+
+    &:active,
+    &:checked {
+      background-color: rgba(255, 255, 255, 0.25);
+    }
+  }
+}
+
+button.status-icon {
+  background: transparent;
+  background-color: transparent;
+  border: none;
+  box-shadow: none;
+  border-radius: 6px;
+  padding: 0;
+  min-width: 26px;
+  max-width: 26px;
+  min-height: 22px;
+  margin: 0;
+  transition: all 120ms ease;
+
+  &:hover {
     background-color: rgba(255, 255, 255, 0.16);
   }
 
   &:active,
-  &:checked,
-  > button:active,
-  > button:checked {
+  &:checked {
     background-color: rgba(255, 255, 255, 0.25);
   }
+}
 
-  .status-icon-label {
-    font-family: $font-icon;
-    font-size: 13.5px;
-    color: $text-primary;
-    line-height: 1;
-  }
+.status-icon-label {
+  font-family: $font-icon;
+  font-size: 14px;
+  color: $text-primary;
+  line-height: 1;
+  min-width: 26px;
+  max-width: 26px;
+  text-align: center;
+}
 
+.status-icon {
   &.battery .status-icon-label,
   .battery-icon-label {
     font-size: 15px;
   }
 
   &.network .status-icon-label {
+    font-size: 14px;
+  }
+
+  &.bluetooth .status-icon-label {
     font-size: 14px;
   }
 
@@ -509,6 +540,11 @@ window.Bar {
   &.spotlight-btn .status-icon-label {
     font-size: 13.5px;
   }
+
+  &.power-menu .status-icon-label,
+  .power-icon {
+    font-size: 13.5px;
+  }
 }
 
 .clock {
@@ -516,7 +552,8 @@ window.Bar {
   font-size: 12px;
   color: $text-primary;
   padding: 2px 8px;
-  margin: 0 2px;
+  margin: 0;
+  min-height: 22px;
   border-radius: 6px;
   letter-spacing: -0.1px;
   transition: all 120ms ease;

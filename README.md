@@ -1,8 +1,10 @@
 # Mistbar
 
 **macOS Tahoe Liquid Glass Top Bar for Linux (Wayland)**
+- A faithful macOS Tahoe-inspired floating menu bar built with [AGS 3](https://github.com/Aylur/ags) (Astal + GTK4 + TypeScript) for the [Niri](https://github.com/YaLTeR/niri) compositor on Wayland.
 
-A faithful macOS Tahoe-inspired floating menu bar built with [AGS 3](https://github.com/Aylur/ags) (Astal + GTK4 + TypeScript) for the [Niri](https://github.com/YaLTeR/niri) compositor on Wayland.
+<img width="1361" height="41" alt="bar" src="https://github.com/user-attachments/assets/c00213bb-c705-40ba-b789-558eaeba2c9e" />
+
 
 ## Features
 

@@ -43,8 +43,24 @@ $font-main: "SF Pro Text", "SF Pro Display", "Inter", "Adwaita Sans", -apple-sys
 $font-icon: "Symbols Nerd Font Mono", "MesloLGS Nerd Font", "MesloLGSDZ Nerd Font Mono", monospace;
 
 // ── Main Layer-Shell Bar Window ──
+window.Bar,
+window.Bar.background,
+window.background.Bar,
+window.Bar > box,
+.bar-outer-container,
+.hover-trigger-zone,
+revealer {
+  background: transparent !important;
+  background-color: transparent !important;
+  background-image: none !important;
+  border: none !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+}
+
 window.Bar {
-  background: transparent;
+  background: transparent !important;
+  background-color: transparent !important;
   color: $text-primary;
   font-family: $font-main;
   font-size: 12px;
@@ -81,15 +97,16 @@ window.Bar {
 
   // Top container & hover trigger zone
   .bar-outer-container {
-    background: transparent;
+    background: transparent !important;
+    background-color: transparent !important;
     padding: 0;
     margin: 0;
   }
 
   .hover-trigger-zone {
-    min-height: 4px;
-    max-height: 4px;
-    background: transparent;
+    min-height: 0;
+    max-height: 0;
+    background: transparent !important;
     padding: 0;
     margin: 0;
   }
@@ -105,7 +122,7 @@ window.Bar {
   &.look-pill .bar-inner,
   centerbox,
   .bar-inner {
-    margin: $bar-margin;
+    margin: 0;
     border-radius: $bar-radius;
     min-height: $bar-height;
     max-height: $bar-height;

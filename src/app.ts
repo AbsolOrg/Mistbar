@@ -43,6 +43,17 @@ function applyLookClass(newLook: MistbarLook) {
       win.remove_css_class("look-pill")
       win.remove_css_class("look-attached")
       win.add_css_class(`look-${newLook}`)
+      if (newLook === "pill") {
+        win.margin_top = config.barMargin ?? 6
+        win.margin_left = 12
+        win.margin_right = 12
+        win.margin_bottom = 0
+      } else {
+        win.margin_top = 0
+        win.margin_left = 0
+        win.margin_right = 0
+        win.margin_bottom = 0
+      }
     } catch (err) {
       console.error("Error applying look class:", err)
     }

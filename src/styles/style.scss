@@ -2,16 +2,16 @@
 // Mistbar — macOS Tahoe / Sequoia Floating Glass Pill Bar
 // ============================================================================
 
-// ── Color Palette (True Frosted Glass — near-transparent, blur-driven) ──
-$glass-bg: rgba(255, 255, 255, 0.06);
-$glass-gradient: linear-gradient(180deg, rgba(255, 255, 255, 0.12) 0%, rgba(255, 255, 255, 0.03) 100%);
+// ── Color Palette (macOS Tahoe Liquid Glass — Luminous Frosted Acrylic) ──
+$glass-bg: rgba(16, 20, 28, 0.32);
+$glass-gradient: linear-gradient(180deg, rgba(255, 255, 255, 0.26) 0%, rgba(255, 255, 255, 0.08) 26%, rgba(255, 255, 255, 0.02) 60%, rgba(12, 16, 24, 0.24) 100%);
 $glass-card: rgba(255, 255, 255, 0.08);
 $glass-card-hover: rgba(255, 255, 255, 0.14);
-$glass-bg-hover: rgba(255, 255, 255, 0.14);
-$glass-bg-active: rgba(255, 255, 255, 0.22);
-$glass-border: rgba(255, 255, 255, 0.22);
-$glass-highlight: rgba(255, 255, 255, 0.50);
-$glass-shadow: rgba(0, 0, 0, 0.18);
+$glass-bg-hover: rgba(255, 255, 255, 0.15);
+$glass-bg-active: rgba(255, 255, 255, 0.24);
+$glass-border: rgba(255, 255, 255, 0.24);
+$glass-highlight: rgba(255, 255, 255, 0.70);
+$glass-shadow: rgba(0, 0, 0, 0.32);
 
 // ── Color Palette (Light Liquid Glass) ──
 $glass-bg-light: rgba(245, 245, 248, 0.70);
@@ -121,7 +121,7 @@ window.Bar {
     padding: 0 10px;
   }
 
-  // ── Style Presets: Glassy (True Frosted Fluid Glass) ──
+  // ── Style Presets: Glassy (macOS Tahoe Liquid Glass) ──
   &.style-glassy centerbox,
   &.style-glassy .bar-inner,
   centerbox,
@@ -129,10 +129,11 @@ window.Bar {
     background-color: $glass-bg;
     background-image: $glass-gradient;
     border: 1px solid $glass-border;
-    border-top: 1px solid $glass-highlight;
+    border-top: 1.5px solid $glass-highlight;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.35);
     box-shadow:
-      0 4px 16px $glass-shadow,
-      0 1px 3px rgba(0, 0, 0, 0.12);
+      0 10px 32px $glass-shadow,
+      0 2px 8px rgba(0, 0, 0, 0.20);
   }
 
   &.look-attached.style-glassy centerbox,
@@ -140,8 +141,8 @@ window.Bar {
     border-left: none;
     border-right: none;
     border-top: none;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.28);
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.15);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.30);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.20);
   }
 
   // ── Style Presets: Transparent (Clear + Frosted Micro-Capsules) ──
@@ -438,34 +439,34 @@ window.Bar {
   background-color: transparent;
   border: none;
   box-shadow: none;
-  border-radius: 5px;
-  padding: 2px 4px;
-  min-width: 20px;
+  border-radius: 6px;
+  padding: 2px 7px;
+  min-width: 24px;
   min-height: 22px;
   margin: 0;
-  transition: background-color 100ms ease;
+  transition: all 120ms ease;
 
   > button {
     background: transparent;
     background-color: transparent;
     border: none;
     box-shadow: none;
-    padding: 2px 4px;
-    min-width: 20px;
+    padding: 2px 7px;
+    min-width: 24px;
     min-height: 22px;
-    border-radius: 5px;
+    border-radius: 6px;
   }
 
   &:hover,
   > button:hover {
-    background-color: $glass-bg-hover;
+    background-color: rgba(255, 255, 255, 0.16);
   }
 
   &:active,
   &:checked,
   > button:active,
   > button:checked {
-    background-color: $glass-bg-active;
+    background-color: rgba(255, 255, 255, 0.25);
   }
 
   .status-icon-label {
@@ -485,7 +486,7 @@ window.Bar {
   }
 
   &.control-center-btn .status-icon-label {
-    font-size: 14.5px;
+    font-size: 15px;
   }
 
   &.spotlight-btn .status-icon-label {
@@ -497,14 +498,14 @@ window.Bar {
   font-weight: 500;
   font-size: 12px;
   color: $text-primary;
-  padding: 2px 10px;
-  margin: 0 4px;
-  border-radius: 5px;
+  padding: 2px 8px;
+  margin: 0 2px;
+  border-radius: 6px;
   letter-spacing: -0.1px;
-  transition: background-color 100ms ease;
+  transition: all 120ms ease;
 
   &:hover {
-    background-color: $glass-bg-hover;
+    background-color: rgba(255, 255, 255, 0.16);
   }
 }
 

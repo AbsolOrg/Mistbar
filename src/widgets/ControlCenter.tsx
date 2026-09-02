@@ -73,7 +73,7 @@ export default function ControlCenter() {
       class="status-icon control-center-btn"
       tooltipText="Control Center"
     >
-      <label class="status-icon-label" label="󰂜" />
+      <label class="status-icon-label" label="󰕮" />
 
       <popover class="control-popover control-center-popover">
         <box orientation={Gtk.Orientation.VERTICAL} spacing={8} class="control-center-container">

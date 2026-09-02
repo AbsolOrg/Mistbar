@@ -1,6 +1,5 @@
 import PrivacyIndicator from "../widgets/PrivacyIndicator"
 import SystemTray from "../widgets/SystemTray"
-import Brightness from "../widgets/Brightness"
 import Volume from "../widgets/Volume"
 import Network from "../widgets/Network"
 import Bluetooth from "../widgets/Bluetooth"
@@ -14,26 +13,14 @@ export default function RightSection() {
   return (
     <box class="right-section" spacing={8}>
       <PrivacyIndicator />
-
-      {/* System Status Indicators Group */}
-      <box class="status-group" spacing={6}>
-        <SystemTray />
-        <Volume />
-        <Network />
-        <Bluetooth />
-        <Battery />
-      </box>
-
-      {/* Spotlight Search */}
+      <SystemTray />
+      <Volume />
+      <Network />
+      <Bluetooth />
+      <Battery />
       <Spotlight />
-
-      {/* Control Center */}
       <ControlCenter />
-
-      {/* Date & Time (Notification Center) */}
       <Clock />
-
-      {/* Power Menu */}
       <PowerMenu />
     </box>
   )

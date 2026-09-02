@@ -5,7 +5,7 @@ export default function Clock() {
   const time = createPoll(
     "",
     1000,
-    ["date", "+%a %b %-d  %-I:%M %p"]
+    ["date", "+%a %b %-d %-I:%M %p"]
   )
 
   return (

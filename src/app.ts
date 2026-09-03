@@ -34,9 +34,6 @@ function applyStyleClass(newStyle: MistbarStyle, fontColor?: string) {
   config.style = newStyle
   if (fontColor === "dark" || fontColor === "white") {
     config.glassyTextColor = fontColor
-    if (newStyle === "glassy") {
-      config.theme = fontColor === "white" ? "dark" : "light"
-    }
   }
   const effectiveFontColor = config.glassyTextColor || "white"
 
@@ -51,11 +48,6 @@ function applyStyleClass(newStyle: MistbarStyle, fontColor?: string) {
       win.add_css_class(`style-${newStyle}`)
       if (newStyle === "glassy") {
         win.add_css_class(`glassy-${effectiveFontColor}`)
-        if (effectiveFontColor === "white") {
-          win.remove_css_class("light-theme")
-        } else {
-          win.add_css_class("light-theme")
-        }
       }
     } catch (err) {
       console.error("Error applying style class:", err)
@@ -147,9 +139,6 @@ app.start({
       const saveObj: Partial<MistbarConfig> = { style: styleName }
       if (fontColor === "dark" || fontColor === "white") {
         saveObj.glassyTextColor = fontColor
-        if (styleName === "glassy") {
-          saveObj.theme = fontColor === "white" ? "dark" : "light"
-        }
       }
       saveConfig(saveObj)
       const colorMsg = (styleName === "glassy" && fontColor) ? ` (${fontColor} fonts & logos)` : ""

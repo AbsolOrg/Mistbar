@@ -49,6 +49,8 @@ print_help() {
     echo -e "    ${GREEN}look <pill|attached>${NC}             Switch shape/geometry dynamically"
     echo -e "    ${GREEN}status${NC}                           Check if the bar is running"
     echo -e "    ${GREEN}config${NC}                           View or edit configuration"
+    echo -e "    ${GREEN}update${NC}                           Update Mistbar to latest release or main"
+    echo -e "    ${GREEN}uninstall${NC}                        Uninstall Mistbar from your system"
     echo -e "    ${GREEN}inspect${NC}                          Open GTK Inspector for live debugging"
     echo -e "    ${GREEN}install-deps${NC}                     Install required system dependencies"
     echo ""
@@ -395,6 +397,38 @@ cmd_install_deps() {
     fi
 }
 
+cmd_update() {
+    local install_script=""
+    if [ -f "$SCRIPT_DIR/install.sh" ]; then
+        install_script="$SCRIPT_DIR/install.sh"
+    elif [ -f "$HOME/.mistbar/install.sh" ]; then
+        install_script="$HOME/.mistbar/install.sh"
+    fi
+
+    if [ -n "$install_script" ]; then
+        exec bash "$install_script" "$@"
+    else
+        echo -e "${BLUE}Fetching latest Mistbar installer...${NC}"
+        bash -c "$(curl -fsSL https://raw.githubusercontent.com/AbsolOrg/Mistbar/main/install.sh)" -- "$@"
+    fi
+}
+
+cmd_uninstall() {
+    local uninstall_script=""
+    if [ -f "$SCRIPT_DIR/uninstall.sh" ]; then
+        uninstall_script="$SCRIPT_DIR/uninstall.sh"
+    elif [ -f "$HOME/.mistbar/uninstall.sh" ]; then
+        uninstall_script="$HOME/.mistbar/uninstall.sh"
+    fi
+
+    if [ -n "$uninstall_script" ]; then
+        exec bash "$uninstall_script" "$@"
+    else
+        echo -e "${RED}Error: Uninstall script not found.${NC}"
+        exit 1
+    fi
+}
+
 # ── Main ──
 case "${1:-}" in
     start)
@@ -441,6 +475,14 @@ case "${1:-}" in
         ;;
     status)
         cmd_status
+        ;;
+    update)
+        shift
+        cmd_update "$@"
+        ;;
+    uninstall)
+        shift
+        cmd_uninstall "$@"
         ;;
     inspect)
         cmd_inspect

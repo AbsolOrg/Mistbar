@@ -2,27 +2,43 @@
 // Mistbar — macOS Tahoe / Sequoia Floating Glass Pill Bar
 // ============================================================================
 
-// ── Color Palette (macOS Tahoe Liquid Glass — Luminous Frosted Acrylic) ──
-$glass-bg: rgba(16, 20, 28, 0.32);
-$glass-gradient: linear-gradient(180deg, rgba(255, 255, 255, 0.26) 0%, rgba(255, 255, 255, 0.08) 26%, rgba(255, 255, 255, 0.02) 60%, rgba(12, 16, 24, 0.24) 100%);
-$glass-card: rgba(255, 255, 255, 0.08);
-$glass-card-hover: rgba(255, 255, 255, 0.14);
+// ── Color Palette (macOS Tahoe & Sequoia Liquid Glass — Deep Refraction Acrylic) ──
+$glass-bg: rgba(14, 18, 26, 0.26);
+$glass-gradient: linear-gradient(
+  180deg,
+  rgba(255, 255, 255, 0.34) 0%,
+  rgba(255, 255, 255, 0.14) 14%,
+  rgba(255, 255, 255, 0.03) 48%,
+  rgba(10, 14, 22, 0.10) 80%,
+  rgba(255, 255, 255, 0.07) 98%,
+  rgba(0, 0, 0, 0.28) 100%
+);
+$glass-card: rgba(255, 255, 255, 0.07);
+$glass-card-hover: rgba(255, 255, 255, 0.13);
 $glass-bg-hover: rgba(255, 255, 255, 0.15);
-$glass-bg-active: rgba(255, 255, 255, 0.24);
-$glass-border: rgba(255, 255, 255, 0.24);
-$glass-highlight: rgba(255, 255, 255, 0.70);
-$glass-shadow: rgba(0, 0, 0, 0.32);
+$glass-bg-active: rgba(255, 255, 255, 0.25);
+$glass-border: rgba(255, 255, 255, 0.26);
+$glass-highlight: rgba(255, 255, 255, 0.78);
+$glass-shadow: rgba(0, 0, 0, 0.36);
 
-// ── Color Palette (Light Liquid Glass) ──
-$glass-bg-light: rgba(245, 245, 248, 0.70);
-$glass-gradient-light: linear-gradient(180deg, rgba(255, 255, 255, 0.85) 0%, rgba(235, 235, 240, 0.65) 100%);
-$glass-card-light: rgba(0, 0, 0, 0.05);
-$glass-card-hover-light: rgba(0, 0, 0, 0.09);
-$glass-bg-hover-light: rgba(0, 0, 0, 0.07);
+// ── Color Palette (Light Crystalline Liquid Glass) ──
+$glass-bg-light: rgba(248, 248, 252, 0.62);
+$glass-gradient-light: linear-gradient(
+  180deg,
+  rgba(255, 255, 255, 0.96) 0%,
+  rgba(255, 255, 255, 0.78) 16%,
+  rgba(240, 242, 248, 0.40) 50%,
+  rgba(230, 232, 242, 0.58) 86%,
+  rgba(255, 255, 255, 0.72) 98%,
+  rgba(0, 0, 0, 0.08) 100%
+);
+$glass-card-light: rgba(0, 0, 0, 0.04);
+$glass-card-hover-light: rgba(0, 0, 0, 0.08);
+$glass-bg-hover-light: rgba(0, 0, 0, 0.06);
 $glass-bg-active-light: rgba(0, 0, 0, 0.12);
-$glass-border-light: rgba(255, 255, 255, 0.55);
-$glass-inner-glow-light: rgba(255, 255, 255, 0.90);
-$glass-shadow-light: rgba(0, 0, 0, 0.14);
+$glass-border-light: rgba(255, 255, 255, 0.65);
+$glass-inner-glow-light: rgba(255, 255, 255, 0.96);
+$glass-shadow-light: rgba(0, 0, 0, 0.12);
 
 $accent-blue: #007aff;
 $accent-blue-hover: #006ee6;
@@ -105,9 +121,13 @@ window.Bar {
 
   .hover-trigger-zone {
     min-height: 0;
+    max-height: 0;
+    height: 0;
     background: transparent;
     padding: 0;
     margin: 0;
+    font-size: 0;
+    line-height: 0;
   }
 
   // Base inner bar container
@@ -135,7 +155,7 @@ window.Bar {
     padding: 0 10px;
   }
 
-  // ── Style Presets (Dark Theme Default) ──
+  // ── Style Presets: Liquid Glass (Dark Theme Default) ──
   &.style-glassy:not(.light-theme) centerbox,
   &.style-glassy:not(.light-theme) .bar-inner,
   &:not(.style-transparent):not(.style-solid):not(.light-theme) centerbox,
@@ -143,11 +163,9 @@ window.Bar {
     background-color: $glass-bg;
     background-image: $glass-gradient;
     border: 1px solid $glass-border;
-    border-top: 1.5px solid $glass-highlight;
-    border-bottom: 1px solid rgba(0, 0, 0, 0.35);
     box-shadow:
-      0 10px 32px $glass-shadow,
-      0 2px 8px rgba(0, 0, 0, 0.20);
+      inset 0 1px 1px 0 rgba(255, 255, 255, 0.60),
+      inset 0 -1px 1px 0 rgba(0, 0, 0, 0.25);
   }
 
   &.look-attached.style-glassy:not(.light-theme) centerbox,
@@ -157,8 +175,10 @@ window.Bar {
     border-left: none;
     border-right: none;
     border-top: none;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.30);
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.20);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.28);
+    box-shadow:
+      inset 0 -1px 1px 0 rgba(255, 255, 255, 0.12),
+      0 6px 20px rgba(0, 0, 0, 0.25);
   }
 
   // ── Style Presets: Transparent (Clear + Frosted Micro-Capsules) ──
@@ -266,7 +286,14 @@ window.Bar {
     .status-icon:hover,
     .status-icon > button:hover,
     .clock:hover {
-      background-color: $glass-bg-hover-light;
+      background-color: rgba(0, 0, 0, 0.06);
+      background-image: linear-gradient(180deg, rgba(255, 255, 255, 0.70) 0%, rgba(0, 0, 0, 0.03) 100%);
+      border: 1px solid rgba(0, 0, 0, 0.08);
+      border-top: 1px solid rgba(255, 255, 255, 0.90);
+      border-radius: 8px;
+      box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.85),
+        0 2px 6px rgba(0, 0, 0, 0.05);
     }
 
     .logo-button:active,
@@ -275,7 +302,12 @@ window.Bar {
     .menu-item-btn > button:active,
     .status-icon:active,
     .status-icon > button:active {
-      background-color: $glass-bg-active-light;
+      background-color: rgba(0, 0, 0, 0.12);
+      background-image: linear-gradient(180deg, rgba(0, 0, 0, 0.05) 0%, rgba(0, 0, 0, 0.14) 100%);
+      border: 1px solid rgba(0, 0, 0, 0.14);
+      border-top: 1px solid rgba(0, 0, 0, 0.18);
+      border-radius: 8px;
+      box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.14);
     }
 
     // Glassy Light (when in light-theme mode)
@@ -286,11 +318,9 @@ window.Bar {
       background-color: $glass-bg-light;
       background-image: $glass-gradient-light;
       border: 1px solid $glass-border-light;
-      border-top: 1.5px solid $glass-inner-glow-light;
-      border-bottom: 1px solid rgba(0, 0, 0, 0.12);
       box-shadow:
-        0 10px 32px $glass-shadow-light,
-        0 2px 8px rgba(0, 0, 0, 0.08);
+        inset 0 1.5px 1px 0 rgba(255, 255, 255, 0.95),
+        inset 0 -1px 1px 0 rgba(0, 0, 0, 0.08);
     }
 
     &.look-attached.style-glassy centerbox,
@@ -301,7 +331,9 @@ window.Bar {
       border-right: none;
       border-top: none;
       border-bottom: 1px solid rgba(0, 0, 0, 0.12);
-      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+      box-shadow:
+        inset 0 -1px 1px 0 rgba(255, 255, 255, 0.50),
+        0 4px 16px rgba(0, 0, 0, 0.08);
     }
 
     // Transparent Light
@@ -383,7 +415,14 @@ window.Bar {
     .status-icon:hover,
     .status-icon > button:hover,
     .clock:hover {
-      background-color: rgba(255, 255, 255, 0.16);
+      background-color: rgba(255, 255, 255, 0.14);
+      background-image: linear-gradient(180deg, rgba(255, 255, 255, 0.24) 0%, rgba(255, 255, 255, 0.06) 100%);
+      border: 1px solid rgba(255, 255, 255, 0.20);
+      border-top: 1px solid rgba(255, 255, 255, 0.50);
+      border-radius: 8px;
+      box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.35),
+        0 2px 6px rgba(0, 0, 0, 0.15);
     }
 
     .logo-button:active,
@@ -392,7 +431,14 @@ window.Bar {
     .menu-item-btn > button:active,
     .status-icon:active,
     .status-icon > button:active {
-      background-color: rgba(255, 255, 255, 0.25);
+      background-color: rgba(255, 255, 255, 0.24);
+      background-image: linear-gradient(180deg, rgba(255, 255, 255, 0.28) 0%, rgba(255, 255, 255, 0.14) 100%);
+      border: 1px solid rgba(255, 255, 255, 0.30);
+      border-top: 1px solid rgba(255, 255, 255, 0.60);
+      border-radius: 8px;
+      box-shadow:
+        inset 0 1px 2px rgba(0, 0, 0, 0.18),
+        0 1px 2px rgba(0, 0, 0, 0.12);
     }
   }
 
@@ -424,7 +470,14 @@ window.Bar {
     .status-icon:hover,
     .status-icon > button:hover,
     .clock:hover {
-      background-color: rgba(0, 0, 0, 0.08);
+      background-color: rgba(0, 0, 0, 0.07);
+      background-image: linear-gradient(180deg, rgba(255, 255, 255, 0.65) 0%, rgba(0, 0, 0, 0.04) 100%);
+      border: 1px solid rgba(0, 0, 0, 0.08);
+      border-top: 1px solid rgba(255, 255, 255, 0.85);
+      border-radius: 8px;
+      box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.80),
+        0 2px 6px rgba(0, 0, 0, 0.05);
     }
 
     .logo-button:active,
@@ -433,7 +486,12 @@ window.Bar {
     .menu-item-btn > button:active,
     .status-icon:active,
     .status-icon > button:active {
-      background-color: rgba(0, 0, 0, 0.14);
+      background-color: rgba(0, 0, 0, 0.12);
+      background-image: linear-gradient(180deg, rgba(0, 0, 0, 0.05) 0%, rgba(0, 0, 0, 0.14) 100%);
+      border: 1px solid rgba(0, 0, 0, 0.14);
+      border-top: 1px solid rgba(0, 0, 0, 0.18);
+      border-radius: 8px;
+      box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.14);
     }
   }
 }
@@ -447,13 +505,13 @@ window.Bar {
 .logo-button {
   background: transparent;
   background-color: transparent;
-  border: none;
+  border: 1px solid transparent;
   box-shadow: none;
-  border-radius: 5px;
+  border-radius: 8px;
   padding: 2px 8px;
   min-width: 24px;
   min-height: 22px;
-  transition: background-color 100ms ease;
+  transition: all 160ms cubic-bezier(0.16, 1, 0.3, 1);
 
   > button {
     background: transparent;
@@ -463,12 +521,26 @@ window.Bar {
 
   &:hover,
   > button:hover {
-    background-color: $glass-bg-hover;
+    background-color: rgba(255, 255, 255, 0.14);
+    background-image: linear-gradient(180deg, rgba(255, 255, 255, 0.24) 0%, rgba(255, 255, 255, 0.06) 100%);
+    border: 1px solid rgba(255, 255, 255, 0.20);
+    border-top: 1px solid rgba(255, 255, 255, 0.50);
+    border-radius: 8px;
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.35),
+      0 2px 6px rgba(0, 0, 0, 0.15);
   }
 
   &:active,
   > button:active {
-    background-color: $glass-bg-active;
+    background-color: rgba(255, 255, 255, 0.24);
+    background-image: linear-gradient(180deg, rgba(255, 255, 255, 0.28) 0%, rgba(255, 255, 255, 0.14) 100%);
+    border: 1px solid rgba(255, 255, 255, 0.30);
+    border-top: 1px solid rgba(255, 255, 255, 0.60);
+    border-radius: 8px;
+    box-shadow:
+      inset 0 1px 2px rgba(0, 0, 0, 0.18),
+      0 1px 2px rgba(0, 0, 0, 0.12);
   }
 
   .logo-icon {
@@ -493,12 +565,12 @@ window.Bar {
   .menu-item-btn {
     background: transparent;
     background-color: transparent;
-    border: none;
+    border: 1px solid transparent;
     box-shadow: none;
-    border-radius: 5px;
+    border-radius: 8px;
     padding: 2px 8px;
     min-height: 20px;
-    transition: background-color 100ms ease;
+    transition: all 160ms cubic-bezier(0.16, 1, 0.3, 1);
 
     > button {
       background: transparent;
@@ -506,19 +578,33 @@ window.Bar {
       box-shadow: none;
       padding: 2px 8px;
       min-height: 20px;
-      border-radius: 5px;
+      border-radius: 8px;
     }
 
     &:hover,
     > button:hover {
-      background-color: $glass-bg-hover;
+      background-color: rgba(255, 255, 255, 0.14);
+      background-image: linear-gradient(180deg, rgba(255, 255, 255, 0.24) 0%, rgba(255, 255, 255, 0.06) 100%);
+      border: 1px solid rgba(255, 255, 255, 0.20);
+      border-top: 1px solid rgba(255, 255, 255, 0.50);
+      border-radius: 8px;
+      box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.35),
+        0 2px 6px rgba(0, 0, 0, 0.15);
     }
 
     &:active,
     &:checked,
     > button:active,
     > button:checked {
-      background-color: $glass-bg-active;
+      background-color: rgba(255, 255, 255, 0.24);
+      background-image: linear-gradient(180deg, rgba(255, 255, 255, 0.28) 0%, rgba(255, 255, 255, 0.14) 100%);
+      border: 1px solid rgba(255, 255, 255, 0.30);
+      border-top: 1px solid rgba(255, 255, 255, 0.60);
+      border-radius: 8px;
+      box-shadow:
+        inset 0 1px 2px rgba(0, 0, 0, 0.18),
+        0 1px 2px rgba(0, 0, 0, 0.12);
     }
 
     label {
@@ -622,22 +708,36 @@ menubutton.status-icon {
   > button {
     background: transparent;
     background-color: transparent;
-    border: none;
+    border: 1px solid transparent;
     box-shadow: none;
-    border-radius: 6px;
+    border-radius: 8px;
     padding: 0;
     min-width: 26px;
     min-height: 22px;
     margin: 0;
-    transition: all 120ms ease;
+    transition: all 160ms cubic-bezier(0.16, 1, 0.3, 1);
 
     &:hover {
-      background-color: rgba(255, 255, 255, 0.16);
+      background-color: rgba(255, 255, 255, 0.14);
+      background-image: linear-gradient(180deg, rgba(255, 255, 255, 0.24) 0%, rgba(255, 255, 255, 0.06) 100%);
+      border: 1px solid rgba(255, 255, 255, 0.20);
+      border-top: 1px solid rgba(255, 255, 255, 0.50);
+      border-radius: 8px;
+      box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.35),
+        0 2px 6px rgba(0, 0, 0, 0.15);
     }
 
     &:active,
     &:checked {
-      background-color: rgba(255, 255, 255, 0.25);
+      background-color: rgba(255, 255, 255, 0.24);
+      background-image: linear-gradient(180deg, rgba(255, 255, 255, 0.28) 0%, rgba(255, 255, 255, 0.14) 100%);
+      border: 1px solid rgba(255, 255, 255, 0.30);
+      border-top: 1px solid rgba(255, 255, 255, 0.60);
+      border-radius: 8px;
+      box-shadow:
+        inset 0 1px 2px rgba(0, 0, 0, 0.18),
+        0 1px 2px rgba(0, 0, 0, 0.12);
     }
   }
 }
@@ -645,22 +745,36 @@ menubutton.status-icon {
 button.status-icon {
   background: transparent;
   background-color: transparent;
-  border: none;
+  border: 1px solid transparent;
   box-shadow: none;
-  border-radius: 6px;
+  border-radius: 8px;
   padding: 0;
   min-width: 26px;
   min-height: 22px;
   margin: 0;
-  transition: all 120ms ease;
+  transition: all 160ms cubic-bezier(0.16, 1, 0.3, 1);
 
   &:hover {
-    background-color: rgba(255, 255, 255, 0.16);
+    background-color: rgba(255, 255, 255, 0.14);
+    background-image: linear-gradient(180deg, rgba(255, 255, 255, 0.24) 0%, rgba(255, 255, 255, 0.06) 100%);
+    border: 1px solid rgba(255, 255, 255, 0.20);
+    border-top: 1px solid rgba(255, 255, 255, 0.50);
+    border-radius: 8px;
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.35),
+      0 2px 6px rgba(0, 0, 0, 0.15);
   }
 
   &:active,
   &:checked {
-    background-color: rgba(255, 255, 255, 0.25);
+    background-color: rgba(255, 255, 255, 0.24);
+    background-image: linear-gradient(180deg, rgba(255, 255, 255, 0.28) 0%, rgba(255, 255, 255, 0.14) 100%);
+    border: 1px solid rgba(255, 255, 255, 0.30);
+    border-top: 1px solid rgba(255, 255, 255, 0.60);
+    border-radius: 8px;
+    box-shadow:
+      inset 0 1px 2px rgba(0, 0, 0, 0.18),
+      0 1px 2px rgba(0, 0, 0, 0.12);
   }
 }
 
@@ -707,12 +821,19 @@ button.status-icon {
   padding: 2px 8px;
   margin: 0;
   min-height: 22px;
-  border-radius: 6px;
+  border: 1px solid transparent;
+  border-radius: 8px;
   letter-spacing: -0.1px;
-  transition: all 120ms ease;
+  transition: all 160ms cubic-bezier(0.16, 1, 0.3, 1);
 
   &:hover {
-    background-color: rgba(255, 255, 255, 0.16);
+    background-color: rgba(255, 255, 255, 0.14);
+    background-image: linear-gradient(180deg, rgba(255, 255, 255, 0.24) 0%, rgba(255, 255, 255, 0.06) 100%);
+    border: 1px solid rgba(255, 255, 255, 0.20);
+    border-top: 1px solid rgba(255, 255, 255, 0.50);
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.35),
+      0 2px 6px rgba(0, 0, 0, 0.15);
   }
 }
 
@@ -742,20 +863,28 @@ button.status-icon {
 
 // ── macOS Popovers & Glass Cards ──
 popover {
-  background-color: rgba(24, 24, 30, 0.90);
-  background-image: linear-gradient(180deg, rgba(255, 255, 255, 0.12) 0%, rgba(20, 20, 26, 0.92) 100%);
-  border: 1px solid rgba(255, 255, 255, 0.16);
-  border-radius: 14px;
+  background-color: rgba(18, 22, 32, 0.88);
+  background-image: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.22) 0%,
+    rgba(255, 255, 255, 0.08) 14%,
+    rgba(16, 20, 28, 0.78) 55%,
+    rgba(12, 16, 24, 0.94) 100%
+  );
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  border-top: 1.5px solid rgba(255, 255, 255, 0.65);
+  border-radius: 16px;
   box-shadow:
-    inset 0 1px 0 0 rgba(255, 255, 255, 0.25),
-    0 12px 36px rgba(0, 0, 0, 0.60),
-    0 3px 8px rgba(0, 0, 0, 0.30);
+    inset 0 1px 1px 0 rgba(255, 255, 255, 0.45),
+    inset 0 -1px 1px 0 rgba(255, 255, 255, 0.08),
+    0 16px 44px rgba(0, 0, 0, 0.65),
+    0 4px 12px rgba(0, 0, 0, 0.35);
   color: $text-primary;
   font-family: $font-main;
 
   > contents {
     background: transparent;
-    border-radius: 14px;
+    border-radius: 16px;
     padding: 0;
   }
 
@@ -964,9 +1093,13 @@ popover {
 
 // ── Popover Cards & Lists ──
 .popover-card {
-  background-color: $glass-card;
-  border-radius: 9px;
+  background-color: rgba(255, 255, 255, 0.07);
+  background-image: linear-gradient(180deg, rgba(255, 255, 255, 0.10) 0%, rgba(255, 255, 255, 0.02) 100%);
+  border: 1px solid rgba(255, 255, 255, 0.10);
+  border-top: 1px solid rgba(255, 255, 255, 0.22);
+  border-radius: 10px;
   padding: 5px 7px;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.12);
 
   .card-icon {
     font-family: $font-icon;
@@ -987,9 +1120,13 @@ popover {
 }
 
 .popover-card-list {
-  background-color: $glass-card;
-  border-radius: 9px;
+  background-color: rgba(255, 255, 255, 0.07);
+  background-image: linear-gradient(180deg, rgba(255, 255, 255, 0.10) 0%, rgba(255, 255, 255, 0.02) 100%);
+  border: 1px solid rgba(255, 255, 255, 0.10);
+  border-top: 1px solid rgba(255, 255, 255, 0.22);
+  border-radius: 10px;
   padding: 5px 7px;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.12);
 
   .network-list-text,
   .device-list-text {
@@ -1001,24 +1138,27 @@ popover {
 
 .popover-toggle-btn {
   background-color: rgba(255, 255, 255, 0.12);
-  border: none;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-top: 1px solid rgba(255, 255, 255, 0.35);
   border-radius: 6px;
   padding: 2px 7px;
   font-size: 10.5px;
   font-weight: 600;
   color: $text-primary;
-  transition: background-color 120ms ease;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.20);
+  transition: all 120ms ease;
 
   &:hover {
     background-color: $accent-blue;
+    border-color: $accent-blue-hover;
     color: #ffffff;
   }
 }
 
 .preset-box {
   .preset-btn {
-    background-color: $glass-card;
-    border: none;
+    background-color: rgba(255, 255, 255, 0.07);
+    border: 1px solid rgba(255, 255, 255, 0.10);
     border-radius: 6px;
     padding: 3px 7px;
     font-size: 10px;
@@ -1027,7 +1167,7 @@ popover {
     transition: all 120ms ease;
 
     &:hover {
-      background-color: $glass-card-hover;
+      background-color: rgba(255, 255, 255, 0.14);
       color: $text-primary;
     }
 
@@ -1040,14 +1180,19 @@ popover {
 }
 
 .action-button {
-  background-color: $glass-card;
-  border: none;
+  background-color: rgba(255, 255, 255, 0.07);
+  background-image: linear-gradient(180deg, rgba(255, 255, 255, 0.10) 0%, rgba(255, 255, 255, 0.02) 100%);
+  border: 1px solid rgba(255, 255, 255, 0.10);
+  border-top: 1px solid rgba(255, 255, 255, 0.22);
   border-radius: 8px;
   padding: 5px 7px;
-  transition: background-color 120ms ease;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.12);
+  transition: all 140ms ease;
 
   &:hover {
-    background-color: $glass-card-hover;
+    background-color: rgba(255, 255, 255, 0.13);
+    border-color: rgba(255, 255, 255, 0.18);
+    border-top-color: rgba(255, 255, 255, 0.35);
   }
 
   .action-icon {
@@ -1108,14 +1253,22 @@ window.Bar.style-glassy.glassy-dark popover,
 window.Bar.light-theme .control-popover,
 window.Bar.light-theme .appmenu-popover,
 window.Bar.light-theme .power-popover {
-  background-color: rgba(250, 250, 252, 0.94);
-  background-image: linear-gradient(180deg, rgba(255, 255, 255, 0.98) 0%, rgba(242, 242, 246, 0.92) 100%);
-  border: 1px solid rgba(0, 0, 0, 0.12);
-  border-top: 1px solid rgba(255, 255, 255, 0.90);
+  background-color: rgba(248, 248, 252, 0.90);
+  background-image: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.98) 0%,
+    rgba(255, 255, 255, 0.85) 15%,
+    rgba(242, 244, 250, 0.82) 60%,
+    rgba(235, 238, 246, 0.92) 100%
+  );
+  border: 1px solid rgba(0, 0, 0, 0.09);
+  border-top: 1.5px solid rgba(255, 255, 255, 0.95);
+  border-radius: 16px;
   box-shadow:
-    inset 0 1px 0 0 rgba(255, 255, 255, 0.90),
-    0 12px 36px rgba(0, 0, 0, 0.14),
-    0 3px 8px rgba(0, 0, 0, 0.08);
+    inset 0 1.5px 1px 0 rgba(255, 255, 255, 0.95),
+    inset 0 -1px 1px 0 rgba(255, 255, 255, 0.40),
+    0 16px 40px rgba(0, 0, 0, 0.14),
+    0 4px 10px rgba(0, 0, 0, 0.07);
   color: $text-primary-light;
 
   separator {
@@ -1152,11 +1305,18 @@ window.Bar.light-theme .power-popover {
   .cc-media-card,
   .action-button,
   .preset-btn {
-    background-color: rgba(0, 0, 0, 0.05);
-    border: 1px solid rgba(0, 0, 0, 0.06);
+    background-color: rgba(0, 0, 0, 0.04);
+    background-image: linear-gradient(180deg, rgba(255, 255, 255, 0.70) 0%, rgba(0, 0, 0, 0.02) 100%);
+    border: 1px solid rgba(0, 0, 0, 0.07);
+    border-top: 1px solid rgba(255, 255, 255, 0.90);
+    border-radius: 10px;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.70);
+    transition: all 140ms ease;
 
     &:hover {
-      background-color: rgba(0, 0, 0, 0.09);
+      background-color: rgba(0, 0, 0, 0.08);
+      border-color: rgba(0, 0, 0, 0.10);
+      border-top-color: rgba(255, 255, 255, 0.95);
     }
 
     &.active {

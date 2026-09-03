@@ -77,9 +77,11 @@ mistbar toggle            # Toggle bar visibility (hide/show)
 mistbar auto-hide on      # Enable intelligent auto-hide (or mistbar --auto-hide)
 mistbar auto-hide off     # Disable auto-hide (or mistbar --always-visible)
 mistbar auto-hide toggle  # Toggle auto-hide state
-mistbar style glassy      # Switch to Frosted Liquid Glass (default)
-mistbar style transparent # Switch to 100% Transparent See-Through
-mistbar style solid       # Switch to Solid Opaque Color (deep black/white)
+mistbar style glassy            # Switch to Frosted Liquid Glass (default)
+mistbar style glassy dark       # Frosted Liquid Glass with Dark Fonts & Logos
+mistbar style glassy white      # Frosted Liquid Glass with White Fonts & Logos
+mistbar style transparent       # Switch to 100% Transparent See-Through
+mistbar style solid             # Switch to Solid Opaque Color (deep black/white)
 mistbar look pill         # Switch to Floating Rounded Pill capsule (default)
 mistbar look attached     # Switch to Edge-to-Edge Full-Width Top Bar
 mistbar theme light       # Switch to Light theme

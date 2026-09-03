@@ -220,6 +220,81 @@ window.Bar {
     box-shadow: 0 4px 16px rgba(0, 0, 0, 0.20);
   }
 
+  // ── Glassy Specific Text & Icon Color Overrides (mistbar style glassy <dark|white>) ──
+  &.style-glassy.glassy-dark {
+    color: #1d1d1f !important;
+
+    .logo-icon,
+    .active-window,
+    .menu-item-btn label,
+    .status-icon-label,
+    .clock,
+    .battery-percent,
+    .power-icon {
+      color: #1d1d1f !important;
+    }
+
+    .workspace-dots {
+      color: rgba(29, 29, 31, 0.75) !important;
+    }
+
+    .logo-button:hover,
+    .logo-button > button:hover,
+    .menu-item-btn:hover,
+    .menu-item-btn > button:hover,
+    .status-icon:hover,
+    .status-icon > button:hover,
+    .clock:hover {
+      background-color: rgba(0, 0, 0, 0.08) !important;
+    }
+
+    .logo-button:active,
+    .logo-button > button:active,
+    .menu-item-btn:active,
+    .menu-item-btn > button:active,
+    .status-icon:active,
+    .status-icon > button:active {
+      background-color: rgba(0, 0, 0, 0.14) !important;
+    }
+  }
+
+  &.style-glassy.glassy-white {
+    color: #ffffff !important;
+
+    .logo-icon,
+    .active-window,
+    .menu-item-btn label,
+    .status-icon-label,
+    .clock,
+    .battery-percent,
+    .power-icon {
+      color: #ffffff !important;
+    }
+
+    .workspace-dots {
+      color: rgba(255, 255, 255, 0.75) !important;
+    }
+
+    .logo-button:hover,
+    .logo-button > button:hover,
+    .menu-item-btn:hover,
+    .menu-item-btn > button:hover,
+    .status-icon:hover,
+    .status-icon > button:hover,
+    .clock:hover {
+      background-color: rgba(255, 255, 255, 0.16) !important;
+    }
+
+    .logo-button:active,
+    .logo-button > button:active,
+    .menu-item-btn:active,
+    .menu-item-btn > button:active,
+    .status-icon:active,
+    .status-icon > button:active {
+      background-color: rgba(255, 255, 255, 0.25) !important;
+    }
+  }
+
   // Dark Theme text & icons
   &:not(.light-theme) {
     color: #ffffff;
@@ -1025,6 +1100,8 @@ popover {
 window.Bar.light-theme popover,
 .light-theme popover,
 popover.light-theme,
+window.Bar.glassy-dark popover,
+window.Bar.style-glassy.glassy-dark popover,
 window.Bar.light-theme .control-popover,
 window.Bar.light-theme .appmenu-popover,
 window.Bar.light-theme .power-popover {

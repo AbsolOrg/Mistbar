@@ -139,29 +139,24 @@ window.Bar {
   }
 
   // ── Style Presets (Dark Theme Default) ──
-  &.style-glassy centerbox,
-  &.style-glassy .bar-inner,
-  &:not(.style-transparent):not(.style-solid) centerbox,
-  &:not(.style-transparent):not(.style-solid) .bar-inner {
-    background-color: $glass-bg;
-    background-image: $glass-gradient;
-    border: 1px solid $glass-border;
-    border-top: 1.5px solid $glass-highlight;
-    border-bottom: 1px solid rgba(0, 0, 0, 0.35);
-    box-shadow:
-      0 10px 32px $glass-shadow,
-      0 2px 8px rgba(0, 0, 0, 0.20);
+  &.style-glassy:not(.light-theme) centerbox,
+  &.style-glassy:not(.light-theme) .bar-inner,
+  &:not(.style-transparent):not(.style-solid):not(.light-theme) centerbox,
+  &:not(.style-transparent):not(.style-solid):not(.light-theme) .bar-inner {
+    background-color: #16161a !important;
+    background-image: none !important;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.5);
   }
 
-  &.look-attached.style-glassy centerbox,
-  &.look-attached.style-glassy .bar-inner,
-  &.look-attached:not(.style-transparent):not(.style-solid) centerbox,
-  &.look-attached:not(.style-transparent):not(.style-solid) .bar-inner {
-    border-left: none;
-    border-right: none;
-    border-top: none;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.30);
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.20);
+  &.look-attached.style-glassy:not(.light-theme) centerbox,
+  &.look-attached.style-glassy:not(.light-theme) .bar-inner,
+  &.look-attached:not(.style-transparent):not(.style-solid):not(.light-theme) centerbox,
+  &.look-attached:not(.style-transparent):not(.style-solid):not(.light-theme) .bar-inner {
+    border-left: none !important;
+    border-right: none !important;
+    border-top: none !important;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.14) !important;
   }
 
   // ── Style Presets: Transparent (Clear + Frosted Micro-Capsules) ──
@@ -206,18 +201,23 @@ window.Bar {
   // ── Style Presets: Solid (Dark) ──
   &.style-solid:not(.light-theme) centerbox,
   &.style-solid:not(.light-theme) .bar-inner {
-    background-color: #16161a !important;
-    background-image: none !important;
-    border: 1px solid rgba(255, 255, 255, 0.12);
-    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.5);
+    background-color: $glass-bg;
+    background-image: $glass-gradient;
+    border: 1px solid $glass-border;
+    border-top: 1.5px solid $glass-highlight;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.35);
+    box-shadow:
+      0 10px 32px $glass-shadow,
+      0 2px 8px rgba(0, 0, 0, 0.20);
   }
 
   &.look-attached.style-solid:not(.light-theme) centerbox,
   &.look-attached.style-solid:not(.light-theme) .bar-inner {
-    border-left: none !important;
-    border-right: none !important;
-    border-top: none !important;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.14) !important;
+    border-left: none;
+    border-right: none;
+    border-top: none;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.30);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.20);
   }
 
   // Dark Theme text & icons
@@ -279,30 +279,26 @@ window.Bar {
       background-color: $glass-bg-active-light;
     }
 
-    // Glassy Light (Liquid Frosted Glass)
+    // Glassy Light
     &.style-glassy centerbox,
     &.style-glassy .bar-inner,
     &:not(.style-transparent):not(.style-solid) centerbox,
     &:not(.style-transparent):not(.style-solid) .bar-inner {
-      background-color: $glass-bg-light;
-      background-image: $glass-gradient-light;
-      border: 1px solid $glass-border-light;
-      border-top: 1.5px solid $glass-inner-glow-light;
-      border-bottom: 1px solid rgba(0, 0, 0, 0.12);
-      box-shadow:
-        0 10px 32px $glass-shadow-light,
-        0 2px 8px rgba(0, 0, 0, 0.08);
+      background-color: #f7f7f9 !important;
+      background-image: none !important;
+      border: 1px solid rgba(0, 0, 0, 0.10) !important;
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08) !important;
     }
 
     &.look-attached.style-glassy centerbox,
     &.look-attached.style-glassy .bar-inner,
     &.look-attached:not(.style-transparent):not(.style-solid) centerbox,
     &.look-attached:not(.style-transparent):not(.style-solid) .bar-inner {
-      border-left: none;
-      border-right: none;
-      border-top: none;
-      border-bottom: 1px solid rgba(0, 0, 0, 0.12);
-      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+      border-left: none !important;
+      border-right: none !important;
+      border-top: none !important;
+      border-bottom: 1px solid rgba(0, 0, 0, 0.12) !important;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06) !important;
     }
 
     // Transparent Light
@@ -338,19 +334,23 @@ window.Bar {
     // Solid Light
     &.style-solid centerbox,
     &.style-solid .bar-inner {
-      background-color: #f7f7f9 !important;
-      background-image: none !important;
-      border: 1px solid rgba(0, 0, 0, 0.10) !important;
-      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08) !important;
+      background-color: $glass-bg-light;
+      background-image: $glass-gradient-light;
+      border: 1px solid $glass-border-light;
+      border-top: 1.5px solid $glass-inner-glow-light;
+      border-bottom: 1px solid rgba(0, 0, 0, 0.12);
+      box-shadow:
+        0 10px 32px $glass-shadow-light,
+        0 2px 8px rgba(0, 0, 0, 0.08);
     }
 
     &.look-attached.style-solid centerbox,
     &.look-attached.style-solid .bar-inner {
-      border-left: none !important;
-      border-right: none !important;
-      border-top: none !important;
-      border-bottom: 1px solid rgba(0, 0, 0, 0.12) !important;
-      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06) !important;
+      border-left: none;
+      border-right: none;
+      border-top: none;
+      border-bottom: 1px solid rgba(0, 0, 0, 0.12);
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
     }
   }
 }

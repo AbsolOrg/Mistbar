@@ -238,11 +238,61 @@ fi
 echo -e "${BLUE}[5/7] Checking Niri compositor blur integration...${NC}"
 NIRI_CONFIG="$HOME/.config/niri/config.kdl"
 if [ -f "$NIRI_CONFIG" ]; then
-    if ! grep -q 'namespace="mistbar"' "$NIRI_CONFIG"; then
-        python3 -c "
+    python3 -c "
 kdl_path = '$NIRI_CONFIG'
 with open(kdl_path, 'r') as f:
     content = f.read()
+
+def remove_mistbar_layer_rules(text):
+    result = []
+    i = 0
+    while i < len(text):
+        idx = text.find('layer-rule', i)
+        if idx == -1:
+            result.append(text[i:])
+            break
+        brace_start = text.find('{', idx)
+        if brace_start == -1:
+            result.append(text[i:])
+            break
+        depth = 1
+        pos = brace_start + 1
+        while pos < len(text) and depth > 0:
+            if text[pos] == '{':
+                depth += 1
+            elif text[pos] == '}':
+                depth -= 1
+            pos += 1
+        block = text[idx:pos]
+        if 'namespace=\"mistbar\"' in block or \"namespace='mistbar'\" in block:
+            while pos < len(text) and text[pos] in ' \\t\\r\\n':
+                if text[pos] == '\\n':
+                    pos += 1
+                    break
+                pos += 1
+            result.append(text[i:idx])
+            i = pos
+        else:
+            result.append(text[i:pos])
+            i = pos
+    return ''.join(result)
+
+# Clean any existing or partial mistbar rules safely
+content = remove_mistbar_layer_rules(content)
+
+# Clean any stray orphaned closing braces
+lines = content.splitlines(True)
+cleaned = []
+open_depth = 0
+for line in lines:
+    stripped = line.strip()
+    if stripped == '}' and open_depth <= 0:
+        continue
+    open_depth += line.count('{') - line.count('}')
+    if open_depth < 0:
+        open_depth = 0
+    cleaned.append(line)
+content = ''.join(cleaned)
 
 rule = '''
 layer-rule {
@@ -253,21 +303,25 @@ layer-rule {
     }
 }
 '''
-if 'match namespace=\"mistbar\"' not in content:
-    idx = content.find('input {')
-    if idx != -1:
-        new_content = content[:idx] + rule + '\n' + content[idx:]
-    else:
-        new_content = content + '\n' + rule
-    with open(kdl_path, 'w') as f:
-        f.write(new_content)
+idx = content.find('input {')
+if idx != -1:
+    new_content = content[:idx] + rule + '\\n' + content[idx:]
+else:
+    new_content = content + '\\n' + rule
+
+with open(kdl_path, 'w') as f:
+    f.write(new_content)
 " 2>/dev/null || true
-        echo -e "${GREEN}  ✓ Added mistbar background-effect blur rule to Niri config${NC}"
-        if command -v niri &>/dev/null; then
+
+    if command -v niri &>/dev/null; then
+        if niri validate 2>/dev/null; then
+            echo -e "${GREEN}  ✓ Added mistbar blur rule and verified Niri configuration${NC}"
             niri msg action load-config-file 2>/dev/null || true
+        else
+            echo -e "${YELLOW}  ⚠ Niri config validation reported an issue; please check $NIRI_CONFIG${NC}"
         fi
     else
-        echo -e "${GREEN}  ✓ Niri blur layer-rule already configured${NC}"
+        echo -e "${GREEN}  ✓ Added mistbar background-effect blur rule to Niri config${NC}"
     fi
 else
     echo -e "${DIM}  Niri config not detected, skipping layer-rule setup${NC}"

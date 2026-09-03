@@ -120,9 +120,56 @@ content = re.sub(r'//\s*spawn-at-startup\s+\"waybar\"\s+//\s*Disabled by Mistbar
 content = re.sub(r'\n?// Start Mistbar on desktop launch\n?spawn-at-startup\s+\"mistbar\"\s+\"start\"\n?', '\n', content)
 content = re.sub(r'spawn-at-startup\s+\"mistbar\"\s+\"start\"\n?', '', content)
 
-# Remove mistbar layer-rule
-layer_rule_pattern = r'\n?layer-rule\s*\{\s*match\s+namespace=\"mistbar\"[\s\S]*?\}\n?'
-content = re.sub(layer_rule_pattern, '\n', content)
+# Remove mistbar layer-rule safely
+def remove_mistbar_layer_rules(text):
+    result = []
+    i = 0
+    while i < len(text):
+        idx = text.find('layer-rule', i)
+        if idx == -1:
+            result.append(text[i:])
+            break
+        brace_start = text.find('{', idx)
+        if brace_start == -1:
+            result.append(text[i:])
+            break
+        depth = 1
+        pos = brace_start + 1
+        while pos < len(text) and depth > 0:
+            if text[pos] == '{':
+                depth += 1
+            elif text[pos] == '}':
+                depth -= 1
+            pos += 1
+        block = text[idx:pos]
+        if 'namespace=\"mistbar\"' in block or \"namespace='mistbar'\" in block:
+            while pos < len(text) and text[pos] in ' \\t\\r\\n':
+                if text[pos] == '\\n':
+                    pos += 1
+                    break
+                pos += 1
+            result.append(text[i:idx])
+            i = pos
+        else:
+            result.append(text[i:pos])
+            i = pos
+    return ''.join(result)
+
+content = remove_mistbar_layer_rules(content)
+
+# Clean any stray orphaned closing braces
+lines = content.splitlines(True)
+cleaned = []
+open_depth = 0
+for line in lines:
+    stripped = line.strip()
+    if stripped == '}' and open_depth <= 0:
+        continue
+    open_depth += line.count('{') - line.count('}')
+    if open_depth < 0:
+        open_depth = 0
+    cleaned.append(line)
+content = ''.join(cleaned)
 
 with open(kdl_path, 'w') as f:
     f.write(content)

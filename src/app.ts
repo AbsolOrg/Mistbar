@@ -1,30 +1,37 @@
 import app from "ags/gtk4/app"
 import style from "./styles/style.scss"
-import Bar, { setBarAutohide, getBarAutohide, getBarWindow } from "./bar/Bar"
+import Bar, {
+  setBarAutohide,
+  getBarAutohide,
+  getBarWindows,
+  getBarWindow,
+  setBarManuallyHidden,
+  toggleBarManuallyHidden,
+  isBarManuallyHidden,
+} from "./bar/Bar"
 import { loadConfig, saveConfig, MistbarStyle, MistbarLook, MistbarTheme } from "./config"
 
 const config = loadConfig()
 
 function getWindows(): any[] {
   const wins: any[] = []
+  const barWins = getBarWindows()
+  if (barWins && barWins.length > 0) {
+    wins.push(...barWins)
+  }
   try {
     const appWins = (app as any).get_windows ? (app as any).get_windows() : []
     if (appWins && appWins.length > 0) {
-      wins.push(...appWins)
+      for (const w of appWins) {
+        if (!wins.includes(w)) wins.push(w)
+      }
     }
   } catch {}
-  const barWin = getBarWindow()
-  if (barWin && !wins.includes(barWin)) {
-    wins.push(barWin)
-  }
   return wins
 }
 
-function getWindow(): any {
-  return getWindows()[0] || null
-}
-
 function applyStyleClass(newStyle: MistbarStyle) {
+  config.style = newStyle
   for (const win of getWindows()) {
     try {
       win.remove_css_class("style-glassy")
@@ -38,6 +45,7 @@ function applyStyleClass(newStyle: MistbarStyle) {
 }
 
 function applyLookClass(newLook: MistbarLook) {
+  config.look = newLook
   for (const win of getWindows()) {
     try {
       win.remove_css_class("look-pill")
@@ -61,6 +69,7 @@ function applyLookClass(newLook: MistbarLook) {
 }
 
 function applyThemeClass(newTheme: MistbarTheme) {
+  config.theme = newTheme
   for (const win of getWindows()) {
     try {
       if (newTheme === "light") {
@@ -79,30 +88,16 @@ app.start({
   css: style,
   requestHandler(args: string[], res: (response: string) => void) {
     const cmd = args.join(" ").trim()
-    const win = getWindow()
 
     if (cmd === "toggle") {
-      if (win) {
-        win.visible = !win.visible
-        res("toggled")
-      } else {
-        res("error: window not found")
-      }
+      const hidden = toggleBarManuallyHidden()
+      res(hidden ? "hidden" : "shown")
     } else if (cmd === "hide") {
-      if (win) {
-        win.visible = false
-        res("hidden")
-      } else {
-        res("error: window not found")
-      }
+      setBarManuallyHidden(true)
+      res("hidden")
     } else if (cmd === "show") {
-      if (win) {
-        win.visible = true
-        setBarAutohide(false)
-        res("shown")
-      } else {
-        res("error: window not found")
-      }
+      setBarManuallyHidden(false)
+      res("shown")
     } else if (cmd.startsWith("autohide:") || cmd === "autohide") {
       const mode = cmd.replace("autohide:", "").trim()
       let enabled = true
@@ -111,10 +106,9 @@ app.start({
       } else if (mode === "toggle" || mode === "autohide") {
         enabled = !getBarAutohide()
       }
-      if (win) {
-        win.visible = true
-      }
+      setBarManuallyHidden(false)
       setBarAutohide(enabled)
+      config.autoHide = enabled
       saveConfig({ autoHide: enabled })
       res(`autohide set to ${enabled ? "on" : "off"}`)
     } else if (cmd.startsWith("theme:")) {
@@ -133,8 +127,8 @@ app.start({
       saveConfig({ look: lookName })
       res(`look set to ${lookName}`)
     } else if (cmd === "status") {
-      const isVisible = win && (typeof win.get_visible === "function" ? win.get_visible() : win.visible)
-      res(isVisible ? "running (visible)" : "running (hidden)")
+      const isVis = !isBarManuallyHidden()
+      res(`running (theme: ${config.theme || "dark"}, style: ${config.style || "glassy"}, look: ${config.look || "pill"}, autohide: ${config.autoHide ? "on" : "off"}, visible: ${isVis ? "yes" : "no"})`)
     } else {
       res(`unknown command: ${cmd}`)
     }

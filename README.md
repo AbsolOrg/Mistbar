@@ -4,6 +4,7 @@
 - A faithful macOS Tahoe-inspired floating menu bar built with [AGS 3](https://github.com/Aylur/ags) (Astal + GTK4 + TypeScript) for the [Niri](https://github.com/YaLTeR/niri) compositor on Wayland.
 
 <img width="1361" height="41" alt="bar" src="https://github.com/user-attachments/assets/c00213bb-c705-40ba-b789-558eaeba2c9e" />
+<img width="1352" height="40" alt="glass" src="https://github.com/user-attachments/assets/d35bd5cb-e3e3-46b2-9856-ffe23173c9eb" />
 
 
 ## Features

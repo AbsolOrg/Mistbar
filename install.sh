@@ -5,21 +5,98 @@
 
 set -euo pipefail
 
-SCRIPT_SOURCE="$(readlink -f "${BASH_SOURCE[0]}")"
-SCRIPT_DIR="$(cd "$(dirname "$SCRIPT_SOURCE")" && pwd)"
+INSTALL_DIR="${MISTBAR_DIR:-$HOME/.mistbar}"
 BIN_TARGET="$HOME/.local/bin/mistbar"
+REPO_URL="https://github.com/AbsolOrg/Mistbar.git"
 INSTANCE_NAME="mistbar"
 
 RED='\033[0;31m'
 GREEN='\033[0;32m'
 BLUE='\033[0;34m'
 CYAN='\033[0;36m'
+YELLOW='\033[1;33m'
 DIM='\033[2m'
 BOLD='\033[1m'
 NC='\033[0m'
 
+# Parse flags
+TARGET_CHANNEL="" # "release", "main", or "local"
+NON_INTERACTIVE=false
+
+for arg in "$@"; do
+    case "$arg" in
+        --release)
+            TARGET_CHANNEL="release"
+            ;;
+        --main)
+            TARGET_CHANNEL="main"
+            ;;
+        --local)
+            TARGET_CHANNEL="local"
+            ;;
+        -y|--yes|--non-interactive)
+            NON_INTERACTIVE=true
+            ;;
+        -h|--help)
+            echo "Mistbar Installer & Updater"
+            echo ""
+            echo "Usage: ./install.sh [options]"
+            echo ""
+            echo "Options:"
+            echo "  --release           Install/update to the latest stable release (recommended)"
+            echo "  --main              Install/update to the latest development commit on main"
+            echo "  --local             Install from the current local repository directory"
+            echo "  -y, --yes           Non-interactive mode (use defaults)"
+            echo "  -h, --help          Show this help message"
+            exit 0
+            ;;
+    esac
+done
+
+prompt_user() {
+    local prompt_msg="$1"
+    local default_val="${2:-}"
+    local reply=""
+
+    if [ "$NON_INTERACTIVE" = true ]; then
+        echo "$default_val"
+        return
+    fi
+
+    if [ -t 0 ]; then
+        read -r -p "$prompt_msg" reply
+    elif [ -e /dev/tty ]; then
+        read -r -p "$prompt_msg" reply < /dev/tty
+    else
+        reply="$default_val"
+    fi
+
+    if [ -z "$reply" ]; then
+        reply="$default_val"
+    fi
+    echo "$reply"
+}
+
+# Determine script location if running from a file
+SCRIPT_SOURCE=""
+SCRIPT_DIR=""
+if [ -n "${BASH_SOURCE[0]:-}" ] && [ -f "${BASH_SOURCE[0]}" ]; then
+    SCRIPT_SOURCE="$(readlink -f "${BASH_SOURCE[0]}")"
+    SCRIPT_DIR="$(cd "$(dirname "$SCRIPT_SOURCE")" && pwd)"
+fi
+
+IS_LOCAL_REPO=false
+if [ -n "$SCRIPT_DIR" ] && [ "$SCRIPT_DIR" != "$INSTALL_DIR" ]; then
+    if [ -f "$SCRIPT_DIR/mistbar" ] && [ -d "$SCRIPT_DIR/src" ]; then
+        IS_LOCAL_REPO=true
+    fi
+fi
+
+# Detect existing installation
 IS_UPDATE=false
-if [ -L "$BIN_TARGET" ] || [ -f "$BIN_TARGET" ]; then
+if [ -d "$INSTALL_DIR" ]; then
+    IS_UPDATE=true
+elif [ -L "$BIN_TARGET" ] || [ -f "$BIN_TARGET" ]; then
     IS_UPDATE=true
 fi
 
@@ -34,35 +111,131 @@ echo "  ========================================"
 echo -e "${NC}"
 
 if [ "$IS_UPDATE" = true ]; then
-    echo -e "${BLUE}Detected existing installation. Updating Mistbar...${NC}"
+    echo -e "${BLUE}Detected existing installation. Updating Mistbar in $INSTALL_DIR...${NC}"
 else
-    echo -e "${BLUE}Setting up new Mistbar installation...${NC}"
+    echo -e "${BLUE}Setting up new Mistbar installation into $INSTALL_DIR...${NC}"
 fi
 echo ""
 
-# 1. Ensure scripts are executable
-echo -e "${BLUE}[1/6] Setting file permissions...${NC}"
-chmod +x "$SCRIPT_DIR/mistbar" "$SCRIPT_DIR/install.sh" "$SCRIPT_DIR/uninstall.sh" "$SCRIPT_DIR/view.sh"
-echo -e "${GREEN}  ✓ Scripts are executable${NC}"
+# Handle local clone execution option
+if [ "$IS_LOCAL_REPO" = true ] && [ -z "$TARGET_CHANNEL" ]; then
+    echo -e "${CYAN}Running installer from local repository: ${BOLD}$SCRIPT_DIR${NC}"
+    echo "Choose installation source:"
+    echo -e "  ${BOLD}1)${NC} Fetch & install from GitHub to $INSTALL_DIR ${GREEN}(Recommended)${NC}"
+    echo -e "  ${BOLD}2)${NC} Install from current local directory into $INSTALL_DIR ${DIM}(Developer mode)${NC}"
+    echo ""
+    src_choice="$(prompt_user "Select option [1/2] (default: 1): " "1")"
+    if [ "$src_choice" = "2" ]; then
+        TARGET_CHANNEL="local"
+    fi
+    echo ""
+fi
 
-# 2. Setup / Refresh symlink in ~/.local/bin
-echo -e "${BLUE}[2/6] Linking binary to ~/.local/bin/mistbar...${NC}"
+# 1. Source Preparation
+echo -e "${BLUE}[1/7] Preparing Mistbar source files...${NC}"
+
+if [ "$TARGET_CHANNEL" = "local" ]; then
+    echo -e "  Syncing local files from $SCRIPT_DIR to $INSTALL_DIR..."
+    mkdir -p "$INSTALL_DIR"
+    if command -v rsync &>/dev/null; then
+        rsync -a --exclude='.git' "$SCRIPT_DIR/" "$INSTALL_DIR/"
+    else
+        cp -rf "$SCRIPT_DIR/mistbar" "$SCRIPT_DIR/install.sh" "$SCRIPT_DIR/uninstall.sh" "$SCRIPT_DIR/view.sh" "$SCRIPT_DIR/README.md" "$INSTALL_DIR/" 2>/dev/null || true
+        mkdir -p "$INSTALL_DIR/src" "$INSTALL_DIR/assets"
+        cp -rf "$SCRIPT_DIR/src/." "$INSTALL_DIR/src/" 2>/dev/null || true
+        cp -rf "$SCRIPT_DIR/assets/." "$INSTALL_DIR/assets/" 2>/dev/null || true
+    fi
+    echo -e "${GREEN}  ✓ Synced local repository to $INSTALL_DIR${NC}"
+else
+    # Check for git
+    if ! command -v git &>/dev/null; then
+        echo -e "${RED}Error: git is required to install or update Mistbar.${NC}"
+        echo "Please install git (e.g. sudo pacman -S git) and run the installer again."
+        exit 1
+    fi
+
+    # Clone or verify git repo in INSTALL_DIR
+    if [ ! -d "$INSTALL_DIR/.git" ]; then
+        if [ -d "$INSTALL_DIR" ]; then
+            BACKUP_DIR="${INSTALL_DIR}.bak.$(date +%s)"
+            echo -e "${YELLOW}  Notice: $INSTALL_DIR exists but is not a git repository. Backing up to $BACKUP_DIR...${NC}"
+            mv "$INSTALL_DIR" "$BACKUP_DIR"
+        fi
+        echo -e "  Cloning repository into $INSTALL_DIR..."
+        git clone "$REPO_URL" "$INSTALL_DIR"
+    fi
+
+    # Fetch latest tags and branches
+    echo -e "  Fetching latest release tags and commits..."
+    git -C "$INSTALL_DIR" fetch --tags origin --quiet
+
+    # Query latest release tag
+    LATEST_TAG="$(git -C "$INSTALL_DIR" tag -l --sort=-v:refname | head -n 1)"
+
+    # Determine channel if not pre-specified
+    if [ -z "$TARGET_CHANNEL" ]; then
+        echo ""
+        if [ "$IS_UPDATE" = true ]; then
+            echo -e "${BOLD}Select update channel:${NC}"
+        else
+            echo -e "${BOLD}Select installation channel:${NC}"
+        fi
+        echo -e "  ${BOLD}1)${NC} Latest Release ${GREEN}(Recommended - stable: ${LATEST_TAG:-v0.1.0})${NC}"
+        echo -e "  ${BOLD}2)${NC} Main Branch ${DIM}(Bleeding edge - latest features)${NC}"
+        echo ""
+        channel_choice="$(prompt_user "Choice [1/2] (default: 1): " "1")"
+        if [ "$channel_choice" = "2" ]; then
+            TARGET_CHANNEL="main"
+        else
+            TARGET_CHANNEL="release"
+        fi
+        echo ""
+    fi
+
+    # Checkout selected channel
+    git -C "$INSTALL_DIR" stash --quiet 2>/dev/null || true
+    if [ "$TARGET_CHANNEL" = "release" ]; then
+        if [ -n "$LATEST_TAG" ]; then
+            echo -e "  Checking out latest release: ${BOLD}$LATEST_TAG${NC}..."
+            git -C "$INSTALL_DIR" checkout "$LATEST_TAG" --quiet
+            echo -e "${GREEN}  ✓ Checked out release $LATEST_TAG${NC}"
+        else
+            echo -e "${YELLOW}  No release tags found, defaulting to main branch...${NC}"
+            git -C "$INSTALL_DIR" checkout main --quiet
+            git -C "$INSTALL_DIR" pull origin main --quiet
+            echo -e "${GREEN}  ✓ Checked out main branch${NC}"
+        fi
+    elif [ "$TARGET_CHANNEL" = "main" ]; then
+        echo -e "  Checking out ${BOLD}main${NC} branch (latest development)..."
+        git -C "$INSTALL_DIR" checkout main --quiet
+        git -C "$INSTALL_DIR" pull origin main --quiet
+        echo -e "${GREEN}  ✓ Checked out main branch${NC}"
+    fi
+fi
+
+# 2. Ensure scripts are executable
+echo -e "${BLUE}[2/7] Setting file permissions...${NC}"
+chmod +x "$INSTALL_DIR/mistbar" "$INSTALL_DIR/install.sh" "$INSTALL_DIR/uninstall.sh" "$INSTALL_DIR/view.sh"
+echo -e "${GREEN}  ✓ Scripts are executable in $INSTALL_DIR${NC}"
+
+# 3. Setup / Refresh symlink in ~/.local/bin
+echo -e "${BLUE}[3/7] Linking binary to ~/.local/bin/mistbar...${NC}"
 mkdir -p "$HOME/.local/bin"
-ln -sf "$SCRIPT_DIR/mistbar" "$BIN_TARGET"
-echo -e "${GREEN}  ✓ Symlink configured: $BIN_TARGET -> $SCRIPT_DIR/mistbar${NC}"
+ln -sf "$INSTALL_DIR/mistbar" "$BIN_TARGET"
+echo -e "${GREEN}  ✓ Symlink configured: $BIN_TARGET -> $INSTALL_DIR/mistbar${NC}"
 
-# 3. Ensure TypeScript type declarations are present
-echo -e "${BLUE}[3/6] Checking TypeScript types...${NC}"
-if [ ! -d "$SCRIPT_DIR/src/@girs" ]; then
+# 4. Ensure TypeScript type declarations are present
+echo -e "${BLUE}[4/7] Checking TypeScript types...${NC}"
+if [ ! -d "$INSTALL_DIR/src/@girs" ]; then
     echo -e "  Generating TypeScript types with AGS..."
-    ags types -d "$SCRIPT_DIR/src" 2>/dev/null || true
+    ags types -d "$INSTALL_DIR/src" 2>/dev/null || true
     echo -e "${GREEN}  ✓ Types generated${NC}"
 else
     echo -e "${GREEN}  ✓ Types are up to date${NC}"
 fi
 
-# 4. Check & Configure Niri Compositor Layer Blur Rule
-echo -e "${BLUE}[4/6] Checking Niri compositor blur integration...${NC}"
+# 5. Check & Configure Niri Compositor Layer Blur Rule
+echo -e "${BLUE}[5/7] Checking Niri compositor blur integration...${NC}"
 NIRI_CONFIG="$HOME/.config/niri/config.kdl"
 if [ -f "$NIRI_CONFIG" ]; then
     if ! grep -q 'namespace="mistbar"' "$NIRI_CONFIG"; then
@@ -100,10 +273,10 @@ else
     echo -e "${DIM}  Niri config not detected, skipping layer-rule setup${NC}"
 fi
 
-# 5. Configure default auto-start on login
-echo -e "${BLUE}[5/6] Configuring default auto-start on login...${NC}"
+# 6. Configure default auto-start on login
+echo -e "${BLUE}[6/7] Configuring default auto-start on login...${NC}"
 
-# 5a. Universal XDG Autostart (.desktop file)
+# 6a. Universal XDG Autostart (.desktop file)
 AUTOSTART_DIR="$HOME/.config/autostart"
 mkdir -p "$AUTOSTART_DIR"
 cat << 'EOF' > "$AUTOSTART_DIR/mistbar.desktop"
@@ -118,7 +291,7 @@ X-GNOME-Autostart-enabled=true
 EOF
 echo -e "${GREEN}  ✓ Configured universal XDG autostart (~/.config/autostart/mistbar.desktop)${NC}"
 
-# 5b. Niri compositor autostart & conflict handling
+# 6b. Niri compositor autostart & conflict handling
 if [ -f "$NIRI_CONFIG" ]; then
     python3 -c "
 kdl_path = '$NIRI_CONFIG'
@@ -164,7 +337,7 @@ else
     echo -e "${DIM}  Niri config not detected, skipping Niri-specific autostart${NC}"
 fi
 
-# 5c. Hyprland compositor autostart (if present)
+# 6c. Hyprland compositor autostart (if present)
 HYPR_CONFIG="$HOME/.config/hypr/hyprland.conf"
 if [ -f "$HYPR_CONFIG" ]; then
     python3 -c "
@@ -198,8 +371,8 @@ if modified:
     echo -e "${GREEN}  ✓ Configured Mistbar in Hyprland config${NC}"
 fi
 
-# 6. PATH check
-echo -e "${BLUE}[6/6] Verifying PATH...${NC}"
+# 7. PATH check
+echo -e "${BLUE}[7/7] Verifying PATH...${NC}"
 if echo "$PATH" | grep -q "$HOME/.local/bin"; then
     echo -e "${GREEN}  ✓ ~/.local/bin is in your PATH${NC}"
 else
@@ -219,9 +392,9 @@ fi
 
 echo ""
 if [ "$IS_UPDATE" = true ]; then
-    echo -e "${GREEN}${BOLD}✓ Mistbar successfully updated!${NC}"
+    echo -e "${GREEN}${BOLD}✓ Mistbar successfully updated in $INSTALL_DIR!${NC}"
 else
-    echo -e "${GREEN}${BOLD}✓ Mistbar installation complete!${NC}"
+    echo -e "${GREEN}${BOLD}✓ Mistbar installation complete in $INSTALL_DIR!${NC}"
 fi
 
 echo ""
@@ -229,8 +402,9 @@ echo "Usage:"
 echo -e "  ${CYAN}mistbar start${NC}        Start the bar"
 echo -e "  ${CYAN}mistbar stop${NC}         Stop the bar"
 echo -e "  ${CYAN}mistbar restart${NC}      Restart the bar"
+echo -e "  ${CYAN}mistbar update${NC}       Update Mistbar to latest release or main"
 echo -e "  ${CYAN}mistbar status${NC}       Check status"
 echo -e "  ${CYAN}mistbar --help${NC}       Show all commands"
 echo ""
 echo -e "To uninstall anytime, run:"
-echo -e "  ${CYAN}./uninstall.sh${NC}"
+echo -e "  ${CYAN}mistbar uninstall${NC} (or ${CYAN}$INSTALL_DIR/uninstall.sh${NC})"

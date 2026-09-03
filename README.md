@@ -50,25 +50,58 @@ Press `Ctrl+C` at any time to close the preview and clean up.
 
 ## Installation & Updates
 
+### Quick Install (Recommended)
+
+Run this one-liner in your terminal to install Mistbar directly:
+
 ```bash
-# Clone
+bash -c "$(curl -fsSL https://raw.githubusercontent.com/AbsolOrg/Mistbar/main/install.sh)"
+```
+
+The installer will:
+- Install Mistbar into `~/.mistbar`
+- Prompt you to select your installation channel:
+  - **1) Latest Release** *(Recommended - stable releases)*
+  - **2) Main Branch** *(Bleeding edge - latest features)*
+- Symlink `mistbar` CLI into `~/.local/bin/mistbar`
+- Configure Wayland blur rules and autostart
+
+### Updating Mistbar
+
+If Mistbar is already installed, update anytime with:
+
+```bash
+mistbar update
+```
+
+*(Or simply re-run the one-liner installer above).* The updater automatically detects your existing installation in `~/.mistbar`, prompts for release or main branch (defaulting to the latest release), updates files, and restarts your active bar smoothly.
+
+### Manual Installation (From Local Clone)
+
+```bash
 git clone https://github.com/AbsolOrg/Mistbar.git
 cd Mistbar
-
-# Install (or update if already installed)
 ./install.sh
+```
 
-# Install system dependencies (Arch/CachyOS)
+### System Dependencies
+
+```bash
+# On Arch Linux / CachyOS:
 mistbar install-deps
 ```
 
-> **Note:** Running `./install.sh` when Mistbar is already installed automatically switches to **Update mode**, refreshing links, permissions, and restarting any active bar instances.
-
 ## Uninstallation
 
+To remove Mistbar, run:
+
 ```bash
-./uninstall.sh
+mistbar uninstall
+# or:
+~/.mistbar/uninstall.sh
 ```
+
+The uninstaller removes CLI symlinks, compositor autostart rules, and optionally prompts whether to delete the `~/.mistbar` installation and configuration files.
 
 ## Usage
 
@@ -76,6 +109,8 @@ mistbar install-deps
 mistbar start             # Start the bar
 mistbar stop              # Stop the bar
 mistbar restart           # Restart the bar
+mistbar update            # Update Mistbar to latest release or main
+mistbar uninstall         # Uninstall Mistbar from system
 mistbar toggle            # Toggle bar visibility (hide/show)
 mistbar auto-hide on      # Enable intelligent auto-hide (or mistbar --auto-hide)
 mistbar auto-hide off     # Disable auto-hide (or mistbar --always-visible)

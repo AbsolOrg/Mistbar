@@ -198,7 +198,11 @@ export default function Bar(gdkmonitor: Gdk.Monitor, config: MistbarConfig = def
 
   // Apply initial classes
   try {
-    win.add_css_class(`style-${config.style || "glassy"}`)
+    const styleName = config.style || "glassy"
+    win.add_css_class(`style-${styleName}`)
+    if (styleName === "glassy") {
+      win.add_css_class(`glassy-${config.glassyTextColor || "white"}`)
+    }
     win.add_css_class(`look-${config.look || "pill"}`)
     if (config.theme === "light") {
       win.add_css_class("light-theme")

@@ -30,14 +30,25 @@ function getWindows(): any[] {
   return wins
 }
 
-function applyStyleClass(newStyle: MistbarStyle) {
+function applyStyleClass(newStyle: MistbarStyle, fontColor?: string) {
   config.style = newStyle
+  if (fontColor === "dark" || fontColor === "white") {
+    config.glassyTextColor = fontColor
+  }
+  const effectiveFontColor = config.glassyTextColor || "white"
+
   for (const win of getWindows()) {
     try {
       win.remove_css_class("style-glassy")
       win.remove_css_class("style-transparent")
       win.remove_css_class("style-solid")
+      win.remove_css_class("glassy-dark")
+      win.remove_css_class("glassy-white")
+
       win.add_css_class(`style-${newStyle}`)
+      if (newStyle === "glassy") {
+        win.add_css_class(`glassy-${effectiveFontColor}`)
+      }
     } catch (err) {
       console.error("Error applying style class:", err)
     }
@@ -87,25 +98,26 @@ app.start({
   instanceName: "mistbar",
   css: style,
   requestHandler(args: string[], res: (response: string) => void) {
-    const cmd = args.join(" ").trim()
-
+    const cmd = (Array.isArray(args) ? args.join(" ") : String(args)).trim()
     if (cmd === "toggle") {
-      const hidden = toggleBarManuallyHidden()
-      res(hidden ? "hidden" : "shown")
-    } else if (cmd === "hide") {
-      setBarManuallyHidden(true)
-      res("hidden")
+      const nowHidden = toggleBarManuallyHidden()
+      res(nowHidden ? "hidden" : "shown")
     } else if (cmd === "show") {
       setBarManuallyHidden(false)
       res("shown")
-    } else if (cmd.startsWith("autohide:") || cmd === "autohide") {
-      const mode = cmd.replace("autohide:", "").trim()
-      let enabled = true
-      if (mode === "off" || mode === "false" || mode === "disable") {
-        enabled = false
-      } else if (mode === "toggle" || mode === "autohide") {
-        enabled = !getBarAutohide()
-      }
+    } else if (cmd === "hide") {
+      setBarManuallyHidden(true)
+      res("hidden")
+    } else if (cmd === "autohide:toggle") {
+      const next = !config.autoHide
+      setBarManuallyHidden(false)
+      setBarAutohide(next)
+      config.autoHide = next
+      saveConfig({ autoHide: next })
+      res(`autohide set to ${next ? "on" : "off"}`)
+    } else if (cmd.startsWith("autohide:")) {
+      const val = cmd.replace("autohide:", "").trim()
+      const enabled = val === "on" || val === "true" || val === "1"
       setBarManuallyHidden(false)
       setBarAutohide(enabled)
       config.autoHide = enabled
@@ -117,10 +129,20 @@ app.start({
       saveConfig({ theme })
       res(`theme set to ${theme}`)
     } else if (cmd.startsWith("style:")) {
-      const styleName = cmd.replace("style:", "").trim() as MistbarStyle
-      applyStyleClass(styleName)
-      saveConfig({ style: styleName })
-      res(`style set to ${styleName}`)
+      const parts = cmd.replace("style:", "").trim().split(/[:\s]+/)
+      const styleName = parts[0] as MistbarStyle
+      let fontColor: string | undefined = parts[1]?.toLowerCase()
+      if (fontColor === "light") fontColor = "white"
+      if (fontColor === "black") fontColor = "dark"
+
+      applyStyleClass(styleName, fontColor)
+      const saveObj: Partial<MistbarConfig> = { style: styleName }
+      if (fontColor === "dark" || fontColor === "white") {
+        saveObj.glassyTextColor = fontColor
+      }
+      saveConfig(saveObj)
+      const colorMsg = (styleName === "glassy" && fontColor) ? ` (${fontColor} fonts & logos)` : ""
+      res(`style set to ${styleName}${colorMsg}`)
     } else if (cmd.startsWith("look:")) {
       const lookName = cmd.replace("look:", "").trim() as MistbarLook
       applyLookClass(lookName)
@@ -128,7 +150,8 @@ app.start({
       res(`look set to ${lookName}`)
     } else if (cmd === "status") {
       const isVis = !isBarManuallyHidden()
-      res(`running (theme: ${config.theme || "dark"}, style: ${config.style || "glassy"}, look: ${config.look || "pill"}, autohide: ${config.autoHide ? "on" : "off"}, visible: ${isVis ? "yes" : "no"})`)
+      const glassyInfo = config.style === "glassy" ? ` (fonts: ${config.glassyTextColor || "white"})` : ""
+      res(`running (theme: ${config.theme || "dark"}, style: ${config.style || "glassy"}${glassyInfo}, look: ${config.look || "pill"}, autohide: ${config.autoHide ? "on" : "off"}, visible: ${isVis ? "yes" : "no"})`)
     } else {
       res(`unknown command: ${cmd}`)
     }
@@ -142,7 +165,7 @@ app.start({
     }
 
     applyThemeClass(config.theme || "dark")
-    applyStyleClass(config.style || "glassy")
+    applyStyleClass(config.style || "glassy", config.glassyTextColor)
     applyLookClass(config.look || "pill")
   },
 })

@@ -4,12 +4,14 @@ import Gio from "gi://Gio?version=2.0"
 export type MistbarTheme = "dark" | "light"
 export type MistbarStyle = "glassy" | "transparent" | "solid"
 export type MistbarLook = "pill" | "attached"
+export type GlassyTextColor = "dark" | "white"
 
 export interface MistbarConfig {
   theme: MistbarTheme
   style: MistbarStyle
   look: MistbarLook
   autoHide: boolean
+  glassyTextColor?: GlassyTextColor
   barHeight: number
   barMargin: number
   borderRadius: number
@@ -30,6 +32,7 @@ export const defaultConfig: MistbarConfig = {
   style: "glassy",
   look: "pill",
   autoHide: false,
+  glassyTextColor: "white",
   barHeight: 28,
   barMargin: 6,
   borderRadius: 16,

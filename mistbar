@@ -45,7 +45,7 @@ print_help() {
     echo -e "    ${GREEN}hide${NC}                             Hide the bar"
     echo -e "    ${GREEN}auto-hide <on|off|toggle>${NC}        Toggle intelligent auto-hide (or --auto-hide)"
     echo -e "    ${GREEN}theme <dark|light>${NC}               Switch theme dynamically"
-    echo -e "    ${GREEN}style <glassy|transparent|solid>${NC}     Switch background style dynamically"
+    echo -e "    ${GREEN}style <glassy [dark|white]|transparent|solid>${NC} Switch background style"
     echo -e "    ${GREEN}look <pill|attached>${NC}             Switch shape/geometry dynamically"
     echo -e "    ${GREEN}status${NC}                           Check if the bar is running"
     echo -e "    ${GREEN}config${NC}                           View or edit configuration"
@@ -63,7 +63,9 @@ print_help() {
     echo "    mistbar auto-hide on       # Intelligent auto-hide (slides away over windows, reveals on top hover)"
     echo "    mistbar auto-hide off      # Always visible"
     echo "    mistbar --auto-hide        # Enable auto-hide shorthand"
-    echo "    mistbar style glassy       # Frosted liquid glass (default)"
+    echo "    mistbar style glassy       # Frosted liquid glass (default text)"
+    echo "    mistbar style glassy dark  # Frosted liquid glass with dark fonts & logos"
+    echo "    mistbar style glassy white # Frosted liquid glass with white fonts & logos"
     echo "    mistbar style transparent  # 100% clear see-through background"
     echo "    mistbar style solid        # Solid opaque color (pitch black/white)"
     echo "    mistbar look pill          # Floating rounded pill (default)"
@@ -261,18 +263,45 @@ cmd_theme() {
 
 cmd_style() {
     local target="${1:-}"
+    local subvariant="${2:-}"
+
     if [ "$target" != "glassy" ] && [ "$target" != "transparent" ] && [ "$target" != "solid" ]; then
-        echo -e "${RED}Usage: mistbar style <glassy|transparent|solid>${NC}"
+        echo -e "${RED}Usage: mistbar style <glassy [dark|white]|transparent|solid>${NC}"
         return 1
+    fi
+
+    if [ "$target" = "glassy" ] && [ -n "$subvariant" ]; then
+        if [ "$subvariant" = "dark" ] || [ "$subvariant" = "black" ]; then
+            subvariant="dark"
+        elif [ "$subvariant" = "white" ] || [ "$subvariant" = "light" ]; then
+            subvariant="white"
+        else
+            echo -e "${RED}Usage: mistbar style glassy <dark|white>${NC}"
+            return 1
+        fi
+        update_config_json "glassyTextColor" "$subvariant"
     fi
 
     update_config_json "style" "$target"
 
+    local req="style:$target"
+    if [ "$target" = "glassy" ] && [ -n "$subvariant" ]; then
+        req="style:$target:$subvariant"
+    fi
+
     if ags list 2>/dev/null | grep -q "$INSTANCE_NAME"; then
-        ags request -i "$INSTANCE_NAME" "style:$target" 2>/dev/null || true
-        echo -e "${GREEN}✓ Switched style to: $target${NC}"
+        ags request -i "$INSTANCE_NAME" "$req" 2>/dev/null || true
+        if [ -n "$subvariant" ]; then
+            echo -e "${GREEN}✓ Switched style to: $target ($subvariant fonts & logos)${NC}"
+        else
+            echo -e "${GREEN}✓ Switched style to: $target${NC}"
+        fi
     else
-        echo -e "${GREEN}✓ Default style saved as: $target${NC}"
+        if [ -n "$subvariant" ]; then
+            echo -e "${GREEN}✓ Default style saved as: $target ($subvariant fonts & logos)${NC}"
+        else
+            echo -e "${GREEN}✓ Default style saved as: $target${NC}"
+        fi
     fi
 }
 

@@ -34,6 +34,9 @@ function applyStyleClass(newStyle: MistbarStyle, fontColor?: string) {
   config.style = newStyle
   if (fontColor === "dark" || fontColor === "white") {
     config.glassyTextColor = fontColor
+    if (newStyle === "glassy") {
+      config.theme = fontColor === "white" ? "dark" : "light"
+    }
   }
   const effectiveFontColor = config.glassyTextColor || "white"
 
@@ -48,6 +51,11 @@ function applyStyleClass(newStyle: MistbarStyle, fontColor?: string) {
       win.add_css_class(`style-${newStyle}`)
       if (newStyle === "glassy") {
         win.add_css_class(`glassy-${effectiveFontColor}`)
+        if (effectiveFontColor === "white") {
+          win.remove_css_class("light-theme")
+        } else {
+          win.add_css_class("light-theme")
+        }
       }
     } catch (err) {
       console.error("Error applying style class:", err)
@@ -98,25 +106,26 @@ app.start({
   instanceName: "mistbar",
   css: style,
   requestHandler(args: string[], res: (response: string) => void) {
-    const cmd = args.join(" ").trim()
-
+    const cmd = (Array.isArray(args) ? args.join(" ") : String(args)).trim()
     if (cmd === "toggle") {
-      const hidden = toggleBarManuallyHidden()
-      res(hidden ? "hidden" : "shown")
-    } else if (cmd === "hide") {
-      setBarManuallyHidden(true)
-      res("hidden")
+      const nowHidden = toggleBarManuallyHidden()
+      res(nowHidden ? "hidden" : "shown")
     } else if (cmd === "show") {
       setBarManuallyHidden(false)
       res("shown")
-    } else if (cmd.startsWith("autohide:") || cmd === "autohide") {
-      const mode = cmd.replace("autohide:", "").trim()
-      let enabled = true
-      if (mode === "off" || mode === "false" || mode === "disable") {
-        enabled = false
-      } else if (mode === "toggle" || mode === "autohide") {
-        enabled = !getBarAutohide()
-      }
+    } else if (cmd === "hide") {
+      setBarManuallyHidden(true)
+      res("hidden")
+    } else if (cmd === "autohide:toggle") {
+      const next = !config.autoHide
+      setBarManuallyHidden(false)
+      setBarAutohide(next)
+      config.autoHide = next
+      saveConfig({ autoHide: next })
+      res(`autohide set to ${next ? "on" : "off"}`)
+    } else if (cmd.startsWith("autohide:")) {
+      const val = cmd.replace("autohide:", "").trim()
+      const enabled = val === "on" || val === "true" || val === "1"
       setBarManuallyHidden(false)
       setBarAutohide(enabled)
       config.autoHide = enabled
@@ -138,6 +147,9 @@ app.start({
       const saveObj: Partial<MistbarConfig> = { style: styleName }
       if (fontColor === "dark" || fontColor === "white") {
         saveObj.glassyTextColor = fontColor
+        if (styleName === "glassy") {
+          saveObj.theme = fontColor === "white" ? "dark" : "light"
+        }
       }
       saveConfig(saveObj)
       const colorMsg = (styleName === "glassy" && fontColor) ? ` (${fontColor} fonts & logos)` : ""

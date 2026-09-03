@@ -50,17 +50,17 @@ window.Bar > box,
 .bar-outer-container,
 .hover-trigger-zone,
 revealer {
-  background: transparent !important;
-  background-color: transparent !important;
-  background-image: none !important;
-  border: none !important;
-  box-shadow: none !important;
-  padding: 0 !important;
+  background: transparent;
+  background-color: transparent;
+  background-image: none;
+  border: none;
+  box-shadow: none;
+  padding: 0;
 }
 
 window.Bar {
-  background: transparent !important;
-  background-color: transparent !important;
+  background: transparent;
+  background-color: transparent;
   color: $text-primary;
   font-family: $font-main;
   font-size: 12px;
@@ -97,16 +97,15 @@ window.Bar {
 
   // Top container & hover trigger zone
   .bar-outer-container {
-    background: transparent !important;
-    background-color: transparent !important;
+    background: transparent;
+    background-color: transparent;
     padding: 0;
     margin: 0;
   }
 
   .hover-trigger-zone {
     min-height: 0;
-    max-height: 0;
-    background: transparent !important;
+    background: transparent;
     padding: 0;
     margin: 0;
   }
@@ -125,7 +124,6 @@ window.Bar {
     margin: 0;
     border-radius: $bar-radius;
     min-height: $bar-height;
-    max-height: $bar-height;
     padding: 0 14px;
   }
 
@@ -134,7 +132,6 @@ window.Bar {
     margin: 0;
     border-radius: 0;
     min-height: 24px;
-    max-height: 24px;
     padding: 0 10px;
   }
 
@@ -143,8 +140,8 @@ window.Bar {
   &.style-glassy:not(.light-theme) .bar-inner,
   &:not(.style-transparent):not(.style-solid):not(.light-theme) centerbox,
   &:not(.style-transparent):not(.style-solid):not(.light-theme) .bar-inner {
-    background-color: #16161a !important;
-    background-image: none !important;
+    background-color: #16161a;
+    background-image: none;
     border: 1px solid rgba(255, 255, 255, 0.12);
     box-shadow: 0 6px 20px rgba(0, 0, 0, 0.5);
   }
@@ -153,19 +150,19 @@ window.Bar {
   &.look-attached.style-glassy:not(.light-theme) .bar-inner,
   &.look-attached:not(.style-transparent):not(.style-solid):not(.light-theme) centerbox,
   &.look-attached:not(.style-transparent):not(.style-solid):not(.light-theme) .bar-inner {
-    border-left: none !important;
-    border-right: none !important;
-    border-top: none !important;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.14) !important;
+    border-left: none;
+    border-right: none;
+    border-top: none;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.14);
   }
 
   // ── Style Presets: Transparent (Clear + Frosted Micro-Capsules) ──
   &.style-transparent centerbox,
   &.style-transparent .bar-inner {
-    background-color: transparent !important;
-    background-image: none !important;
-    border: none !important;
-    box-shadow: none !important;
+    background-color: transparent;
+    background-image: none;
+    border: none;
+    box-shadow: none;
   }
 
   &.style-transparent:not(.light-theme) {
@@ -220,82 +217,7 @@ window.Bar {
     box-shadow: 0 4px 16px rgba(0, 0, 0, 0.20);
   }
 
-  // ── Glassy Specific Text & Icon Color Overrides (mistbar style glassy <dark|white>) ──
-  &.style-glassy.glassy-dark {
-    color: #1d1d1f !important;
-
-    .logo-icon,
-    .active-window,
-    .menu-item-btn label,
-    .status-icon-label,
-    .clock,
-    .battery-percent,
-    .power-icon {
-      color: #1d1d1f !important;
-    }
-
-    .workspace-dots {
-      color: rgba(29, 29, 31, 0.75) !important;
-    }
-
-    .logo-button:hover,
-    .logo-button > button:hover,
-    .menu-item-btn:hover,
-    .menu-item-btn > button:hover,
-    .status-icon:hover,
-    .status-icon > button:hover,
-    .clock:hover {
-      background-color: rgba(0, 0, 0, 0.08) !important;
-    }
-
-    .logo-button:active,
-    .logo-button > button:active,
-    .menu-item-btn:active,
-    .menu-item-btn > button:active,
-    .status-icon:active,
-    .status-icon > button:active {
-      background-color: rgba(0, 0, 0, 0.14) !important;
-    }
-  }
-
-  &.style-glassy.glassy-white {
-    color: #ffffff !important;
-
-    .logo-icon,
-    .active-window,
-    .menu-item-btn label,
-    .status-icon-label,
-    .clock,
-    .battery-percent,
-    .power-icon {
-      color: #ffffff !important;
-    }
-
-    .workspace-dots {
-      color: rgba(255, 255, 255, 0.75) !important;
-    }
-
-    .logo-button:hover,
-    .logo-button > button:hover,
-    .menu-item-btn:hover,
-    .menu-item-btn > button:hover,
-    .status-icon:hover,
-    .status-icon > button:hover,
-    .clock:hover {
-      background-color: rgba(255, 255, 255, 0.16) !important;
-    }
-
-    .logo-button:active,
-    .logo-button > button:active,
-    .menu-item-btn:active,
-    .menu-item-btn > button:active,
-    .status-icon:active,
-    .status-icon > button:active {
-      background-color: rgba(255, 255, 255, 0.25) !important;
-    }
-  }
-
-  // Dark Theme text & icons
+  // ── Dark Theme text & icons (Default) ──
   &:not(.light-theme) {
     color: #ffffff;
 
@@ -303,6 +225,7 @@ window.Bar {
     .active-window,
     .menu-item-btn label,
     .status-icon-label,
+    .battery-icon-label,
     .battery-percent,
     .clock,
     .power-icon {
@@ -315,13 +238,14 @@ window.Bar {
   }
 
   // ── Light Theme Variant ──
-  &.light-theme {
+  &.light-theme:not(.glassy-white) {
     color: $text-primary-light;
 
     .logo-icon,
     .active-window,
     .menu-item-btn label,
     .status-icon-label,
+    .battery-icon-label,
     .clock {
       color: $text-primary-light;
     }
@@ -354,26 +278,26 @@ window.Bar {
       background-color: $glass-bg-active-light;
     }
 
-    // Glassy Light
+    // Glassy Light (when in light-theme mode)
     &.style-glassy centerbox,
     &.style-glassy .bar-inner,
     &:not(.style-transparent):not(.style-solid) centerbox,
     &:not(.style-transparent):not(.style-solid) .bar-inner {
-      background-color: #f7f7f9 !important;
-      background-image: none !important;
-      border: 1px solid rgba(0, 0, 0, 0.10) !important;
-      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08) !important;
+      background-color: #f7f7f9;
+      background-image: none;
+      border: 1px solid rgba(0, 0, 0, 0.10);
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
     }
 
     &.look-attached.style-glassy centerbox,
     &.look-attached.style-glassy .bar-inner,
     &.look-attached:not(.style-transparent):not(.style-solid) centerbox,
     &.look-attached:not(.style-transparent):not(.style-solid) .bar-inner {
-      border-left: none !important;
-      border-right: none !important;
-      border-top: none !important;
-      border-bottom: 1px solid rgba(0, 0, 0, 0.12) !important;
-      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06) !important;
+      border-left: none;
+      border-right: none;
+      border-top: none;
+      border-bottom: 1px solid rgba(0, 0, 0, 0.12);
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
     }
 
     // Transparent Light
@@ -426,6 +350,101 @@ window.Bar {
       border-top: none;
       border-bottom: 1px solid rgba(0, 0, 0, 0.12);
       box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+    }
+  }
+
+  // ── Glassy Specific Overrides (mistbar style glassy <dark|white>) ──
+  &.glassy-white,
+  &.style-glassy.glassy-white {
+    color: #ffffff;
+
+    centerbox,
+    .bar-inner {
+      background-color: #16161a;
+      background-image: none;
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.5);
+    }
+
+    .logo-icon,
+    .active-window,
+    .menu-item-btn label,
+    .status-icon-label,
+    .battery-icon-label,
+    .clock,
+    .battery-percent,
+    .power-icon {
+      color: #ffffff;
+    }
+
+    .workspace-dots {
+      color: rgba(255, 255, 255, 0.75);
+    }
+
+    .logo-button:hover,
+    .logo-button > button:hover,
+    .menu-item-btn:hover,
+    .menu-item-btn > button:hover,
+    .status-icon:hover,
+    .status-icon > button:hover,
+    .clock:hover {
+      background-color: rgba(255, 255, 255, 0.16);
+    }
+
+    .logo-button:active,
+    .logo-button > button:active,
+    .menu-item-btn:active,
+    .menu-item-btn > button:active,
+    .status-icon:active,
+    .status-icon > button:active {
+      background-color: rgba(255, 255, 255, 0.25);
+    }
+  }
+
+  &.glassy-dark,
+  &.style-glassy.glassy-dark {
+    color: #1d1d1f;
+
+    centerbox,
+    .bar-inner {
+      background-color: #f7f7f9;
+      background-image: none;
+      border: 1px solid rgba(0, 0, 0, 0.10);
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
+    }
+
+    .logo-icon,
+    .active-window,
+    .menu-item-btn label,
+    .status-icon-label,
+    .battery-icon-label,
+    .clock,
+    .battery-percent,
+    .power-icon {
+      color: #1d1d1f;
+    }
+
+    .workspace-dots {
+      color: rgba(29, 29, 31, 0.75);
+    }
+
+    .logo-button:hover,
+    .logo-button > button:hover,
+    .menu-item-btn:hover,
+    .menu-item-btn > button:hover,
+    .status-icon:hover,
+    .status-icon > button:hover,
+    .clock:hover {
+      background-color: rgba(0, 0, 0, 0.08);
+    }
+
+    .logo-button:active,
+    .logo-button > button:active,
+    .menu-item-btn:active,
+    .menu-item-btn > button:active,
+    .status-icon:active,
+    .status-icon > button:active {
+      background-color: rgba(0, 0, 0, 0.14);
     }
   }
 }
@@ -609,7 +628,6 @@ menubutton.status-icon {
   padding: 0;
   margin: 0;
   min-width: 26px;
-  max-width: 26px;
   min-height: 22px;
 
   > button {
@@ -620,7 +638,6 @@ menubutton.status-icon {
     border-radius: 6px;
     padding: 0;
     min-width: 26px;
-    max-width: 26px;
     min-height: 22px;
     margin: 0;
     transition: all 120ms ease;
@@ -644,7 +661,6 @@ button.status-icon {
   border-radius: 6px;
   padding: 0;
   min-width: 26px;
-  max-width: 26px;
   min-height: 22px;
   margin: 0;
   transition: all 120ms ease;
@@ -665,8 +681,6 @@ button.status-icon {
   color: $text-primary;
   line-height: 1;
   min-width: 26px;
-  max-width: 26px;
-  text-align: center;
 }
 
 .status-icon {

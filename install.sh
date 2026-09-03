@@ -100,22 +100,102 @@ else
     echo -e "${DIM}  Niri config not detected, skipping layer-rule setup${NC}"
 fi
 
-# 5. Auto-start on login via Niri spawn-at-startup
-echo -e "${BLUE}[5/6] Configuring auto-start on login...${NC}"
+# 5. Configure default auto-start on login
+echo -e "${BLUE}[5/6] Configuring default auto-start on login...${NC}"
+
+# 5a. Universal XDG Autostart (.desktop file)
+AUTOSTART_DIR="$HOME/.config/autostart"
+mkdir -p "$AUTOSTART_DIR"
+cat << 'EOF' > "$AUTOSTART_DIR/mistbar.desktop"
+[Desktop Entry]
+Type=Application
+Name=Mistbar
+Comment=macOS Tahoe Liquid Glass Top Bar
+Exec=mistbar start
+Terminal=false
+Categories=Utility;
+X-GNOME-Autostart-enabled=true
+EOF
+echo -e "${GREEN}  ✓ Configured universal XDG autostart (~/.config/autostart/mistbar.desktop)${NC}"
+
+# 5b. Niri compositor autostart & conflict handling
 if [ -f "$NIRI_CONFIG" ]; then
-    if ! grep -q 'spawn-at-startup.*mistbar' "$NIRI_CONFIG"; then
-        # Add spawn-at-startup directive after the layer-rule block
-        echo '' >> "$NIRI_CONFIG"
-        echo 'spawn-at-startup "mistbar" "start"' >> "$NIRI_CONFIG"
-        echo -e "${GREEN}  ✓ Added auto-start rule to Niri config${NC}"
-        if command -v niri &>/dev/null; then
-            niri msg action load-config-file 2>/dev/null || true
-        fi
-    else
-        echo -e "${GREEN}  ✓ Auto-start already configured${NC}"
+    python3 -c "
+kdl_path = '$NIRI_CONFIG'
+with open(kdl_path, 'r') as f:
+    lines = f.readlines()
+
+new_lines = []
+modified = False
+has_mistbar_startup = False
+
+for line in lines:
+    stripped = line.strip()
+    if stripped.startswith('spawn-at-startup') and 'mistbar' in stripped:
+        has_mistbar_startup = True
+        new_lines.append(line)
+    elif stripped.startswith('spawn-at-startup') and 'waybar' in stripped:
+        # Disable conflicting waybar startup
+        new_lines.append('// spawn-at-startup \"waybar\" // Disabled by Mistbar installer\n')
+        modified = True
+    else:
+        new_lines.append(line)
+
+if not has_mistbar_startup:
+    new_lines.append('\n// Start Mistbar on desktop launch\nspawn-at-startup \"mistbar\" \"start\"\n')
+    modified = True
+
+if modified:
+    with open(kdl_path, 'w') as f:
+        f.writelines(new_lines)
+" 2>/dev/null || true
+    echo -e "${GREEN}  ✓ Configured Mistbar as default bar in Niri config (disabled conflicting bars)${NC}"
+
+    # Stop conflicting waybar if running
+    if pgrep -x waybar &>/dev/null; then
+        echo -e "${BLUE}  Stopping currently running Waybar...${NC}"
+        pkill -x waybar 2>/dev/null || true
+    fi
+
+    if command -v niri &>/dev/null; then
+        niri msg action load-config-file 2>/dev/null || true
     fi
 else
-    echo -e "${DIM}  Niri config not detected, skipping auto-start setup${NC}"
+    echo -e "${DIM}  Niri config not detected, skipping Niri-specific autostart${NC}"
+fi
+
+# 5c. Hyprland compositor autostart (if present)
+HYPR_CONFIG="$HOME/.config/hypr/hyprland.conf"
+if [ -f "$HYPR_CONFIG" ]; then
+    python3 -c "
+conf_path = '$HYPR_CONFIG'
+with open(conf_path, 'r') as f:
+    lines = f.readlines()
+
+new_lines = []
+modified = False
+has_mistbar = False
+
+for line in lines:
+    stripped = line.strip()
+    if 'mistbar' in stripped and ('exec-once' in stripped or 'exec' in stripped):
+        has_mistbar = True
+        new_lines.append(line)
+    elif stripped.startswith('exec-once') and 'waybar' in stripped:
+        new_lines.append('# exec-once = waybar # Disabled by Mistbar installer\n')
+        modified = True
+    else:
+        new_lines.append(line)
+
+if not has_mistbar:
+    new_lines.append('\n# Start Mistbar on desktop launch\nexec-once = mistbar start\n')
+    modified = True
+
+if modified:
+    with open(conf_path, 'w') as f:
+        f.writelines(new_lines)
+" 2>/dev/null || true
+    echo -e "${GREEN}  ✓ Configured Mistbar in Hyprland config${NC}"
 fi
 
 # 6. PATH check

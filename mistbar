@@ -95,6 +95,49 @@ check_deps() {
     fi
 }
 
+update_config_json() {
+    local key="$1"
+    local val="$2"
+    mkdir -p "$CONFIG_DIR"
+    python3 -c "
+import json, os
+path = '$CONFIG_FILE'
+data = {
+  'theme': 'dark',
+  'style': 'glassy',
+  'look': 'pill',
+  'autoHide': False,
+  'barHeight': 28,
+  'barMargin': 6,
+  'borderRadius': 16,
+  'showAppMenu': True,
+  'showWorkspaces': True,
+  'showTray': True,
+  'showBattery': True,
+  'showBrightness': True,
+  'showVolume': True,
+  'showNetwork': True,
+  'showBluetooth': True,
+  'showControlCenter': True,
+  'showSpotlight': True
+}
+if os.path.exists(path):
+    try:
+        with open(path, 'r') as f:
+            data.update(json.load(f))
+    except Exception:
+        pass
+val = '$val'
+if val.lower() == 'true':
+    val = True
+elif val.lower() == 'false':
+    val = False
+data['$key'] = val
+with open(path, 'w') as f:
+    json.dump(data, f, indent=2)
+" 2>/dev/null || true
+}
+
 cmd_start() {
     check_deps
 
@@ -105,24 +148,11 @@ cmd_start() {
 
     echo -e "${GREEN}Starting Mistbar...${NC}"
 
-    # Build entrypoint flags
-    local extra_flags=()
-    for arg in "$@"; do
-        case "$arg" in
-            --auto-hide)
-                extra_flags+=("-a")
-                ;;
-            --always-visible)
-                ;;
-        esac
-    done
+    mkdir -p "$CONFIG_DIR"
+    local log_file="$CONFIG_DIR/mistbar.log"
 
     # Launch daemon in background detached from current terminal
-    if [ ${#extra_flags[@]} -gt 0 ]; then
-        setsid -f ags run -d "$SRC_DIR" "${extra_flags[@]}" >/dev/null 2>&1
-    else
-        setsid -f ags run -d "$SRC_DIR" >/dev/null 2>&1
-    fi
+    setsid -f ags run -d "$SRC_DIR" >"$log_file" 2>&1
 
     # Wait up to 3 seconds for instance to register
     local count=0
@@ -136,6 +166,10 @@ cmd_start() {
     done
 
     echo -e "${RED}Failed to verify Mistbar startup.${NC}"
+    if [ -f "$log_file" ] && [ -s "$log_file" ]; then
+        echo -e "${RED}Error details:${NC}"
+        tail -n 12 "$log_file"
+    fi
     return 1
 }
 
@@ -163,7 +197,9 @@ cmd_toggle() {
         cmd_start
         return
     fi
-    ags request -i "$INSTANCE_NAME" "toggle" 2>/dev/null || echo -e "${RED}Failed to send toggle command.${NC}"
+    local res
+    res="$(ags request -i "$INSTANCE_NAME" "toggle" 2>/dev/null || echo "toggled")"
+    echo -e "${GREEN}✓ Mistbar is now ${res}.${NC}"
 }
 
 cmd_show() {
@@ -172,11 +208,13 @@ cmd_show() {
         return
     fi
     ags request -i "$INSTANCE_NAME" "show" 2>/dev/null || true
+    echo -e "${GREEN}✓ Mistbar shown.${NC}"
 }
 
 cmd_hide() {
     if ags list 2>/dev/null | grep -q "$INSTANCE_NAME"; then
         ags request -i "$INSTANCE_NAME" "hide" 2>/dev/null || true
+        echo -e "${GREEN}✓ Mistbar hidden.${NC}"
     fi
 }
 
@@ -184,8 +222,10 @@ cmd_autohide() {
     local target="${1:-toggle}"
     if [ "$target" = "on" ] || [ "$target" = "true" ] || [ "$target" = "enable" ]; then
         target="on"
+        update_config_json "autoHide" "true"
     elif [ "$target" = "off" ] || [ "$target" = "false" ] || [ "$target" = "disable" ]; then
         target="off"
+        update_config_json "autoHide" "false"
     elif [ "$target" = "toggle" ]; then
         target="toggle"
     else
@@ -193,18 +233,10 @@ cmd_autohide() {
         return 1
     fi
 
-    # Update config file
-    mkdir -p "$CONFIG_DIR"
-    if [ "$target" = "on" ]; then
-        sed -i 's/"autoHide": [^,]*/"autoHide": true/' "$CONFIG_FILE" 2>/dev/null || true
-    elif [ "$target" = "off" ]; then
-        sed -i 's/"autoHide": [^,]*/"autoHide": false/' "$CONFIG_FILE" 2>/dev/null || true
-    fi
-
-    # If running, send dynamic IPC request
     if ags list 2>/dev/null | grep -q "$INSTANCE_NAME"; then
-        ags request -i "$INSTANCE_NAME" "autohide:$target" 2>/dev/null || true
-        echo -e "${GREEN}✓ Intelligent auto-hide set to: $target${NC}"
+        local res
+        res="$(ags request -i "$INSTANCE_NAME" "autohide:$target" 2>/dev/null || echo "autohide updated")"
+        echo -e "${GREEN}✓ $res${NC}"
     else
         echo -e "${GREEN}✓ Auto-hide setting saved as: $target${NC}"
     fi
@@ -217,13 +249,8 @@ cmd_theme() {
         return 1
     fi
 
-    # Update config file
-    mkdir -p "$CONFIG_DIR"
-    if [ -f "$CONFIG_FILE" ]; then
-        sed -i "s/\"theme\": \"[^\"]*\"/\"theme\": \"$target\"/" "$CONFIG_FILE" 2>/dev/null || true
-    fi
+    update_config_json "theme" "$target"
 
-    # If running, send dynamic IPC request
     if ags list 2>/dev/null | grep -q "$INSTANCE_NAME"; then
         ags request -i "$INSTANCE_NAME" "theme:$target" 2>/dev/null || true
         echo -e "${GREEN}✓ Switched theme to: $target${NC}"
@@ -239,13 +266,8 @@ cmd_style() {
         return 1
     fi
 
-    # Update config file
-    mkdir -p "$CONFIG_DIR"
-    if [ -f "$CONFIG_FILE" ]; then
-        sed -i "s/\"style\": \"[^\"]*\"/\"style\": \"$target\"/" "$CONFIG_FILE" 2>/dev/null || true
-    fi
+    update_config_json "style" "$target"
 
-    # If running, send dynamic IPC request
     if ags list 2>/dev/null | grep -q "$INSTANCE_NAME"; then
         ags request -i "$INSTANCE_NAME" "style:$target" 2>/dev/null || true
         echo -e "${GREEN}✓ Switched style to: $target${NC}"
@@ -261,13 +283,8 @@ cmd_look() {
         return 1
     fi
 
-    # Update config file
-    mkdir -p "$CONFIG_DIR"
-    if [ -f "$CONFIG_FILE" ]; then
-        sed -i "s/\"look\": \"[^\"]*\"/\"look\": \"$target\"/" "$CONFIG_FILE" 2>/dev/null || true
-    fi
+    update_config_json "look" "$target"
 
-    # If running, send dynamic IPC request
     if ags list 2>/dev/null | grep -q "$INSTANCE_NAME"; then
         ags request -i "$INSTANCE_NAME" "look:$target" 2>/dev/null || true
         echo -e "${GREEN}✓ Switched look to: $target${NC}"

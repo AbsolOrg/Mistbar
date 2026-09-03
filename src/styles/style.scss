@@ -120,8 +120,8 @@ window.Bar {
   // ── Look Presets: Pill (Default) vs Attached ──
   &.look-pill centerbox,
   &.look-pill .bar-inner,
-  centerbox,
-  .bar-inner {
+  &:not(.look-attached) centerbox,
+  &:not(.look-attached) .bar-inner {
     margin: 0;
     border-radius: $bar-radius;
     min-height: $bar-height;
@@ -138,11 +138,11 @@ window.Bar {
     padding: 0 10px;
   }
 
-  // ── Style Presets: Glassy (macOS Tahoe Liquid Glass) ──
+  // ── Style Presets (Dark Theme Default) ──
   &.style-glassy centerbox,
   &.style-glassy .bar-inner,
-  centerbox,
-  .bar-inner {
+  &:not(.style-transparent):not(.style-solid) centerbox,
+  &:not(.style-transparent):not(.style-solid) .bar-inner {
     background-color: $glass-bg;
     background-image: $glass-gradient;
     border: 1px solid $glass-border;
@@ -154,7 +154,9 @@ window.Bar {
   }
 
   &.look-attached.style-glassy centerbox,
-  &.look-attached.style-glassy .bar-inner {
+  &.look-attached.style-glassy .bar-inner,
+  &.look-attached:not(.style-transparent):not(.style-solid) centerbox,
+  &.look-attached:not(.style-transparent):not(.style-solid) .bar-inner {
     border-left: none;
     border-right: none;
     border-top: none;
@@ -171,7 +173,7 @@ window.Bar {
     box-shadow: none !important;
   }
 
-  &.style-transparent {
+  &.style-transparent:not(.light-theme) {
     .bar-left,
     .center-section,
     .status-group,
@@ -179,8 +181,8 @@ window.Bar {
     .status-icon.control-center-btn,
     .clock,
     .status-icon.power-menu {
-      background-color: rgba(255, 255, 255, 0.06);
-      background-image: linear-gradient(180deg, rgba(255, 255, 255, 0.10) 0%, rgba(255, 255, 255, 0.03) 100%);
+      background-color: rgba(255, 255, 255, 0.08);
+      background-image: linear-gradient(180deg, rgba(255, 255, 255, 0.12) 0%, rgba(255, 255, 255, 0.04) 100%);
       border: 1px solid rgba(255, 255, 255, 0.18);
       border-top: 1px solid rgba(255, 255, 255, 0.38);
       border-radius: 12px;
@@ -190,7 +192,7 @@ window.Bar {
       transition: all 120ms ease;
 
       &:hover {
-        background-color: rgba(255, 255, 255, 0.14);
+        background-color: rgba(255, 255, 255, 0.16);
         border-color: rgba(255, 255, 255, 0.30);
         border-top-color: rgba(255, 255, 255, 0.55);
       }
@@ -201,26 +203,25 @@ window.Bar {
     }
   }
 
-  // ── Style Presets: Solid (Opaque Color) ──
-  &.style-solid centerbox,
-  &.style-solid .bar-inner {
+  // ── Style Presets: Solid (Dark) ──
+  &.style-solid:not(.light-theme) centerbox,
+  &.style-solid:not(.light-theme) .bar-inner {
     background-color: #16161a !important;
     background-image: none !important;
     border: 1px solid rgba(255, 255, 255, 0.12);
     box-shadow: 0 6px 20px rgba(0, 0, 0, 0.5);
   }
 
-  &.look-attached.style-solid centerbox,
-  &.look-attached.style-solid .bar-inner {
+  &.look-attached.style-solid:not(.light-theme) centerbox,
+  &.look-attached.style-solid:not(.light-theme) .bar-inner {
     border-left: none !important;
     border-right: none !important;
     border-top: none !important;
     border-bottom: 1px solid rgba(255, 255, 255, 0.14) !important;
   }
 
-  // Glassy & Transparent always use clean white text & icons
-  &.style-glassy,
-  &.style-transparent {
+  // Dark Theme text & icons
+  &:not(.light-theme) {
     color: #ffffff;
 
     .logo-icon,
@@ -238,16 +239,109 @@ window.Bar {
     }
   }
 
-  // ── Light Theme Variant (Only for Solid mode or explicit light styling) ──
-  &.light-theme:not(.style-glassy):not(.style-transparent) {
+  // ── Light Theme Variant ──
+  &.light-theme {
     color: $text-primary-light;
 
+    .logo-icon,
+    .active-window,
+    .menu-item-btn label,
+    .status-icon-label,
+    .clock {
+      color: $text-primary-light;
+    }
+
+    .battery-percent,
+    .power-icon {
+      color: $text-secondary-light;
+    }
+
+    .workspace-dots {
+      color: $text-secondary-light;
+    }
+
+    .logo-button:hover,
+    .logo-button > button:hover,
+    .menu-item-btn:hover,
+    .menu-item-btn > button:hover,
+    .status-icon:hover,
+    .status-icon > button:hover,
+    .clock:hover {
+      background-color: $glass-bg-hover-light;
+    }
+
+    .logo-button:active,
+    .logo-button > button:active,
+    .menu-item-btn:active,
+    .menu-item-btn > button:active,
+    .status-icon:active,
+    .status-icon > button:active {
+      background-color: $glass-bg-active-light;
+    }
+
+    // Glassy Light (Liquid Frosted Glass)
+    &.style-glassy centerbox,
+    &.style-glassy .bar-inner,
+    &:not(.style-transparent):not(.style-solid) centerbox,
+    &:not(.style-transparent):not(.style-solid) .bar-inner {
+      background-color: $glass-bg-light;
+      background-image: $glass-gradient-light;
+      border: 1px solid $glass-border-light;
+      border-top: 1.5px solid $glass-inner-glow-light;
+      border-bottom: 1px solid rgba(0, 0, 0, 0.12);
+      box-shadow:
+        0 10px 32px $glass-shadow-light,
+        0 2px 8px rgba(0, 0, 0, 0.08);
+    }
+
+    &.look-attached.style-glassy centerbox,
+    &.look-attached.style-glassy .bar-inner,
+    &.look-attached:not(.style-transparent):not(.style-solid) centerbox,
+    &.look-attached:not(.style-transparent):not(.style-solid) .bar-inner {
+      border-left: none;
+      border-right: none;
+      border-top: none;
+      border-bottom: 1px solid rgba(0, 0, 0, 0.12);
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+    }
+
+    // Transparent Light
+    &.style-transparent {
+      .bar-left,
+      .center-section,
+      .status-group,
+      .status-icon.spotlight-btn,
+      .status-icon.control-center-btn,
+      .clock,
+      .status-icon.power-menu {
+        background-color: rgba(0, 0, 0, 0.05);
+        background-image: linear-gradient(180deg, rgba(255, 255, 255, 0.45) 0%, rgba(240, 240, 245, 0.25) 100%);
+        border: 1px solid rgba(0, 0, 0, 0.08);
+        border-top: 1px solid rgba(255, 255, 255, 0.75);
+        border-radius: 12px;
+        padding: 1px 8px;
+        margin: 1px 2px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+        transition: all 120ms ease;
+
+        &:hover {
+          background-color: rgba(0, 0, 0, 0.09);
+          border-color: rgba(0, 0, 0, 0.12);
+        }
+      }
+
+      .clock {
+        padding: 2px 10px;
+      }
+    }
+
+    // Solid Light
     &.style-solid centerbox,
     &.style-solid .bar-inner {
-      background-color: #ffffff !important;
+      background-color: #f7f7f9 !important;
       background-image: none !important;
       border: 1px solid rgba(0, 0, 0, 0.10) !important;
-      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.10) !important;
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08) !important;
     }
 
     &.look-attached.style-solid centerbox,
@@ -256,27 +350,8 @@ window.Bar {
       border-right: none !important;
       border-top: none !important;
       border-bottom: 1px solid rgba(0, 0, 0, 0.12) !important;
-      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08) !important;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06) !important;
     }
-
-    .logo-button:hover,
-    .logo-button > button:hover { background-color: $glass-bg-hover-light; }
-    .logo-button .logo-icon { color: $text-primary-light; }
-    .active-window { color: $text-primary-light; }
-
-    .menu-item-btn:hover,
-    .menu-item-btn > button:hover { background-color: $glass-bg-hover-light; }
-    .menu-item-btn label { color: $text-primary-light; }
-
-    .workspace-dots { color: $text-secondary-light; }
-    .clock { color: $text-primary-light; }
-    .clock:hover { background-color: $glass-bg-hover-light; }
-
-    .status-icon:hover,
-    .status-icon > button:hover { background-color: $glass-bg-hover-light; }
-    .status-icon-label { color: $text-primary-light; }
-    .battery-percent { color: $text-secondary-light; }
-    .power-icon { color: $text-secondary-light; }
   }
 }
 
@@ -942,6 +1017,157 @@ popover {
       font-family: $font-icon;
       font-size: 13px;
       color: $text-secondary;
+    }
+  }
+}
+
+// ── Light Theme Popovers Overrides ──
+window.Bar.light-theme popover,
+.light-theme popover,
+popover.light-theme,
+window.Bar.light-theme .control-popover,
+window.Bar.light-theme .appmenu-popover,
+window.Bar.light-theme .power-popover {
+  background-color: rgba(250, 250, 252, 0.94);
+  background-image: linear-gradient(180deg, rgba(255, 255, 255, 0.98) 0%, rgba(242, 242, 246, 0.92) 100%);
+  border: 1px solid rgba(0, 0, 0, 0.12);
+  border-top: 1px solid rgba(255, 255, 255, 0.90);
+  box-shadow:
+    inset 0 1px 0 0 rgba(255, 255, 255, 0.90),
+    0 12px 36px rgba(0, 0, 0, 0.14),
+    0 3px 8px rgba(0, 0, 0, 0.08);
+  color: $text-primary-light;
+
+  separator {
+    background-color: rgba(0, 0, 0, 0.08);
+  }
+
+  .popover-title,
+  .cc-header-title,
+  .cc-tile-title,
+  .card-title,
+  .cc-slider-title,
+  .cc-media-title,
+  .menu-option-label {
+    color: $text-primary-light;
+  }
+
+  .popover-subtitle,
+  .cc-tile-subtitle,
+  .card-subtitle,
+  .cc-slider-value,
+  .network-list-text,
+  .device-list-text,
+  .menu-shortcut {
+    color: $text-secondary-light;
+  }
+
+  .section-subtitle {
+    color: $text-dim-light;
+  }
+
+  .cc-tile,
+  .popover-card,
+  .popover-card-list,
+  .cc-media-card,
+  .action-button,
+  .preset-btn {
+    background-color: rgba(0, 0, 0, 0.05);
+    border: 1px solid rgba(0, 0, 0, 0.06);
+
+    &:hover {
+      background-color: rgba(0, 0, 0, 0.09);
+    }
+
+    &.active {
+      background-color: $accent-blue;
+      border-color: rgba(0, 0, 0, 0.10);
+
+      .cc-tile-icon,
+      .cc-tile-title,
+      .preset-btn {
+        color: #ffffff;
+      }
+      .cc-tile-subtitle {
+        color: rgba(255, 255, 255, 0.85);
+      }
+      &:hover {
+        background-color: $accent-blue-hover;
+      }
+    }
+
+    .cc-tile-icon {
+      color: $text-secondary-light;
+    }
+  }
+
+  .cc-slider-card {
+    background-color: rgba(0, 0, 0, 0.04);
+  }
+
+  .control-slider-box {
+    background-color: rgba(0, 0, 0, 0.05);
+
+    .slider-icon {
+      color: $text-secondary-light;
+    }
+
+    scale,
+    slider {
+      trough {
+        background-color: rgba(0, 0, 0, 0.10);
+      }
+
+      highlight {
+        background-color: $accent-blue;
+      }
+
+      slider {
+        background-color: #ffffff;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+      }
+    }
+  }
+
+  .popover-toggle-btn {
+    background-color: rgba(0, 0, 0, 0.07);
+    color: $text-primary-light;
+
+    &:hover {
+      background-color: $accent-blue;
+      color: #ffffff;
+    }
+  }
+
+  .power-option {
+    label {
+      color: $text-primary-light;
+    }
+    .power-option-icon {
+      color: $text-secondary-light;
+    }
+    &:hover {
+      background-color: $glass-bg-hover-light;
+    }
+    &:active {
+      background-color: $glass-bg-active-light;
+    }
+  }
+
+  .menu-option-btn {
+    .menu-option-label {
+      color: $text-primary-light;
+    }
+    .menu-shortcut {
+      color: $text-dim-light;
+    }
+
+    &:hover {
+      background-color: $accent-blue;
+      .menu-option-label,
+      .menu-shortcut {
+        color: #ffffff;
+      }
     }
   }
 }

@@ -7,23 +7,44 @@ import RightSection from "./RightSection"
 import { MistbarConfig, defaultConfig } from "../config"
 import { execAsync } from "ags/process"
 
-let winRef: any = null
-let revealerRef: Gtk.Revealer | null = null
+export interface BarEntry {
+  win: any
+  revealer: Gtk.Revealer
+  outerBox: Gtk.Box
+}
+
+const barEntries: BarEntry[] = []
 let isHovered = false
 let hasWindow = false
 let autoHide = false
+let manuallyHidden = false
 let watcherStarted = false
 
-export function getBarWindow() {
-  return winRef
+export function getBarWindows(): any[] {
+  return barEntries.map(e => e.win)
+}
+
+export function getBarWindow(): any {
+  return barEntries[0]?.win || null
+}
+
+export function isBarManuallyHidden(): boolean {
+  return manuallyHidden
+}
+
+export function setBarManuallyHidden(hidden: boolean) {
+  manuallyHidden = hidden
+  updateVisibility()
+}
+
+export function toggleBarManuallyHidden(): boolean {
+  manuallyHidden = !manuallyHidden
+  updateVisibility()
+  return manuallyHidden
 }
 
 export function setBarAutohide(enabled: boolean) {
   autoHide = enabled
-  if (winRef) {
-    winRef.visible = true
-    winRef.exclusivity = enabled ? Astal.Exclusivity.IGNORE : Astal.Exclusivity.EXCLUSIVE
-  }
   updateVisibility()
 }
 
@@ -31,63 +52,70 @@ export function getBarAutohide(): boolean {
   return autoHide
 }
 
-function updateVisibility() {
-  if (!revealerRef) return
-  if (!autoHide) {
-    revealerRef.set_reveal_child(true)
-    if (winRef) {
-      winRef.visible = true
-      winRef.exclusivity = Astal.Exclusivity.EXCLUSIVE
+export function updateVisibility() {
+  for (const { win, revealer } of barEntries) {
+    if (manuallyHidden) {
+      revealer.set_reveal_child(false)
+      win.visible = false
+      continue
     }
-  } else {
-    // Intelligent Auto-Hide (Intellihide):
-    // If desktop has NO windows on active workspace OR mouse is hovered -> slide down / reveal
-    // If windows are active AND mouse is not hovered -> slide up / hide smoothly
-    const shouldShow = !hasWindow || isHovered
-    revealerRef.set_reveal_child(shouldShow)
-    if (winRef) {
-      winRef.visible = true
-      winRef.exclusivity = Astal.Exclusivity.IGNORE
+
+    win.visible = true
+    if (!autoHide) {
+      revealer.set_reveal_child(true)
+      win.exclusivity = Astal.Exclusivity.EXCLUSIVE
+    } else {
+      // Intelligent Auto-Hide (Intellihide):
+      // If desktop has NO windows on active workspace OR mouse is hovered -> slide down / reveal
+      // If windows are active AND mouse is not hovered -> slide up / hide smoothly
+      const shouldShow = !hasWindow || isHovered
+      revealer.set_reveal_child(shouldShow)
+      win.exclusivity = Astal.Exclusivity.IGNORE
     }
   }
+}
+
+function checkWindowStatus() {
+  execAsync(["niri", "msg", "-j", "workspaces"])
+    .then((out: string) => {
+      try {
+        const ws = JSON.parse(out)
+        const act = ws.find((w: any) => w.is_active || w.is_focused)
+        const has = Boolean(act && act.active_window_id !== null)
+        if (has !== hasWindow) {
+          hasWindow = has
+          updateVisibility()
+        }
+      } catch {}
+    })
+    .catch(() => {
+      // Fallback for Hyprland
+      execAsync(["hyprctl", "activewindow", "-j"])
+        .then((out: string) => {
+          try {
+            const act = JSON.parse(out)
+            const has = Boolean(act && (act.title || act.class))
+            if (has !== hasWindow) {
+              hasWindow = has
+              updateVisibility()
+            }
+          } catch {}
+        })
+        .catch(() => {})
+    })
 }
 
 function startWindowWatcher() {
   if (watcherStarted) return
   watcherStarted = true
 
-  GLib.timeout_add(GLib.PRIORITY_DEFAULT, 400, () => {
-    execAsync([
-      "python3",
-      "-c",
-      `
-import subprocess, json
-try:
-  ws = json.loads(subprocess.check_output(['niri', 'msg', '-j', 'workspaces'], stderr=subprocess.DEVNULL))
-  act = next((w['id'] for w in ws if w.get('is_active')), None)
-  if act is not None:
-    wins = json.loads(subprocess.check_output(['niri', 'msg', '-j', 'windows'], stderr=subprocess.DEVNULL))
-    has_w = any(w.get('workspace_id') == act for w in wins)
-    print('true' if has_w else 'false')
-    exit(0)
-except: pass
-try:
-  act = json.loads(subprocess.check_output(['hyprctl', 'activewindow', '-j'], stderr=subprocess.DEVNULL))
-  print('true' if (act.get('title') or act.get('class')) else 'false')
-  exit(0)
-except: pass
-print('false')
-`
-    ])
-      .then((out: string) => {
-        const has = out.trim() === "true"
-        if (has !== hasWindow) {
-          hasWindow = has
-          updateVisibility()
-        }
-      })
-      .catch(() => {})
+  checkWindowStatus()
 
+  // Lightweight check every 600ms without spawning python subprocesses
+  GLib.timeout_add(GLib.PRIORITY_DEFAULT, 600, () => {
+    if (autoHide && !manuallyHidden) {
+      checkWindowStatus()
+    }
     return GLib.SOURCE_CONTINUE
   })
 }
@@ -118,7 +146,6 @@ export default function Bar(gdkmonitor: Gdk.Monitor, config: MistbarConfig = def
     reveal_child: !config.autoHide,
   })
   revealer.set_child(innerBar)
-  revealerRef = revealer
 
   // 3. Top hover trigger zone & outer container
   const triggerZone = new Gtk.Box({
@@ -165,10 +192,20 @@ export default function Bar(gdkmonitor: Gdk.Monitor, config: MistbarConfig = def
     </window>
   )
 
-  winRef = win
   try {
     win.remove_css_class("background")
   } catch {}
+
+  // Apply initial classes
+  try {
+    win.add_css_class(`style-${config.style || "glassy"}`)
+    win.add_css_class(`look-${config.look || "pill"}`)
+    if (config.theme === "light") {
+      win.add_css_class("light-theme")
+    }
+  } catch (err) {
+    console.error("Error setting initial bar CSS classes:", err)
+  }
 
   try {
     if (isPill) {
@@ -185,6 +222,13 @@ export default function Bar(gdkmonitor: Gdk.Monitor, config: MistbarConfig = def
   } catch (err) {
     console.error("Error setting layer surface margins:", err)
   }
+
+  const entry: BarEntry = { win, revealer, outerBox }
+  barEntries.push(entry)
+  win.connect("destroy", () => {
+    const idx = barEntries.indexOf(entry)
+    if (idx !== -1) barEntries.splice(idx, 1)
+  })
 
   win.visible = true
 

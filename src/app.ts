@@ -23,7 +23,9 @@ function getWindows(): any[] {
     const appWins = (app as any).get_windows ? (app as any).get_windows() : []
     if (appWins && appWins.length > 0) {
       for (const w of appWins) {
-        if (!wins.includes(w)) wins.push(w)
+        if (!wins.includes(w) && (w.name === "mistbar" || w.namespace === "mistbar")) {
+          wins.push(w)
+        }
       }
     }
   } catch {}
@@ -99,30 +101,47 @@ app.start({
   css: style,
   requestHandler(args: string[], res: (response: string) => void) {
     const cmd = (Array.isArray(args) ? args.join(" ") : String(args)).trim()
-    if (cmd === "toggle") {
-      const nowHidden = toggleBarManuallyHidden()
-      res(nowHidden ? "hidden" : "shown")
+    if (cmd === "hide") {
+      setBarManuallyHidden(true)
+      res("hidden completely (disabled cursor toggles)")
     } else if (cmd === "show") {
       setBarManuallyHidden(false)
-      res("shown")
-    } else if (cmd === "hide") {
-      setBarManuallyHidden(true)
-      res("hidden")
-    } else if (cmd === "autohide:toggle") {
-      const next = !config.autoHide
+      setBarAutohide(false)
+      config.autoHide = false
+      saveConfig({ autoHide: false })
+      res("shown (always visible)")
+    } else if (cmd === "autohide:on" || cmd === "auto-hide on" || cmd === "autohide on") {
       setBarManuallyHidden(false)
-      setBarAutohide(next)
-      config.autoHide = next
-      saveConfig({ autoHide: next })
-      res(`autohide set to ${next ? "on" : "off"}`)
-    } else if (cmd.startsWith("autohide:")) {
-      const val = cmd.replace("autohide:", "").trim()
+      setBarAutohide(true)
+      config.autoHide = true
+      saveConfig({ autoHide: true })
+      res("autohide on (reveals on hover)")
+    } else if (cmd === "autohide:off" || cmd === "auto-hide off" || cmd === "autohide off") {
+      setBarManuallyHidden(false)
+      setBarAutohide(false)
+      config.autoHide = false
+      saveConfig({ autoHide: false })
+      res("autohide off (always visible)")
+    } else if (cmd === "toggle" || cmd === "autohide:toggle" || cmd === "auto-hide toggle" || cmd === "autohide toggle") {
+      if (isBarManuallyHidden()) {
+        setBarManuallyHidden(false)
+        res(config.autoHide ? "autohide on (reveals on hover)" : "autohide off (always visible)")
+      } else {
+        const next = !config.autoHide
+        setBarManuallyHidden(false)
+        setBarAutohide(next)
+        config.autoHide = next
+        saveConfig({ autoHide: next })
+        res(next ? "autohide on (reveals on hover)" : "autohide off (always visible)")
+      }
+    } else if (cmd.startsWith("autohide:") || cmd.startsWith("auto-hide:")) {
+      const val = cmd.replace(/^auto-?hide:/, "").trim()
       const enabled = val === "on" || val === "true" || val === "1"
       setBarManuallyHidden(false)
       setBarAutohide(enabled)
       config.autoHide = enabled
       saveConfig({ autoHide: enabled })
-      res(`autohide set to ${enabled ? "on" : "off"}`)
+      res(enabled ? "autohide on (reveals on hover)" : "autohide off (always visible)")
     } else if (cmd.startsWith("theme:")) {
       const theme = cmd.replace("theme:", "").trim() as MistbarTheme
       applyThemeClass(theme)
@@ -151,7 +170,7 @@ app.start({
     } else if (cmd === "status") {
       const isVis = !isBarManuallyHidden()
       const glassyInfo = config.style === "glassy" ? ` (fonts: ${config.glassyTextColor || "white"})` : ""
-      res(`running (theme: ${config.theme || "dark"}, style: ${config.style || "glassy"}${glassyInfo}, look: ${config.look || "pill"}, autohide: ${config.autoHide ? "on" : "off"}, visible: ${isVis ? "yes" : "no"})`)
+      res(`running (theme: ${config.theme || "dark"}, style: ${config.style || "glassy"}${glassyInfo}, look: ${config.look || "pill"}, autohide: ${config.autoHide ? "on" : "off"}, manually_hidden: ${isBarManuallyHidden() ? "yes" : "no"})`)
     } else {
       res(`unknown command: ${cmd}`)
     }

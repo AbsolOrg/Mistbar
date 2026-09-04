@@ -40,10 +40,10 @@ print_help() {
     echo -e "    ${GREEN}start${NC}                            Start the bar"
     echo -e "    ${GREEN}stop${NC}                             Stop the bar"
     echo -e "    ${GREEN}restart${NC}                          Restart the bar"
-    echo -e "    ${GREEN}toggle${NC}                           Toggle bar visibility on/off"
-    echo -e "    ${GREEN}show${NC}                             Show the bar"
-    echo -e "    ${GREEN}hide${NC}                             Hide the bar"
-    echo -e "    ${GREEN}auto-hide <on|off|toggle>${NC}        Toggle intelligent auto-hide (or --auto-hide)"
+    echo -e "    ${GREEN}toggle${NC}                           Toggle intelligent auto-hide on/off"
+    echo -e "    ${GREEN}show${NC}                             Show the bar (always visible)"
+    echo -e "    ${GREEN}hide${NC}                             Hide the bar completely (disables cursor hovers)"
+    echo -e "    ${GREEN}auto-hide <on|off|toggle>${NC}        Intelligent auto-hide (or --auto-hide)"
     echo -e "    ${GREEN}theme <dark|light>${NC}               Switch theme dynamically"
     echo -e "    ${GREEN}style <glassy [dark|white]|transparent|solid>${NC} Switch background style"
     echo -e "    ${GREEN}look <pill|attached>${NC}             Switch shape/geometry dynamically"
@@ -64,7 +64,10 @@ print_help() {
     echo "    mistbar start"
     echo "    mistbar auto-hide on       # Intelligent auto-hide (slides away over windows, reveals on top hover)"
     echo "    mistbar auto-hide off      # Always visible"
-    echo "    mistbar --auto-hide        # Enable auto-hide shorthand"
+    echo "    mistbar auto-hide toggle   # Toggle intelligent auto-hide"
+    echo "    mistbar toggle             # Toggle intelligent auto-hide"
+    echo "    mistbar hide               # Force-hide bar completely (disables cursor hovers)"
+    echo "    mistbar show               # Show bar (always visible)"
     echo "    mistbar style glassy       # Frosted liquid glass (default text)"
     echo "    mistbar style glassy dark  # Frosted liquid glass with dark fonts & logos"
     echo "    mistbar style glassy white # Frosted liquid glass with white fonts & logos"
@@ -211,14 +214,16 @@ cmd_show() {
         cmd_start
         return
     fi
-    ags request -i "$INSTANCE_NAME" "show" 2>/dev/null || true
-    echo -e "${GREEN}✓ Mistbar shown.${NC}"
+    local res
+    res="$(ags request -i "$INSTANCE_NAME" "show" 2>/dev/null || echo "shown (always visible)")"
+    echo -e "${GREEN}✓ Mistbar $res.${NC}"
 }
 
 cmd_hide() {
     if ags list 2>/dev/null | grep -q "$INSTANCE_NAME"; then
-        ags request -i "$INSTANCE_NAME" "hide" 2>/dev/null || true
-        echo -e "${GREEN}✓ Mistbar hidden.${NC}"
+        local res
+        res="$(ags request -i "$INSTANCE_NAME" "hide" 2>/dev/null || echo "hidden completely (disabled cursor toggles)")"
+        echo -e "${GREEN}✓ Mistbar $res.${NC}"
     fi
 }
 

@@ -9,16 +9,70 @@ import { execAsync } from "ags/process"
 
 export interface BarEntry {
   win: any
+  triggerWin: any
   revealer: Gtk.Revealer
   outerBox: Gtk.Box
+  monitor: Gdk.Monitor
+  hasWindow: boolean
+  isHovered: boolean
+  isTriggerHovered: boolean
+  graceTimerId: number
+  slideTimerId: number
 }
 
 const barEntries: BarEntry[] = []
-let isHovered = false
-let hasWindow = false
 let autoHide = false
 let manuallyHidden = false
 let watcherStarted = false
+const openMenus = new Set<any>()
+
+export function isAnyMenuOpen(): boolean {
+  return openMenus.size > 0
+}
+
+export function registerMenuButton(btn: Gtk.MenuButton) {
+  try {
+    btn.connect("notify::active", (b: Gtk.MenuButton) => {
+      if (b.active) {
+        openMenus.add(b)
+      } else {
+        openMenus.delete(b)
+      }
+      updateVisibility()
+    })
+
+    const pop = btn.get_popover()
+    if (pop) {
+      pop.connect("notify::visible", (p: Gtk.Popover) => {
+        if (p.visible) {
+          openMenus.add(p)
+        } else {
+          openMenus.delete(p)
+        }
+        updateVisibility()
+      })
+      pop.connect("closed", () => {
+        openMenus.delete(pop)
+        openMenus.delete(btn)
+        updateVisibility()
+      })
+    }
+  } catch (err) {
+    console.error("Error registering menu button:", err)
+  }
+}
+
+export function bindMenuButtons(widget: Gtk.Widget) {
+  if (!widget) return
+  if (widget instanceof Gtk.MenuButton) {
+    registerMenuButton(widget)
+  }
+  let child = widget.get_first_child()
+  while (child) {
+    bindMenuButtons(child)
+    child = child.get_next_sibling()
+  }
+}
 
 export function getBarWindows(): any[] {
   return barEntries.map(e => e.win)
@@ -34,44 +88,106 @@ export function isBarManuallyHidden(): boolean {
 
 export function setBarManuallyHidden(hidden: boolean) {
   manuallyHidden = hidden
-  updateVisibility()
+  for (const entry of barEntries) {
+    cancelGraceTimer(entry)
+    if (hidden) {
+      entry.revealer.set_reveal_child(false)
+      entry.win.visible = false
+      if (entry.triggerWin) entry.triggerWin.visible = false
+    } else {
+      updateEntryVisibility(entry)
+    }
+  }
 }
 
 export function toggleBarManuallyHidden(): boolean {
   manuallyHidden = !manuallyHidden
-  updateVisibility()
+  setBarManuallyHidden(manuallyHidden)
   return manuallyHidden
 }
 
 export function setBarAutohide(enabled: boolean) {
   autoHide = enabled
-  updateVisibility()
+  for (const entry of barEntries) {
+    cancelGraceTimer(entry)
+    entry.win.exclusivity = enabled ? Astal.Exclusivity.IGNORE : Astal.Exclusivity.EXCLUSIVE
+    updateEntryVisibility(entry)
+  }
 }
 
 export function getBarAutohide(): boolean {
   return autoHide
 }
 
-export function updateVisibility() {
-  for (const { win, revealer } of barEntries) {
-    if (manuallyHidden) {
-      revealer.set_reveal_child(false)
-      win.visible = false
-      continue
+function cancelGraceTimer(entry: BarEntry) {
+  if (entry.graceTimerId) {
+    GLib.source_remove(entry.graceTimerId)
+    entry.graceTimerId = 0
+  }
+}
+
+function scheduleGraceHide(entry: BarEntry) {
+  if (entry.graceTimerId) return
+
+  entry.graceTimerId = GLib.timeout_add(GLib.PRIORITY_DEFAULT, 250, () => {
+    entry.graceTimerId = 0
+
+    if (!autoHide || manuallyHidden) return GLib.SOURCE_REMOVE
+    if (entry.isHovered || entry.isTriggerHovered || isAnyMenuOpen() || !entry.hasWindow) {
+      return GLib.SOURCE_REMOVE
     }
 
+    // Smoothly slide up into top edge
+    entry.revealer.set_reveal_child(false)
+    return GLib.SOURCE_REMOVE
+  })
+}
+
+function updateEntryVisibility(entry: BarEntry) {
+  const { win, triggerWin, revealer } = entry
+
+  if (manuallyHidden) {
+    cancelGraceTimer(entry)
+    revealer.set_reveal_child(false)
+    win.visible = false
+    if (triggerWin) triggerWin.visible = false
+    return
+  }
+
+  if (!autoHide) {
+    cancelGraceTimer(entry)
+    win.exclusivity = Astal.Exclusivity.EXCLUSIVE
     win.visible = true
-    if (!autoHide) {
-      revealer.set_reveal_child(true)
-      win.exclusivity = Astal.Exclusivity.EXCLUSIVE
-    } else {
-      // Intelligent Auto-Hide (Intellihide):
-      // If desktop has NO windows on active workspace OR mouse is hovered -> slide down / reveal
-      // If windows are active AND mouse is not hovered -> slide up / hide smoothly
-      const shouldShow = !hasWindow || isHovered
-      revealer.set_reveal_child(shouldShow)
-      win.exclusivity = Astal.Exclusivity.IGNORE
+    revealer.set_reveal_child(true)
+    if (triggerWin) triggerWin.visible = false
+    return
+  }
+
+  // Auto-hide mode is ON
+  win.exclusivity = Astal.Exclusivity.IGNORE
+
+  // Reveal conditions (Intelligent Auto-Hide):
+  // 1. Desktop has NO windows on active workspace (!entry.hasWindow)
+  // 2. OR cursor is hovering the bar or top trigger edge
+  // 3. OR a popover menu / control center is open
+  const shouldReveal = !entry.hasWindow || entry.isHovered || entry.isTriggerHovered || isAnyMenuOpen()
+
+  if (shouldReveal) {
+    cancelGraceTimer(entry)
+    win.visible = true
+    revealer.set_reveal_child(true)
+    if (!entry.hasWindow && triggerWin) {
+      triggerWin.visible = false
     }
+  } else {
+    if (triggerWin) triggerWin.visible = true
+    scheduleGraceHide(entry)
+  }
+}
+
+export function updateVisibility() {
+  for (const entry of barEntries) {
+    updateEntryVisibility(entry)
   }
 }
 
@@ -80,28 +196,76 @@ function checkWindowStatus() {
     .then((out: string) => {
       try {
         const ws = JSON.parse(out)
-        const act = ws.find((w: any) => w.is_active || w.is_focused)
-        const has = Boolean(act && act.active_window_id !== null)
-        if (has !== hasWindow) {
-          hasWindow = has
-          updateVisibility()
+        for (const entry of barEntries) {
+          const conn = entry.monitor.get_connector ? entry.monitor.get_connector() : (entry.monitor as any).connector
+          const act = ws.find((w: any) =>
+            w.is_active && (!conn || !w.output || w.output === conn)
+          ) || ws.find((w: any) => w.is_active || w.is_focused)
+
+          const has = Boolean(act && act.active_window_id !== null)
+          if (has !== entry.hasWindow) {
+            entry.hasWindow = has
+            updateEntryVisibility(entry)
+          }
         }
       } catch {}
     })
     .catch(() => {
-      // Fallback for Hyprland
-      execAsync(["hyprctl", "activewindow", "-j"])
+      // Hyprland check
+      execAsync(["hyprctl", "workspaces", "-j"])
         .then((out: string) => {
           try {
-            const act = JSON.parse(out)
-            const has = Boolean(act && (act.title || act.class))
-            if (has !== hasWindow) {
-              hasWindow = has
-              updateVisibility()
-            }
+            const ws = JSON.parse(out)
+            execAsync(["hyprctl", "monitors", "-j"])
+              .then((mOut: string) => {
+                const monitors = JSON.parse(mOut)
+                for (const entry of barEntries) {
+                  const conn = entry.monitor.get_connector ? entry.monitor.get_connector() : (entry.monitor as any).connector
+                  const mon = monitors.find((m: any) => m.name === conn) || monitors.find((m: any) => m.focused)
+                  const actWsName = mon?.activeWorkspace?.name ?? mon?.activeWorkspace?.id
+                  const wObj = ws.find((w: any) => w.name === actWsName || w.id === actWsName)
+                  const has = Boolean(wObj && wObj.windows > 0)
+                  if (has !== entry.hasWindow) {
+                    entry.hasWindow = has
+                    updateEntryVisibility(entry)
+                  }
+                }
+              })
+              .catch(() => {
+                execAsync(["hyprctl", "activewindow", "-j"])
+                  .then((actOut: string) => {
+                    const act = JSON.parse(actOut)
+                    const has = Boolean(act && (act.title || act.class))
+                    for (const entry of barEntries) {
+                      if (has !== entry.hasWindow) {
+                        entry.hasWindow = has
+                        updateEntryVisibility(entry)
+                      }
+                    }
+                  })
+                  .catch(() => {})
+              })
           } catch {}
         })
-        .catch(() => {})
+        .catch(() => {
+          // Sway check
+          execAsync(["swaymsg", "-t", "get_workspaces"])
+            .then((sOut: string) => {
+              try {
+                const sWs = JSON.parse(sOut)
+                for (const entry of barEntries) {
+                  const conn = entry.monitor.get_connector ? entry.monitor.get_connector() : (entry.monitor as any).connector
+                  const focused = sWs.find((w: any) => (!conn || w.output === conn) && w.focused) || sWs.find((w: any) => w.focused)
+                  const has = Boolean(focused && (focused.representation !== null || focused.windows > 0))
+                  if (has !== entry.hasWindow) {
+                    entry.hasWindow = has
+                    updateEntryVisibility(entry)
+                  }
+                }
+              } catch {}
+            })
+            .catch(() => {})
+        })
     })
 }
 
@@ -111,13 +275,61 @@ function startWindowWatcher() {
 
   checkWindowStatus()
 
-  // Lightweight check every 600ms without spawning python subprocesses
-  GLib.timeout_add(GLib.PRIORITY_DEFAULT, 600, () => {
+  // Responsive check every 400ms
+  GLib.timeout_add(GLib.PRIORITY_DEFAULT, 400, () => {
     if (autoHide && !manuallyHidden) {
       checkWindowStatus()
     }
     return GLib.SOURCE_CONTINUE
   })
+}
+
+function createTriggerWindow(
+  gdkmonitor: Gdk.Monitor,
+  onEnter: () => void,
+  onLeave: () => void
+): any {
+  const { TOP, LEFT, RIGHT } = Astal.WindowAnchor
+
+  const triggerBox = new Gtk.Box({
+    css_classes: ["mistbar-hot-edge"],
+  })
+  triggerBox.set_size_request(-1, 2)
+
+  const motion = new Gtk.EventControllerMotion()
+  motion.connect("enter", () => {
+    onEnter()
+  })
+  motion.connect("leave", () => {
+    onLeave()
+  })
+  triggerBox.add_controller(motion)
+
+  const win = (
+    <window
+      visible={autoHide}
+      name="mistbar-trigger"
+      namespace="mistbar-trigger"
+      class="MistbarTrigger"
+      gdkmonitor={gdkmonitor}
+      exclusivity={Astal.Exclusivity.IGNORE}
+      layer={Astal.Layer.TOP}
+      anchor={TOP | LEFT | RIGHT}
+      margin_top={0}
+      margin_left={0}
+      margin_right={0}
+      margin_bottom={0}
+      application={app}
+    >
+      {triggerBox}
+    </window>
+  )
+
+  try {
+    win.remove_css_class("background")
+  } catch {}
+
+  return win
 }
 
 export default function Bar(gdkmonitor: Gdk.Monitor, config: MistbarConfig = defaultConfig) {
@@ -142,45 +354,29 @@ export default function Bar(gdkmonitor: Gdk.Monitor, config: MistbarConfig = def
   // 2. Wrap in native GTK4 Revealer for smooth hardware-accelerated slide up / down animation
   const revealer = new Gtk.Revealer({
     transition_type: Gtk.RevealerTransitionType.SLIDE_DOWN,
-    transition_duration: 250,
+    transition_duration: 200,
     reveal_child: !config.autoHide,
   })
   revealer.set_child(innerBar)
 
-  // 3. Top hover trigger zone & outer container
-  const triggerZone = new Gtk.Box({
-    css_classes: ["hover-trigger-zone"],
-  })
-
+  // 3. Outer container with mouse motion detection
   const outerBox = new Gtk.Box({
     orientation: Gtk.Orientation.VERTICAL,
     css_classes: ["bar-outer-container"],
   })
-  outerBox.append(triggerZone)
   outerBox.append(revealer)
 
-  // 4. Attach mouse motion controller to outerBox for hover detection
-  const motion = new Gtk.EventControllerMotion()
-  motion.connect("enter", () => {
-    isHovered = true
-    updateVisibility()
-  })
-  motion.connect("leave", () => {
-    isHovered = false
-    updateVisibility()
-  })
-  outerBox.add_controller(motion)
-
-  // 5. Build the layer-shell window
+  // 4. Build the layer-shell main bar window
   const isPill = (config.look || "pill") === "pill"
   const win = (
     <window
-      visible
+      visible={!config.autoHide}
       name="mistbar"
       namespace="mistbar"
       class="Bar"
       gdkmonitor={gdkmonitor}
       exclusivity={config.autoHide ? Astal.Exclusivity.IGNORE : Astal.Exclusivity.EXCLUSIVE}
+      layer={Astal.Layer.TOP}
       anchor={TOP | LEFT | RIGHT}
       margin_top={isPill ? (config.barMargin ?? 6) : 0}
       margin_left={isPill ? 12 : 0}
@@ -227,17 +423,81 @@ export default function Bar(gdkmonitor: Gdk.Monitor, config: MistbarConfig = def
     console.error("Error setting layer surface margins:", err)
   }
 
-  const entry: BarEntry = { win, revealer, outerBox }
+  // 5. Create the entry and trigger window
+  const entry: BarEntry = {
+    win,
+    triggerWin: null,
+    revealer,
+    outerBox,
+    monitor: gdkmonitor,
+    hasWindow: false,
+    isHovered: false,
+    isTriggerHovered: false,
+    graceTimerId: 0,
+    slideTimerId: 0,
+  }
+
+  const triggerWin = createTriggerWindow(
+    gdkmonitor,
+    () => {
+      entry.isTriggerHovered = true
+      updateEntryVisibility(entry)
+    },
+    () => {
+      entry.isTriggerHovered = false
+      updateEntryVisibility(entry)
+    }
+  )
+  entry.triggerWin = triggerWin
+
+  // 6. Connect motion controller to outerBox
+  const motion = new Gtk.EventControllerMotion()
+  motion.connect("enter", () => {
+    entry.isHovered = true
+    updateEntryVisibility(entry)
+  })
+  motion.connect("leave", () => {
+    entry.isHovered = false
+    updateEntryVisibility(entry)
+  })
+  outerBox.add_controller(motion)
+
+  // 7. Bind menu buttons and popovers
+  bindMenuButtons(innerBar)
+  GLib.idle_add(GLib.PRIORITY_DEFAULT_IDLE, () => {
+    bindMenuButtons(innerBar)
+    return GLib.SOURCE_REMOVE
+  })
+
+  // 8. Connect revealer transition finished signal to completely unmap window when hidden
+  revealer.connect("notify::child-revealed", (r: Gtk.Revealer) => {
+    if (!r.get_child_revealed()) {
+      if ((autoHide && entry.hasWindow && !entry.isHovered && !entry.isTriggerHovered && !isAnyMenuOpen()) || manuallyHidden) {
+        win.visible = false
+        if (autoHide && !manuallyHidden && entry.triggerWin) {
+          entry.triggerWin.visible = true
+        }
+      }
+    }
+  })
+
   barEntries.push(entry)
+
   win.connect("destroy", () => {
+    cancelGraceTimer(entry)
+    if (entry.triggerWin) {
+      try {
+        entry.triggerWin.destroy()
+      } catch {}
+    }
     const idx = barEntries.indexOf(entry)
     if (idx !== -1) barEntries.splice(idx, 1)
   })
 
-  win.visible = true
+  win.visible = !config.autoHide
 
   startWindowWatcher()
-  updateVisibility()
+  updateEntryVisibility(entry)
 
   return win
 }

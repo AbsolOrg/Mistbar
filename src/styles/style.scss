@@ -64,8 +64,13 @@ window.Bar,
 window.Bar.background,
 window.background.Bar,
 window.Bar > box,
+window.MistbarTrigger,
+window.MistbarTrigger.background,
+window.background.MistbarTrigger,
+window.MistbarTrigger > box,
 .bar-outer-container,
 .hover-trigger-zone,
+.mistbar-hot-edge,
 revealer {
   background: transparent;
   background-color: transparent;
@@ -73,6 +78,15 @@ revealer {
   border: none;
   box-shadow: none;
   padding: 0;
+}
+
+// ── Top Edge Trigger Surface (for smooth auto-hide) ──
+window.MistbarTrigger,
+.mistbar-hot-edge {
+  min-height: 2px;
+  min-width: 0;
+  padding: 0;
+  margin: 0;
 }
 
 window.Bar {
@@ -112,23 +126,12 @@ window.Bar {
     }
   }
 
-  // Top container & hover trigger zone
+  // Top container
   .bar-outer-container {
     background: transparent;
     background-color: transparent;
     padding: 0;
     margin: 0;
-  }
-
-  .hover-trigger-zone {
-    min-height: 0;
-    max-height: 0;
-    height: 0;
-    background: transparent;
-    padding: 0;
-    margin: 0;
-    font-size: 0;
-    line-height: 0;
   }
 
   // Base inner bar container

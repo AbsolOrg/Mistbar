@@ -32,11 +32,38 @@ const volumePercent = createPoll(
   }
 )
 
-const sinkName = createPoll(
-  "Default Audio",
-  5000,
-  ["bash", "-c", "wpctl status 2>/dev/null | grep -A 2 'Sinks:' | grep -E '\\*' | sed 's/.*\\*\\s*[0-9]*\\.\\s*//;s/\\[.*\\]//' | tr -d '\\n'"],
-  (out: string) => out.trim() || "Built-in Audio"
+interface AudioSink {
+  id: string
+  name: string
+  isDefault: boolean
+}
+
+const audioSinksJson = createPoll(
+  "[]",
+  3000,
+  ["bash", "-c", `python3 -c '
+import subprocess, re, json
+try:
+    out = subprocess.check_output(["wpctl", "status"], text=True, timeout=2)
+    sinks = []
+    in_sinks = False
+    for line in out.splitlines():
+        if "Sinks:" in line:
+            in_sinks = True
+            continue
+        if in_sinks:
+            if line.strip() == "" or "Sources:" in line or "Filters:" in line or "Streams:" in line:
+                break
+            m = re.search(r"(\*?)\s*(\d+)\.\s+([^\[]+)", line)
+            if m:
+                is_default = m.group(1) == "*"
+                sink_id = m.group(2)
+                name = m.group(3).strip()
+                sinks.append({"id": sink_id, "name": name, "isDefault": is_default})
+    print(json.dumps(sinks))
+except:
+    print("[]")
+' 2>/dev/null || echo '[]'`],
 )
 
 export default function Volume() {
@@ -59,10 +86,17 @@ export default function Volume() {
       <label class="status-icon-label" label={volumeIcon} />
 
       <popover class="control-popover volume-popover">
-        <box orientation={Gtk.Orientation.VERTICAL} spacing={10} class="popover-container">
+        <box orientation={Gtk.Orientation.VERTICAL} spacing={10} class="popover-container volume-container">
           <box class="popover-header" spacing={8}>
             <label class="popover-title" label="Sound" hexpand halign={Gtk.Align.START} />
             <label class="popover-subtitle" label={volumePercent} />
+            <button
+              class="popover-toggle-btn"
+              onClicked={() => execAsync(["wpctl", "set-mute", "@DEFAULT_AUDIO_SINK@", "toggle"]).catch(console.error)}
+              tooltipText="Toggle Mute"
+            >
+              <label label={volumePercent((p) => p.includes("Muted") ? "Unmute" : "Mute")} />
+            </button>
           </box>
 
           <box class="control-slider-box" spacing={8}>
@@ -93,19 +127,80 @@ export default function Volume() {
 
           <Gtk.Separator />
 
-          <box class="popover-card" spacing={8}>
-            <label class="card-icon" label="󰓃" />
-            <box orientation={Gtk.Orientation.VERTICAL} hexpand>
-              <label class="card-title" label="Output Device" halign={Gtk.Align.START} />
-              <label class="card-subtitle" label={sinkName} halign={Gtk.Align.START} />
-            </box>
-            <button
-              class="popover-toggle-btn"
-              onClicked={() => execAsync(["wpctl", "set-mute", "@DEFAULT_AUDIO_SINK@", "toggle"]).catch(console.error)}
-              tooltipText="Toggle Mute"
-            >
-              <label label="Mute" />
-            </button>
+          {/* Output Devices List */}
+          <box orientation={Gtk.Orientation.VERTICAL} spacing={6}>
+            <label class="section-subtitle" label="Output Devices" halign={Gtk.Align.START} />
+            <box
+              class="popover-card-list"
+              orientation={Gtk.Orientation.VERTICAL}
+              spacing={2}
+              $={(self: Gtk.Box) => {
+                audioSinksJson.subscribe(() => {
+                  try {
+                    const list = JSON.parse(audioSinksJson.peek()) as AudioSink[]
+
+                    let child = self.get_first_child()
+                    while (child) {
+                      const next = child.get_next_sibling()
+                      self.remove(child)
+                      child = next
+                    }
+
+                    if (list.length === 0) {
+                      const emptyLbl = new Gtk.Label({
+                        label: sinkName.peek() || "Default Audio Output",
+                        css_classes: ["popover-empty-text"],
+                        halign: Gtk.Align.START,
+                      })
+                      self.append(emptyLbl)
+                      return
+                    }
+
+                    for (const sink of list) {
+                      const btn = new Gtk.Button({
+                        css_classes: ["popover-item-row", sink.isDefault ? "active" : ""],
+                      })
+
+                      const rowBox = new Gtk.Box({
+                        spacing: 8,
+                      })
+
+                      const iconLbl = new Gtk.Label({
+                        label: sink.name.toLowerCase().includes("headphone") ? "󰋋" : (sink.name.toLowerCase().includes("hdmi") ? "󰡁" : "󰓃"),
+                        css_classes: ["item-icon"],
+                      })
+                      rowBox.append(iconLbl)
+
+                      const nameLbl = new Gtk.Label({
+                        label: sink.name,
+                        hexpand: true,
+                        halign: Gtk.Align.START,
+                        css_classes: ["item-title"],
+                      })
+                      rowBox.append(nameLbl)
+
+                      if (sink.isDefault) {
+                        const checkLbl = new Gtk.Label({
+                          label: "✓",
+                          css_classes: ["item-badge"],
+                        })
+                        rowBox.append(checkLbl)
+                      }
+
+                      btn.set_child(rowBox)
+
+                      btn.connect("clicked", () => {
+                        execAsync(["wpctl", "set-default", sink.id]).catch(console.error)
+                      })
+
+                      self.append(btn)
+                    }
+                  } catch (e) {
+                    console.error("Error rendering audio sinks:", e)
+                  }
+                })
+              }}
+            />
           </box>
         </box>
       </popover>

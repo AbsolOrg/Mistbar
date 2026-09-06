@@ -11,8 +11,12 @@
 
 - **Liquid Glass Design** -- Frosted glass effect with semi-transparent dark background, subtle inner glow, and drop shadows
 - **Floating Bar** -- Hovering with gaps from screen edges, rounded pill-like corners
-- **macOS Layout** -- Three-section layout: App menu (left), Clock + Workspaces (center), System icons (right)
+- **macOS Layout** -- Three-section layout: App menu with File, Edit, View, Go, Window, Help (left), Clock + Calendar & Workspaces (center), System icons (right)
+- **macOS Go Menu** -- Quick navigation to Home, Documents, Downloads, Pictures, Applications, Terminal, and Root
+- **Rich Liquid Glass Applets** -- Frosted translucent glass popovers with specular edge glow, interactive Wi-Fi network rows, Bluetooth devices, and Audio Output switcher
+- **Interactive Calendar** -- Dynamic month calendar grid and date overview upon clicking the Clock
 - **System Status Icons** -- Wi-Fi, Bluetooth, Volume, Battery, Brightness with Nerd Font icons
+- **Control Center** -- Combined Wi-Fi/BT toggles, Dark Mode, Auto-Hide, Lock Screen, thick capsule sliders, and media playback
 - **Workspace Dots** -- macOS Mission Control-style dot indicators for Niri workspaces
 - **Power Menu** -- Sleep, Restart, Shut Down, Log Out dropdown
 - **CLI Interface** -- `mistbar start/stop/restart/status` with colored output

@@ -67,6 +67,38 @@ const mediaStatus = createPoll(
   (out: string) => out.trim()
 )
 
+const isDarkMode = createPoll(
+  true,
+  3000,
+  ["bash", "-c", `python3 -c '
+import json, os
+path = os.path.expanduser("~/.config/mistbar/config.json")
+try:
+    with open(path) as f:
+        d = json.load(f)
+    print("true" if d.get("theme", "dark") == "dark" else "false")
+except:
+    print("true")
+' 2>/dev/null || echo "true"`],
+  (out: string) => out.trim() === "true"
+)
+
+const isAutohideOn = createPoll(
+  false,
+  3000,
+  ["bash", "-c", `python3 -c '
+import json, os
+path = os.path.expanduser("~/.config/mistbar/config.json")
+try:
+    with open(path) as f:
+        d = json.load(f)
+    print("true" if d.get("autoHide", False) else "false")
+except:
+    print("false")
+' 2>/dev/null || echo "false"`],
+  (out: string) => out.trim() === "true"
+)
+
 export default function ControlCenter() {
   return (
     <menubutton
@@ -113,6 +145,48 @@ export default function ControlCenter() {
                   <label class="cc-tile-title" label="Bluetooth" halign={Gtk.Align.START} />
                   <label class="cc-tile-subtitle" label={btName} halign={Gtk.Align.START} />
                 </box>
+              </box>
+            </button>
+          </box>
+
+          {/* Extra Mini Toggles Row (Dark Mode, Auto-Hide, Lock) */}
+          <box spacing={6} homogeneous class="cc-mini-toggles">
+            <button
+              class={isDarkMode((d) => `cc-mini-tile ${d ? "active" : ""}`)}
+              tooltipText="Toggle Dark / Light Theme"
+              onClicked={() => {
+                execAsync(["bash", "-c", "if mistbar status 2>/dev/null | grep -q 'theme: dark'; then mistbar theme light; else mistbar theme dark; fi"]).catch(console.error)
+              }}
+            >
+              <box spacing={6} halign={Gtk.Align.CENTER}>
+                <label class="cc-mini-icon" label="󰃚" />
+                <label class="cc-mini-label" label="Dark Mode" />
+              </box>
+            </button>
+
+            <button
+              class={isAutohideOn((a) => `cc-mini-tile ${a ? "active" : ""}`)}
+              tooltipText="Toggle Intelligent Auto-Hide"
+              onClicked={() => {
+                execAsync(["bash", "-c", "mistbar auto-hide toggle"]).catch(console.error)
+              }}
+            >
+              <box spacing={6} halign={Gtk.Align.CENTER}>
+                <label class="cc-mini-icon" label="󰘳" />
+                <label class="cc-mini-label" label="Auto-Hide" />
+              </box>
+            </button>
+
+            <button
+              class="cc-mini-tile"
+              tooltipText="Lock Screen"
+              onClicked={() => {
+                execAsync(["bash", "-c", "loginctl lock-session 2>/dev/null || niri msg action power-off-monitors 2>/dev/null || true"]).catch(console.error)
+              }}
+            >
+              <box spacing={6} halign={Gtk.Align.CENTER}>
+                <label class="cc-mini-icon" label="󰌾" />
+                <label class="cc-mini-label" label="Lock" />
               </box>
             </button>
           </box>

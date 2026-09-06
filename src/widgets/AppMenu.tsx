@@ -159,6 +159,88 @@ export default function AppMenu() {
         </popover>
       </menubutton>
 
+      {/* Go Menu */}
+      <menubutton class="menu-item-btn">
+        <label label="Go" />
+        <popover class="control-popover appmenu-popover">
+          <box orientation={Gtk.Orientation.VERTICAL} spacing={2} class="appmenu-content">
+            <button
+              class="menu-option-btn"
+              onClicked={() => execAsync(["bash", "-c", "xdg-open ~ 2>/dev/null || true"]).catch(console.error)}
+            >
+              <box spacing={16}>
+                <label class="menu-option-label" label="Home" hexpand halign={Gtk.Align.START} />
+                <label class="menu-shortcut" label="Ctrl+Shift+H" />
+              </box>
+            </button>
+            <button
+              class="menu-option-btn"
+              onClicked={() => execAsync(["bash", "-c", "xdg-open \"$(xdg-user-dir DOCUMENTS 2>/dev/null || echo $HOME/Documents)\" 2>/dev/null || true"]).catch(console.error)}
+            >
+              <box spacing={16}>
+                <label class="menu-option-label" label="Documents" hexpand halign={Gtk.Align.START} />
+                <label class="menu-shortcut" label="Ctrl+Shift+O" />
+              </box>
+            </button>
+            <button
+              class="menu-option-btn"
+              onClicked={() => execAsync(["bash", "-c", "xdg-open \"$(xdg-user-dir DOWNLOAD 2>/dev/null || echo $HOME/Downloads)\" 2>/dev/null || true"]).catch(console.error)}
+            >
+              <box spacing={16}>
+                <label class="menu-option-label" label="Downloads" hexpand halign={Gtk.Align.START} />
+                <label class="menu-shortcut" label="Ctrl+Shift+L" />
+              </box>
+            </button>
+            <button
+              class="menu-option-btn"
+              onClicked={() => execAsync(["bash", "-c", "xdg-open \"$(xdg-user-dir PICTURES 2>/dev/null || echo $HOME/Pictures)\" 2>/dev/null || true"]).catch(console.error)}
+            >
+              <box spacing={16}>
+                <label class="menu-option-label" label="Pictures" hexpand halign={Gtk.Align.START} />
+              </box>
+            </button>
+            <Gtk.Separator />
+            <button
+              class="menu-option-btn"
+              onClicked={() => execAsync(["bash", "-c", "fuzzel 2>/dev/null || true"]).catch(console.error)}
+            >
+              <box spacing={16}>
+                <label class="menu-option-label" label="Applications" hexpand halign={Gtk.Align.START} />
+                <label class="menu-shortcut" label="Ctrl+Shift+A" />
+              </box>
+            </button>
+            <button
+              class="menu-option-btn"
+              onClicked={() => execAsync(["bash", "-c", "x-terminal-emulator 2>/dev/null || alacritty 2>/dev/null || kitty 2>/dev/null || foot 2>/dev/null || true"]).catch(console.error)}
+            >
+              <box spacing={16}>
+                <label class="menu-option-label" label="Terminal" hexpand halign={Gtk.Align.START} />
+                <label class="menu-shortcut" label="Ctrl+Alt+T" />
+              </box>
+            </button>
+            <button
+              class="menu-option-btn"
+              onClicked={() => execAsync(["bash", "-c", "xdg-open / 2>/dev/null || true"]).catch(console.error)}
+            >
+              <box spacing={16}>
+                <label class="menu-option-label" label="Computer" hexpand halign={Gtk.Align.START} />
+                <label class="menu-shortcut" label="Ctrl+Shift+C" />
+              </box>
+            </button>
+            <Gtk.Separator />
+            <button
+              class="menu-option-btn"
+              onClicked={() => execAsync(["bash", "-c", "fuzzel 2>/dev/null || true"]).catch(console.error)}
+            >
+              <box spacing={16}>
+                <label class="menu-option-label" label="Go to Folder..." hexpand halign={Gtk.Align.START} />
+                <label class="menu-shortcut" label="Ctrl+Shift+G" />
+              </box>
+            </button>
+          </box>
+        </popover>
+      </menubutton>
+
       {/* Window Menu */}
       <menubutton class="menu-item-btn">
         <label label="Window" />

@@ -928,30 +928,39 @@ button.status-icon {
   }
 }
 
-// ── macOS Popovers & Glass Cards ──
+// ── macOS Tahoe Liquid Glass Popovers & Micro-Capsules ──
+$glass-popover-bg: rgba(16, 22, 34, 0.72);
+$glass-popover-gradient: linear-gradient(
+  180deg,
+  rgba(255, 255, 255, 0.38) 0%,
+  rgba(255, 255, 255, 0.14) 10%,
+  rgba(255, 255, 255, 0.04) 24%,
+  rgba(14, 19, 30, 0.50) 65%,
+  rgba(10, 14, 24, 0.78) 100%
+);
+
 popover {
-  background-color: rgba(18, 22, 32, 0.88);
-  background-image: linear-gradient(
-    180deg,
-    rgba(255, 255, 255, 0.22) 0%,
-    rgba(255, 255, 255, 0.08) 14%,
-    rgba(16, 20, 28, 0.78) 55%,
-    rgba(12, 16, 24, 0.94) 100%
-  );
-  border: 1px solid rgba(255, 255, 255, 0.22);
-  border-top: 1.5px solid rgba(255, 255, 255, 0.65);
-  border-radius: 16px;
-  box-shadow:
-    inset 0 1px 1px 0 rgba(255, 255, 255, 0.45),
-    inset 0 -1px 1px 0 rgba(255, 255, 255, 0.08),
-    0 16px 44px rgba(0, 0, 0, 0.65),
-    0 4px 12px rgba(0, 0, 0, 0.35);
-  color: $text-primary;
-  font-family: $font-main;
+  background: transparent;
+  background-color: transparent;
+  border: none;
+  box-shadow: none;
+  padding: 0;
+  margin: 0;
 
   > contents {
-    background: transparent;
+    background-color: $glass-popover-bg;
+    background-image: $glass-popover-gradient;
+    border: 1px solid rgba(255, 255, 255, 0.28);
+    border-top: 1.5px solid rgba(255, 255, 255, 0.82);
     border-radius: 16px;
+    box-shadow:
+      inset 0 1px 0 0 rgba(255, 255, 255, 0.85),
+      inset 0 2px 8px 0 rgba(255, 255, 255, 0.22),
+      inset 0 -1px 0 0 rgba(255, 255, 255, 0.18),
+      0 20px 50px rgba(0, 0, 0, 0.60),
+      0 6px 18px rgba(0, 0, 0, 0.35);
+    color: $text-primary;
+    font-family: $font-main;
     padding: 0;
   }
 
@@ -963,26 +972,105 @@ popover {
   separator {
     background-color: rgba(255, 255, 255, 0.12);
     min-height: 1px;
-    margin: 2px 0;
+    margin: 4px 0;
+  }
+}
+
+.appmenu-popover {
+  > contents {
+    border-radius: 10px;
+    padding: 4px;
+    background-color: rgba(16, 22, 34, 0.76);
+  }
+
+  .appmenu-content {
+    padding: 2px;
+    min-width: 195px;
+  }
+
+  .menu-option-btn {
+    background: transparent;
+    border: none;
+    border-radius: 6px;
+    padding: 4px 10px;
+    margin: 1px 0;
+    transition: all 100ms ease;
+
+    &:hover {
+      background-color: $accent-blue;
+      box-shadow: 0 1px 4px rgba(0, 122, 255, 0.4);
+
+      label,
+      .menu-option-label,
+      .menu-shortcut {
+        color: #ffffff;
+      }
+    }
+
+    .menu-option-label {
+      font-size: 12px;
+      font-weight: 500;
+      color: $text-primary;
+    }
+
+    .menu-shortcut {
+      font-size: 11px;
+      color: $text-dim;
+      font-family: $font-main;
+      font-weight: 400;
+    }
   }
 }
 
 .popover-container {
-  padding: 10px 12px;
-  min-width: 230px;
+  padding: 12px 14px;
+  min-width: 250px;
 }
 
 .popover-header {
   .popover-title {
-    font-size: 12.5px;
+    font-size: 13px;
     font-weight: 600;
     color: $text-primary;
+    letter-spacing: -0.1px;
   }
 
   .popover-subtitle {
-    font-size: 11px;
+    font-size: 11.5px;
     font-weight: 500;
     color: $text-secondary;
+  }
+}
+
+.popover-action-icon-btn {
+  background: transparent;
+  border: none;
+  border-radius: 6px;
+  padding: 3px 6px;
+  color: $text-secondary;
+  font-family: $font-icon;
+  font-size: 13px;
+  transition: all 120ms ease;
+
+  &:hover {
+    background-color: rgba(255, 255, 255, 0.14);
+    color: #ffffff;
+  }
+}
+
+.card-action-btn {
+  background-color: rgba(255, 69, 58, 0.18);
+  border: 1px solid rgba(255, 69, 58, 0.35);
+  border-radius: 6px;
+  padding: 3px 8px;
+  font-size: 10.5px;
+  font-weight: 600;
+  color: #ff453a;
+  transition: all 120ms ease;
+
+  &:hover {
+    background-color: #ff453a;
+    color: #ffffff;
   }
 }
 
@@ -991,75 +1079,93 @@ popover {
   font-weight: 600;
   color: $text-dim;
   text-transform: uppercase;
-  letter-spacing: 0.5px;
+  letter-spacing: 0.6px;
 }
 
-// ── macOS Sliders ──
+// ── macOS Sliders (Capsule Glass Style) ──
 .control-slider-box {
-  background-color: $glass-card;
-  border-radius: 10px;
-  padding: 5px 8px;
+  background-color: rgba(255, 255, 255, 0.08);
+  background-image: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.12) 0%,
+    rgba(255, 255, 255, 0.02) 100%
+  );
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-top: 1px solid rgba(255, 255, 255, 0.32);
+  border-radius: 12px;
+  padding: 6px 10px;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.18);
 
   .slider-icon {
     font-family: $font-icon;
-    font-size: 12px;
+    font-size: 13px;
     color: $text-secondary;
   }
 
   scale,
   slider {
-    min-height: 20px;
-    min-width: 130px;
+    min-height: 22px;
+    min-width: 140px;
 
     trough {
       background-color: rgba(255, 255, 255, 0.14);
-      border-radius: 6px;
-      min-height: 6px;
-      min-width: 6px;
+      border-radius: 8px;
+      min-height: 8px;
     }
 
     highlight {
-      background-color: $text-primary;
-      border-radius: 6px;
-      min-height: 6px;
+      background: linear-gradient(90deg, rgba(255, 255, 255, 0.90) 0%, #ffffff 100%);
+      border-radius: 8px;
+      min-height: 8px;
+      box-shadow: 0 0 6px rgba(255, 255, 255, 0.35);
     }
 
     slider {
       background-color: #ffffff;
       border-radius: 50%;
-      min-height: 13px;
-      min-width: 13px;
-      margin: -3.5px 0;
-      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.4);
+      min-height: 16px;
+      min-width: 16px;
+      margin: -4px 0;
+      box-shadow:
+        0 2px 6px rgba(0, 0, 0, 0.40),
+        inset 0 1px 0 rgba(255, 255, 255, 0.9);
     }
   }
 }
 
 // ── Control Center Specific Styles ──
 .control-center-container {
-  padding: 10px;
-  min-width: 280px;
+  padding: 12px;
+  min-width: 290px;
 
   .cc-header-title {
-    font-size: 13px;
+    font-size: 13.5px;
     font-weight: 700;
     color: $text-primary;
   }
 
   .cc-tile {
-    background-color: $glass-card;
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    border-radius: 10px;
-    padding: 6px 8px;
+    background-color: rgba(255, 255, 255, 0.08);
+    background-image: linear-gradient(
+      180deg,
+      rgba(255, 255, 255, 0.12) 0%,
+      rgba(255, 255, 255, 0.02) 100%
+    );
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-top: 1px solid rgba(255, 255, 255, 0.30);
+    border-radius: 12px;
+    padding: 8px 10px;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.18);
     transition: all 120ms ease;
 
     &:hover {
-      background-color: $glass-card-hover;
+      background-color: rgba(255, 255, 255, 0.14);
+      border-top-color: rgba(255, 255, 255, 0.45);
     }
 
     &.active {
       background-color: $accent-blue;
-      border-color: rgba(255, 255, 255, 0.25);
+      border-color: rgba(255, 255, 255, 0.28);
 
       .cc-tile-icon,
       .cc-tile-title {
@@ -1076,7 +1182,7 @@ popover {
 
     .cc-tile-icon {
       font-family: $font-icon;
-      font-size: 15px;
+      font-size: 16px;
       color: $text-secondary;
     }
 
@@ -1092,10 +1198,52 @@ popover {
     }
   }
 
+  .cc-mini-toggles {
+    .cc-mini-tile {
+      background-color: rgba(255, 255, 255, 0.07);
+      border: 1px solid rgba(255, 255, 255, 0.10);
+      border-top: 1px solid rgba(255, 255, 255, 0.26);
+      border-radius: 10px;
+      padding: 6px 4px;
+      transition: all 120ms ease;
+
+      &:hover {
+        background-color: rgba(255, 255, 255, 0.14);
+        border-top-color: rgba(255, 255, 255, 0.45);
+      }
+
+      &.active {
+        background-color: $accent-blue;
+        border-color: rgba(255, 255, 255, 0.25);
+
+        .cc-mini-icon,
+        .cc-mini-label {
+          color: #ffffff;
+        }
+
+        &:hover {
+          background-color: $accent-blue-hover;
+        }
+      }
+
+      .cc-mini-icon {
+        font-family: $font-icon;
+        font-size: 13px;
+        color: $text-secondary;
+      }
+
+      .cc-mini-label {
+        font-size: 10.5px;
+        font-weight: 600;
+        color: $text-primary;
+      }
+    }
+  }
+
   .cc-slider-card {
-    background-color: rgba(255, 255, 255, 0.04);
-    border-radius: 10px;
-    padding: 5px 7px;
+    background-color: rgba(255, 255, 255, 0.05);
+    border-radius: 12px;
+    padding: 6px 8px;
 
     .cc-slider-title {
       font-size: 11px;
@@ -1111,9 +1259,11 @@ popover {
   }
 
   .cc-media-card {
-    background-color: $glass-card;
-    border-radius: 10px;
-    padding: 6px 8px;
+    background-color: rgba(255, 255, 255, 0.07);
+    border: 1px solid rgba(255, 255, 255, 0.10);
+    border-top: 1px solid rgba(255, 255, 255, 0.25);
+    border-radius: 12px;
+    padding: 8px 10px;
 
     .cc-media-icon {
       font-family: $font-icon;
@@ -1131,8 +1281,8 @@ popover {
       background-color: rgba(255, 255, 255, 0.10);
       border: none;
       border-radius: 50%;
-      min-width: 22px;
-      min-height: 22px;
+      min-width: 24px;
+      min-height: 24px;
       padding: 0;
       font-family: $font-icon;
       font-size: 10px;
@@ -1146,8 +1296,8 @@ popover {
       &.play-btn {
         background-color: $accent-blue;
         color: #ffffff;
-        min-width: 24px;
-        min-height: 24px;
+        min-width: 26px;
+        min-height: 26px;
         font-size: 11px;
 
         &:hover {
@@ -1158,19 +1308,23 @@ popover {
   }
 }
 
-// ── Popover Cards & Lists ──
+// ── Popover Cards & Interactive Lists ──
 .popover-card {
-  background-color: rgba(255, 255, 255, 0.07);
-  background-image: linear-gradient(180deg, rgba(255, 255, 255, 0.10) 0%, rgba(255, 255, 255, 0.02) 100%);
-  border: 1px solid rgba(255, 255, 255, 0.10);
-  border-top: 1px solid rgba(255, 255, 255, 0.22);
-  border-radius: 10px;
-  padding: 5px 7px;
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.12);
+  background-color: rgba(255, 255, 255, 0.08);
+  background-image: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.14) 0%,
+    rgba(255, 255, 255, 0.03) 100%
+  );
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-top: 1px solid rgba(255, 255, 255, 0.32);
+  border-radius: 12px;
+  padding: 8px 10px;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.18);
 
   .card-icon {
     font-family: $font-icon;
-    font-size: 15px;
+    font-size: 16px;
     color: $accent-blue;
   }
 
@@ -1181,34 +1335,89 @@ popover {
   }
 
   .card-subtitle {
-    font-size: 10px;
+    font-size: 10.5px;
     color: $text-secondary;
   }
 }
 
 .popover-card-list {
-  background-color: rgba(255, 255, 255, 0.07);
-  background-image: linear-gradient(180deg, rgba(255, 255, 255, 0.10) 0%, rgba(255, 255, 255, 0.02) 100%);
-  border: 1px solid rgba(255, 255, 255, 0.10);
-  border-top: 1px solid rgba(255, 255, 255, 0.22);
-  border-radius: 10px;
-  padding: 5px 7px;
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.12);
+  background-color: rgba(255, 255, 255, 0.06);
+  background-image: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.10) 0%,
+    rgba(255, 255, 255, 0.02) 100%
+  );
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-top: 1px solid rgba(255, 255, 255, 0.28);
+  border-radius: 12px;
+  padding: 4px;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.14);
+}
 
-  .network-list-text,
-  .device-list-text {
-    font-size: 11px;
-    color: $text-secondary;
-    line-height: 1.4;
+.popover-item-row {
+  background: transparent;
+  border: none;
+  border-radius: 8px;
+  padding: 6px 8px;
+  transition: all 120ms ease;
+
+  &:hover {
+    background-color: rgba(255, 255, 255, 0.14);
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.15);
   }
+
+  &.active {
+    background-color: rgba(0, 122, 255, 0.22);
+    border: 1px solid rgba(0, 122, 255, 0.40);
+  }
+
+  .item-title {
+    font-size: 11.5px;
+    font-weight: 500;
+    color: $text-primary;
+  }
+
+  .item-icon {
+    font-family: $font-icon;
+    font-size: 13px;
+    color: $accent-blue;
+  }
+
+  .item-lock-icon {
+    font-family: $font-icon;
+    font-size: 11px;
+    color: $text-dim;
+  }
+
+  .item-badge {
+    font-size: 9.5px;
+    font-weight: 600;
+    color: $accent-blue;
+    background-color: rgba(0, 122, 255, 0.18);
+    border-radius: 6px;
+    padding: 2px 6px;
+  }
+
+  .item-action-hint {
+    font-size: 9.5px;
+    font-weight: 500;
+    color: $text-dim;
+  }
+}
+
+.popover-empty-text {
+  font-size: 11px;
+  color: $text-dim;
+  padding: 6px 8px;
+  font-style: italic;
 }
 
 .popover-toggle-btn {
   background-color: rgba(255, 255, 255, 0.12);
   border: 1px solid rgba(255, 255, 255, 0.16);
   border-top: 1px solid rgba(255, 255, 255, 0.35);
-  border-radius: 6px;
-  padding: 2px 7px;
+  border-radius: 7px;
+  padding: 3px 8px;
   font-size: 10.5px;
   font-weight: 600;
   color: $text-primary;
@@ -1224,17 +1433,17 @@ popover {
 
 .preset-box {
   .preset-btn {
-    background-color: rgba(255, 255, 255, 0.07);
-    border: 1px solid rgba(255, 255, 255, 0.10);
-    border-radius: 6px;
-    padding: 3px 7px;
-    font-size: 10px;
+    background-color: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 7px;
+    padding: 4px 9px;
+    font-size: 10.5px;
     font-weight: 500;
     color: $text-secondary;
     transition: all 120ms ease;
 
     &:hover {
-      background-color: rgba(255, 255, 255, 0.14);
+      background-color: rgba(255, 255, 255, 0.16);
       color: $text-primary;
     }
 
@@ -1247,19 +1456,19 @@ popover {
 }
 
 .action-button {
-  background-color: rgba(255, 255, 255, 0.07);
-  background-image: linear-gradient(180deg, rgba(255, 255, 255, 0.10) 0%, rgba(255, 255, 255, 0.02) 100%);
-  border: 1px solid rgba(255, 255, 255, 0.10);
-  border-top: 1px solid rgba(255, 255, 255, 0.22);
-  border-radius: 8px;
-  padding: 5px 7px;
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.12);
+  background-color: rgba(255, 255, 255, 0.08);
+  background-image: linear-gradient(180deg, rgba(255, 255, 255, 0.12) 0%, rgba(255, 255, 255, 0.02) 100%);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-top: 1px solid rgba(255, 255, 255, 0.28);
+  border-radius: 10px;
+  padding: 6px 8px;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.14);
   transition: all 140ms ease;
 
   &:hover {
-    background-color: rgba(255, 255, 255, 0.13);
-    border-color: rgba(255, 255, 255, 0.18);
-    border-top-color: rgba(255, 255, 255, 0.35);
+    background-color: rgba(255, 255, 255, 0.15);
+    border-color: rgba(255, 255, 255, 0.20);
+    border-top-color: rgba(255, 255, 255, 0.40);
   }
 
   .action-icon {
@@ -1269,24 +1478,86 @@ popover {
   }
 
   label {
-    font-size: 11px;
+    font-size: 11.5px;
     font-weight: 500;
     color: $text-primary;
   }
 }
 
+// ── Calendar Popover ──
+.calendar-popover {
+  > contents {
+    border-radius: 14px;
+    min-width: 255px;
+  }
+
+  .calendar-container {
+    padding: 12px;
+  }
+
+  .glass-calendar {
+    background: transparent;
+    color: $text-primary;
+    border: none;
+    font-family: $font-main;
+
+    header {
+      background: transparent;
+      color: $text-primary;
+      font-weight: 600;
+      font-size: 12.5px;
+
+      button {
+        color: $text-secondary;
+        border-radius: 6px;
+        padding: 2px 6px;
+
+        &:hover {
+          background-color: rgba(255, 255, 255, 0.14);
+          color: #ffffff;
+        }
+      }
+    }
+
+    grid {
+      label {
+        font-size: 11px;
+        color: $text-secondary;
+        padding: 4px;
+      }
+    }
+
+    &:selected,
+    .day-number:selected {
+      background-color: $accent-blue;
+      border-radius: 50%;
+      color: #ffffff;
+    }
+
+    .today {
+      color: $accent-blue;
+      font-weight: 700;
+    }
+  }
+}
+
 // ── Power Menu Popover ──
 .power-popover {
+  > contents {
+    border-radius: 12px;
+  }
+
   .power-popover-content {
-    padding: 3px;
-    min-width: 150px;
+    padding: 4px;
+    min-width: 160px;
   }
 
   .power-option {
     background: transparent;
     border: none;
-    border-radius: 6px;
-    padding: 4px 7px;
+    border-radius: 7px;
+    padding: 5px 8px;
+    margin: 1px 0;
     transition: background-color 120ms ease;
 
     &:hover {
@@ -1305,7 +1576,7 @@ popover {
 
     .power-option-icon {
       font-family: $font-icon;
-      font-size: 13px;
+      font-size: 14px;
       color: $text-secondary;
     }
   }
@@ -1319,24 +1590,26 @@ window.Bar.glassy-dark popover,
 window.Bar.style-glassy.glassy-dark popover,
 window.Bar.light-theme .control-popover,
 window.Bar.light-theme .appmenu-popover,
+window.Bar.light-theme .calendar-popover,
 window.Bar.light-theme .power-popover {
-  background-color: rgba(248, 248, 252, 0.90);
-  background-image: linear-gradient(
-    180deg,
-    rgba(255, 255, 255, 0.98) 0%,
-    rgba(255, 255, 255, 0.85) 15%,
-    rgba(242, 244, 250, 0.82) 60%,
-    rgba(235, 238, 246, 0.92) 100%
-  );
-  border: 1px solid rgba(0, 0, 0, 0.09);
-  border-top: 1.5px solid rgba(255, 255, 255, 0.95);
-  border-radius: 16px;
-  box-shadow:
-    inset 0 1.5px 1px 0 rgba(255, 255, 255, 0.95),
-    inset 0 -1px 1px 0 rgba(255, 255, 255, 0.40),
-    0 16px 40px rgba(0, 0, 0, 0.14),
-    0 4px 10px rgba(0, 0, 0, 0.07);
-  color: $text-primary-light;
+  > contents {
+    background-color: rgba(246, 248, 252, 0.88);
+    background-image: linear-gradient(
+      180deg,
+      rgba(255, 255, 255, 0.98) 0%,
+      rgba(255, 255, 255, 0.88) 15%,
+      rgba(240, 244, 252, 0.84) 60%,
+      rgba(234, 239, 248, 0.94) 100%
+    );
+    border: 1px solid rgba(0, 0, 0, 0.10);
+    border-top: 1.5px solid rgba(255, 255, 255, 0.98);
+    box-shadow:
+      inset 0 1.5px 1px 0 rgba(255, 255, 255, 0.95),
+      inset 0 -1px 1px 0 rgba(255, 255, 255, 0.40),
+      0 18px 44px rgba(0, 0, 0, 0.14),
+      0 4px 12px rgba(0, 0, 0, 0.07);
+    color: $text-primary-light;
+  }
 
   separator {
     background-color: rgba(0, 0, 0, 0.08);
@@ -1348,6 +1621,7 @@ window.Bar.light-theme .power-popover {
   .card-title,
   .cc-slider-title,
   .cc-media-title,
+  .item-title,
   .menu-option-label {
     color: $text-primary-light;
   }
@@ -1356,8 +1630,8 @@ window.Bar.light-theme .power-popover {
   .cc-tile-subtitle,
   .card-subtitle,
   .cc-slider-value,
-  .network-list-text,
-  .device-list-text,
+  .item-action-hint,
+  .popover-empty-text,
   .menu-shortcut {
     color: $text-secondary-light;
   }
@@ -1405,6 +1679,72 @@ window.Bar.light-theme .power-popover {
 
     .cc-tile-icon {
       color: $text-secondary-light;
+    }
+  }
+
+  .popover-item-row {
+    &:hover {
+      background-color: rgba(0, 0, 0, 0.06);
+    }
+
+    &.active {
+      background-color: rgba(0, 122, 255, 0.14);
+      border-color: rgba(0, 122, 255, 0.35);
+    }
+  }
+
+  .cc-mini-toggles {
+    .cc-mini-tile {
+      background-color: rgba(0, 0, 0, 0.04);
+      border-color: rgba(0, 0, 0, 0.07);
+      border-top-color: rgba(255, 255, 255, 0.90);
+
+      .cc-mini-icon {
+        color: $text-secondary-light;
+      }
+      .cc-mini-label {
+        color: $text-primary-light;
+      }
+
+      &.active {
+        background-color: $accent-blue;
+        border-color: rgba(0, 0, 0, 0.10);
+
+        .cc-mini-icon,
+        .cc-mini-label {
+          color: #ffffff;
+        }
+      }
+    }
+  }
+
+  .glass-calendar {
+    color: $text-primary-light;
+
+    header {
+      color: $text-primary-light;
+
+      button {
+        color: $text-secondary-light;
+
+        &:hover {
+          background-color: rgba(0, 0, 0, 0.06);
+          color: #000000;
+        }
+      }
+    }
+
+    grid label {
+      color: $text-secondary-light;
+    }
+  }
+
+  .popover-action-icon-btn {
+    color: $text-secondary-light;
+
+    &:hover {
+      background-color: rgba(0, 0, 0, 0.06);
+      color: #000000;
     }
   }
 

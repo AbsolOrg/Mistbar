@@ -25,37 +25,88 @@ let autoHide = false
 let manuallyHidden = false
 let watcherStarted = false
 const openMenus = new Set<any>()
+const registeredMenuButtons = new Set<Gtk.MenuButton>()
+const registeredPopovers = new Set<Gtk.Popover>()
 
 export function isAnyMenuOpen(): boolean {
-  return openMenus.size > 0
+  if (openMenus.size > 0) return true
+  for (const btn of registeredMenuButtons) {
+    try {
+      if (btn.get_active && btn.get_active()) return true
+    } catch {}
+  }
+  for (const pop of registeredPopovers) {
+    try {
+      if (pop.get_visible && pop.get_visible()) return true
+    } catch {}
+  }
+  return false
+}
+
+function attachPopoverEvents(pop: Gtk.Popover) {
+  if (!pop || registeredPopovers.has(pop)) return
+  registeredPopovers.add(pop)
+
+  try {
+    pop.connect("notify::visible", (p: Gtk.Popover) => {
+      if (p.visible) {
+        openMenus.add(p)
+      } else {
+        openMenus.delete(p)
+      }
+      updateVisibility()
+    })
+
+    pop.connect("closed", () => {
+      openMenus.delete(pop)
+      updateVisibility()
+    })
+
+    // Track motion over popovers so interacting with popovers prevents bar auto-hide
+    const motion = new Gtk.EventControllerMotion()
+    motion.connect("enter", () => {
+      openMenus.add(pop)
+      for (const entry of barEntries) {
+        cancelGraceTimer(entry)
+        entry.isHovered = true
+      }
+    })
+    motion.connect("leave", () => {
+      for (const entry of barEntries) {
+        scheduleGraceHide(entry)
+      }
+    })
+    pop.add_controller(motion)
+  } catch (err) {
+    console.error("Error attaching popover events:", err)
+  }
 }
 
 export function registerMenuButton(btn: Gtk.MenuButton) {
   try {
+    if (registeredMenuButtons.has(btn)) return
+    registeredMenuButtons.add(btn)
+
     btn.connect("notify::active", (b: Gtk.MenuButton) => {
       if (b.active) {
         openMenus.add(b)
+        for (const entry of barEntries) {
+          cancelGraceTimer(entry)
+        }
       } else {
         openMenus.delete(b)
       }
       updateVisibility()
     })
 
+    btn.connect("notify::popover", (b: Gtk.MenuButton) => {
+      const pop = b.get_popover()
+      if (pop) attachPopoverEvents(pop)
+    })
+
     const pop = btn.get_popover()
     if (pop) {
-      pop.connect("notify::visible", (p: Gtk.Popover) => {
-        if (p.visible) {
-          openMenus.add(p)
-        } else {
-          openMenus.delete(p)
-        }
-        updateVisibility()
-      })
-      pop.connect("closed", () => {
-        openMenus.delete(pop)
-        openMenus.delete(btn)
-        updateVisibility()
-      })
+      attachPopoverEvents(pop)
     }
   } catch (err) {
     console.error("Error registering menu button:", err)
@@ -129,7 +180,7 @@ function cancelGraceTimer(entry: BarEntry) {
 function scheduleGraceHide(entry: BarEntry) {
   if (entry.graceTimerId) return
 
-  entry.graceTimerId = GLib.timeout_add(GLib.PRIORITY_DEFAULT, 250, () => {
+  entry.graceTimerId = GLib.timeout_add(GLib.PRIORITY_DEFAULT, 500, () => {
     entry.graceTimerId = 0
 
     if (!autoHide || manuallyHidden) return GLib.SOURCE_REMOVE
@@ -176,7 +227,7 @@ function updateEntryVisibility(entry: BarEntry) {
     cancelGraceTimer(entry)
     win.visible = true
     revealer.set_reveal_child(true)
-    if (!entry.hasWindow && triggerWin) {
+    if (triggerWin) {
       triggerWin.visible = false
     }
   } else {
@@ -192,17 +243,32 @@ export function updateVisibility() {
 }
 
 function checkWindowStatus() {
-  execAsync(["niri", "msg", "-j", "workspaces"])
+  execAsync([
+    "bash",
+    "-c",
+    "niri msg --json workspaces 2>/dev/null || hyprctl workspaces -j 2>/dev/null || swaymsg -t get_workspaces 2>/dev/null || echo '[]'"
+  ])
     .then((out: string) => {
       try {
-        const ws = JSON.parse(out)
+        const text = out.trim()
+        if (!text || text === "[]") return
+        const ws = JSON.parse(text)
         for (const entry of barEntries) {
           const conn = entry.monitor.get_connector ? entry.monitor.get_connector() : (entry.monitor as any).connector
           const act = ws.find((w: any) =>
-            w.is_active && (!conn || !w.output || w.output === conn)
+            (w.is_active || w.is_focused) && (!conn || !w.output || w.output === conn)
           ) || ws.find((w: any) => w.is_active || w.is_focused)
 
-          const has = Boolean(act && act.active_window_id !== null)
+          let has = false
+          if (act) {
+            if (act.active_window_id !== undefined) {
+              has = act.active_window_id !== null
+            } else if (act.windows !== undefined) {
+              has = act.windows > 0
+            } else if (act.representation !== undefined) {
+              has = act.representation !== null
+            }
+          }
           if (has !== entry.hasWindow) {
             entry.hasWindow = has
             updateEntryVisibility(entry)
@@ -210,63 +276,7 @@ function checkWindowStatus() {
         }
       } catch {}
     })
-    .catch(() => {
-      // Hyprland check
-      execAsync(["hyprctl", "workspaces", "-j"])
-        .then((out: string) => {
-          try {
-            const ws = JSON.parse(out)
-            execAsync(["hyprctl", "monitors", "-j"])
-              .then((mOut: string) => {
-                const monitors = JSON.parse(mOut)
-                for (const entry of barEntries) {
-                  const conn = entry.monitor.get_connector ? entry.monitor.get_connector() : (entry.monitor as any).connector
-                  const mon = monitors.find((m: any) => m.name === conn) || monitors.find((m: any) => m.focused)
-                  const actWsName = mon?.activeWorkspace?.name ?? mon?.activeWorkspace?.id
-                  const wObj = ws.find((w: any) => w.name === actWsName || w.id === actWsName)
-                  const has = Boolean(wObj && wObj.windows > 0)
-                  if (has !== entry.hasWindow) {
-                    entry.hasWindow = has
-                    updateEntryVisibility(entry)
-                  }
-                }
-              })
-              .catch(() => {
-                execAsync(["hyprctl", "activewindow", "-j"])
-                  .then((actOut: string) => {
-                    const act = JSON.parse(actOut)
-                    const has = Boolean(act && (act.title || act.class))
-                    for (const entry of barEntries) {
-                      if (has !== entry.hasWindow) {
-                        entry.hasWindow = has
-                        updateEntryVisibility(entry)
-                      }
-                    }
-                  })
-                  .catch(() => {})
-              })
-          } catch {}
-        })
-        .catch(() => {
-          // Sway check
-          execAsync(["swaymsg", "-t", "get_workspaces"])
-            .then((sOut: string) => {
-              try {
-                const sWs = JSON.parse(sOut)
-                for (const entry of barEntries) {
-                  const conn = entry.monitor.get_connector ? entry.monitor.get_connector() : (entry.monitor as any).connector
-                  const focused = sWs.find((w: any) => (!conn || w.output === conn) && w.focused) || sWs.find((w: any) => w.focused)
-                  const has = Boolean(focused && (focused.representation !== null || focused.windows > 0))
-                  if (has !== entry.hasWindow) {
-                    entry.hasWindow = has
-                    updateEntryVisibility(entry)
-                  }
-                }
-              } catch {}
-            })
-            .catch(() => {})
-        })
-    })
+    .catch(() => {})
 }
 
 function startWindowWatcher() {
@@ -294,7 +304,7 @@ function createTriggerWindow(
   const triggerBox = new Gtk.Box({
     css_classes: ["mistbar-hot-edge"],
   })
-  triggerBox.set_size_request(-1, 2)
+  triggerBox.set_size_request(-1, 3)
 
   const motion = new Gtk.EventControllerMotion()
   motion.connect("enter", () => {
@@ -440,6 +450,7 @@ export default function Bar(gdkmonitor: Gdk.Monitor, config: MistbarConfig = def
   const triggerWin = createTriggerWindow(
     gdkmonitor,
     () => {
+      cancelGraceTimer(entry)
       entry.isTriggerHovered = true
       updateEntryVisibility(entry)
     },
@@ -453,6 +464,7 @@ export default function Bar(gdkmonitor: Gdk.Monitor, config: MistbarConfig = def
   // 6. Connect motion controller to outerBox
   const motion = new Gtk.EventControllerMotion()
   motion.connect("enter", () => {
+    cancelGraceTimer(entry)
     entry.isHovered = true
     updateEntryVisibility(entry)
   })
@@ -477,6 +489,10 @@ export default function Bar(gdkmonitor: Gdk.Monitor, config: MistbarConfig = def
         if (autoHide && !manuallyHidden && entry.triggerWin) {
           entry.triggerWin.visible = true
         }
+      }
+    } else {
+      if (autoHide && entry.triggerWin) {
+        entry.triggerWin.visible = false
       }
     }
   })

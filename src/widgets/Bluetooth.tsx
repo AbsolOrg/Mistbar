@@ -50,7 +50,7 @@ interface BtDevice {
 const btDevicesJson = createPoll(
   "[]",
   4000,
-  ["bash", "-c", `python3 -c '
+  ["python3", "-c", `
 import subprocess, json
 try:
     paired = subprocess.check_output(["bluetoothctl", "devices"], text=True, timeout=2).strip().splitlines()
@@ -71,7 +71,7 @@ try:
     print(json.dumps(devices))
 except:
     print("[]")
-' 2>/dev/null || echo '[]'`],
+`],
 )
 
 function getBtDeviceIcon(name: string): string {

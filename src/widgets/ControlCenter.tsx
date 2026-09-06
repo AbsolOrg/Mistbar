@@ -70,7 +70,7 @@ const mediaStatus = createPoll(
 const isDarkMode = createPoll(
   true,
   3000,
-  ["bash", "-c", `python3 -c '
+  ["python3", "-c", `
 import json, os
 path = os.path.expanduser("~/.config/mistbar/config.json")
 try:
@@ -79,14 +79,14 @@ try:
     print("true" if d.get("theme", "dark") == "dark" else "false")
 except:
     print("true")
-' 2>/dev/null || echo "true"`],
+`],
   (out: string) => out.trim() === "true"
 )
 
 const isAutohideOn = createPoll(
   false,
   3000,
-  ["bash", "-c", `python3 -c '
+  ["python3", "-c", `
 import json, os
 path = os.path.expanduser("~/.config/mistbar/config.json")
 try:
@@ -95,7 +95,7 @@ try:
     print("true" if d.get("autoHide", False) else "false")
 except:
     print("false")
-' 2>/dev/null || echo "false"`],
+`],
   (out: string) => out.trim() === "true"
 )
 

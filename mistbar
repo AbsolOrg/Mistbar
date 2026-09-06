@@ -161,9 +161,9 @@ cmd_start() {
     # Launch daemon in background detached from current terminal
     setsid -f ags run -d "$SRC_DIR" >"$log_file" 2>&1
 
-    # Wait up to 3 seconds for instance to register
+    # Wait up to 7 seconds for instance to register
     local count=0
-    while [ $count -lt 15 ]; do
+    while [ $count -lt 35 ]; do
         if ags list 2>/dev/null | grep -q "$INSTANCE_NAME"; then
             echo -e "${GREEN}✓ Mistbar started successfully!${NC}"
             return 0
@@ -184,17 +184,29 @@ cmd_stop() {
     echo -e "${BLUE}Stopping Mistbar...${NC}"
     if ags list 2>/dev/null | grep -q "$INSTANCE_NAME"; then
         ags quit -i "$INSTANCE_NAME" 2>/dev/null || true
-        sleep 0.3
+        local quit_wait=0
+        while ags list 2>/dev/null | grep -q "$INSTANCE_NAME" && [ $quit_wait -lt 20 ]; do
+            sleep 0.1
+            quit_wait=$((quit_wait + 1))
+        done
     fi
 
-    # Force kill any remaining ags run process for this directory
+    # Terminate any remaining ags run or gjs process for this source directory
     pkill -f "ags run -d $SRC_DIR" 2>/dev/null || true
+
+    local wait_count=0
+    while pgrep -f "ags run -d $SRC_DIR" >/dev/null 2>&1 && [ $wait_count -lt 15 ]; do
+        sleep 0.1
+        wait_count=$((wait_count + 1))
+    done
+    sleep 0.2
+
     echo -e "${GREEN}✓ Mistbar stopped.${NC}"
 }
 
 cmd_restart() {
     cmd_stop
-    sleep 0.5
+    sleep 0.4
     cmd_start "$@"
 }
 

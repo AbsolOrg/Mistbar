@@ -41,7 +41,7 @@ interface AudioSink {
 const audioSinksJson = createPoll(
   "[]",
   3000,
-  ["bash", "-c", `python3 -c '
+  ["python3", "-c", `
 import subprocess, re, json
 try:
     out = subprocess.check_output(["wpctl", "status"], text=True, timeout=2)
@@ -54,16 +54,16 @@ try:
         if in_sinks:
             if line.strip() == "" or "Sources:" in line or "Filters:" in line or "Streams:" in line:
                 break
-            m = re.search(r"(\*?)\s*(\d+)\.\s+([^\[]+)", line)
+            m = re.search(r"(\\*)?\\s*(\\d+)\\.\\s+([^\\[]+)", line)
             if m:
-                is_default = m.group(1) == "*"
+                is_default = bool(m.group(1))
                 sink_id = m.group(2)
                 name = m.group(3).strip()
                 sinks.append({"id": sink_id, "name": name, "isDefault": is_default})
     print(json.dumps(sinks))
 except:
     print("[]")
-' 2>/dev/null || echo '[]'`],
+`],
 )
 
 export default function Volume() {

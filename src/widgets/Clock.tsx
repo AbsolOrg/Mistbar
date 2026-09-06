@@ -1,20 +1,20 @@
 import Gtk from "gi://Gtk?version=4.0"
 import { createPoll } from "ags/time"
 
+// Exact macOS format as in Apple docs: "Tue Apr 1  9:41 AM"
+const time = createPoll(
+  "",
+  1000,
+  ["date", "+%a %b %-d  %-I:%M %p"]
+)
+
+const fullDate = createPoll(
+  "",
+  60000,
+  ["date", "+%A, %B %-d, %Y"]
+)
+
 export default function Clock() {
-  // Exact macOS format as in Apple docs: "Tue Apr 1  9:41 AM"
-  const time = createPoll(
-    "",
-    1000,
-    ["date", "+%a %b %-d  %-I:%M %p"]
-  )
-
-  const fullDate = createPoll(
-    "",
-    60000,
-    ["date", "+%A, %B %-d, %Y"]
-  )
-
   return (
     <menubutton class="status-icon clock-btn" tooltipText="Calendar & Time">
       <label class="clock" label={time} />

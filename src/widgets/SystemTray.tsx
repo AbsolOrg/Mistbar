@@ -12,7 +12,7 @@ interface TrayItem {
 const trayItemsJson = createPoll(
   "[]",
   3000,
-  ["bash", "-c", `python3 -c '
+  ["python3", "-c", `
 import subprocess, json
 
 def get_tray():
@@ -28,7 +28,7 @@ def get_tray():
         raw = out.strip()
         if "[" in raw:
             content = raw[raw.index("[")+1:raw.index("]")]
-            entries = [x.strip().strip("\\x27\\"") for x in content.split(",") if x.strip()]
+            entries = [x.strip().strip("'\\"") for x in content.split(",") if x.strip()]
             for e in entries:
                 if "/" in e:
                     service = e[:e.index("/")]
@@ -37,6 +37,7 @@ def get_tray():
                     service = e
                     path = "/StatusNotifierItem"
                 
+                icon = ""
                 try:
                     icon_out = subprocess.check_output([
                         "gdbus", "call", "--session",
@@ -45,10 +46,13 @@ def get_tray():
                         "--method", "org.freedesktop.DBus.Properties.Get",
                         "org.kde.StatusNotifierItem", "IconName"
                     ], text=True, timeout=1).strip()
-                    icon = icon_out.replace("(<", "").replace(">,)", "").strip("\x27\\" ")
+                    for ch in ["(", ")", "<", ">", "'", '"', ","]:
+                        icon_out = icon_out.replace(ch, "")
+                    icon = icon_out.strip()
                 except:
-                    icon = ""
+                    pass
 
+                title = service
                 try:
                     title_out = subprocess.check_output([
                         "gdbus", "call", "--session",
@@ -57,9 +61,11 @@ def get_tray():
                         "--method", "org.freedesktop.DBus.Properties.Get",
                         "org.kde.StatusNotifierItem", "Title"
                     ], text=True, timeout=1).strip()
-                    title = title_out.replace("(<", "").replace(">,)", "").strip("\x27\\" ")
+                    for ch in ["(", ")", "<", ">", "'", '"', ","]:
+                        title_out = title_out.replace(ch, "")
+                    title = title_out.strip() or service
                 except:
-                    title = service
+                    pass
                 
                 items.append({"service": service, "path": path, "title": title, "icon": icon})
     except:
@@ -67,7 +73,7 @@ def get_tray():
     print(json.dumps(items))
 
 get_tray()
-' 2>/dev/null || echo '[]'`],
+`],
 )
 
 export default function SystemTray() {

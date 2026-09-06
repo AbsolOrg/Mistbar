@@ -83,7 +83,7 @@ const wifiRadioState = createPoll(
 const wifiNetworksJson = createPoll(
   "[]",
   6000,
-  ["bash", "-c", `python3 -c '
+  ["python3", "-c", `
 import subprocess, json
 try:
     out = subprocess.check_output(["nmcli", "-t", "-f", "IN-USE,SSID,SIGNAL,SECURITY", "dev", "wifi", "list"], text=True, timeout=4)
@@ -103,7 +103,7 @@ try:
     print(json.dumps(networks[:6]))
 except:
     print("[]")
-' 2>/dev/null || echo '[]'`],
+`],
 )
 
 function getSignalIcon(signal: number): string {

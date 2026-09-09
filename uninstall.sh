@@ -226,7 +226,7 @@ fi
 echo ""
 echo -e "${GREEN}${BOLD}✓ Mistbar has been successfully uninstalled.${NC}"
 echo -e "To reinstall anytime, run:"
-echo -e "  ${CYAN}bash -c \"\$(curl -fsSL https://raw.githubusercontent.com/AbsolOrg/Mistbar/main/install.sh)\"${NC}"
+echo -e "  ${CYAN}bash -c \"\$(curl -fsSL https://raw.githubusercontent.com/TattvaOrg/Mistbar/main/install.sh)\"${NC}"
 
 if [ "$DELETE_INSTALL_DIR" = true ]; then
     rm -rf "$INSTALL_DIR"

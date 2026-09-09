@@ -44,7 +44,7 @@ You can try Mistbar live without downloading or installing anything permanently:
 
 ```bash
 # One-liner remote preview:
-curl -sSL https://raw.githubusercontent.com/AbsolOrg/Mistbar/main/view.sh | bash
+curl -sSL https://raw.githubusercontent.com/TattvaOrg/Mistbar/main/view.sh | bash
 
 # Or from local clone:
 ./view.sh
@@ -59,7 +59,7 @@ Press `Ctrl+C` at any time to close the preview and clean up.
 Run this one-liner in your terminal to install Mistbar directly:
 
 ```bash
-bash -c "$(curl -fsSL https://raw.githubusercontent.com/AbsolOrg/Mistbar/main/install.sh)"
+bash -c "$(curl -fsSL https://raw.githubusercontent.com/TattvaOrg/Mistbar/main/install.sh)"
 ```
 
 The installer will:
@@ -83,7 +83,7 @@ mistbar update
 ### Manual Installation (From Local Clone)
 
 ```bash
-git clone https://github.com/AbsolOrg/Mistbar.git
+git clone https://github.com/TattvaOrg/Mistbar.git
 cd Mistbar
 ./install.sh
 ```

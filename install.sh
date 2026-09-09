@@ -7,7 +7,7 @@ set -euo pipefail
 
 INSTALL_DIR="${MISTBAR_DIR:-$HOME/.mistbar}"
 BIN_TARGET="$HOME/.local/bin/mistbar"
-REPO_URL="https://github.com/AbsolOrg/Mistbar.git"
+REPO_URL="https://github.com/TattvaOrg/Mistbar.git"
 INSTANCE_NAME="mistbar"
 
 RED='\033[0;31m'

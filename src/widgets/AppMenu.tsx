@@ -298,7 +298,7 @@ export default function AppMenu() {
             </button>
             <button
               class="menu-option-btn"
-              onClicked={() => execAsync(["bash", "-c", "xdg-open 'https://github.com/AbsolOrg/Mistbar' 2>/dev/null || true"]).catch(console.error)}
+              onClicked={() => execAsync(["bash", "-c", "xdg-open 'https://github.com/TattvaOrg/Mistbar' 2>/dev/null || true"]).catch(console.error)}
             >
               <box spacing={16}>
                 <label class="menu-option-label" label="Mistbar Documentation" hexpand halign={Gtk.Align.START} />

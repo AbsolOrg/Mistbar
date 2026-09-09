@@ -65,7 +65,7 @@ fi
 if [ -z "$SRC_DIR" ]; then
     echo -e "${BLUE}Fetching Mistbar for live preview...${NC}"
     CLEANUP_DIR="$(mktemp -d /tmp/mistbar-preview.XXXXXX)"
-    git clone --depth 1 https://github.com/AbsolOrg/Mistbar.git "$CLEANUP_DIR" >/dev/null 2>&1
+    git clone --depth 1 https://github.com/TattvaOrg/Mistbar.git "$CLEANUP_DIR" >/dev/null 2>&1
     SRC_DIR="$CLEANUP_DIR/src"
 fi
 

@@ -1,8 +1,3 @@
-#!/usr/bin/env bash
-# ============================================================================
-# Mistbar Uninstallation Script
-# ============================================================================
-
 set -euo pipefail
 
 INSTALL_DIR="${MISTBAR_DIR:-$HOME/.mistbar}"
